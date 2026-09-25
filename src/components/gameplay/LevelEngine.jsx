@@ -413,11 +413,7 @@ const LevelEngine = ({ config }) => {
   const [lockToast, setLockToast] = useState(null);
   const [buildChoice, setBuildChoice] = useState(null);
 
-  useEffect(() => {
-    if (stage > 1 && stage < 6) {
-      playSound('level_unlock');
-    }
-  }, [stage, playSound]);
+
 
   const timers = useRef([]);
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
@@ -429,11 +425,7 @@ const LevelEngine = ({ config }) => {
   const builderData = useMemo(() => getBuilderDataForLevel(config.id), [config]);
   const buildActions = builderData.buildings;
 
-  useEffect(() => {
-    if (stage === 6 && !isReplay && config.id !== 14) {
-      playSound('level_complete');
-    }
-  }, [stage, isReplay, config.id, playSound]);
+
 
 
   const isBeginner = config.id <= 3;
@@ -484,6 +476,18 @@ const LevelEngine = ({ config }) => {
   const theme = levelThemes[config.id] || levelThemes.default;
 
   const { stage, exploration, discovery, learning, completedChallenges, builtItems, resources, activePopup } = levelState;
+
+  useEffect(() => {
+    if (stage > 1 && stage < 6) {
+      playSound('level_unlock');
+    }
+  }, [stage, playSound]);
+
+  useEffect(() => {
+    if (stage === 6 && !isReplay && config.id !== 14) {
+      playSound('level_complete');
+    }
+  }, [stage, isReplay, config.id, playSound]);
 
   // Track stage upgrades for notifications
   const previousStage = useRef(stage);
