@@ -6,7 +6,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { getAdaptiveText } from '../utils/ageUtils';
 import { levelThemes } from '../data/levelThemes';
 import { questData } from '../data/quests';
-import { Lock, Unlock, CheckCircle, Star } from 'lucide-react';
+import { Lock, Unlock, CheckCircle, Star, ArrowRight } from 'lucide-react';
 import BackButton from '../components/common/BackButton';
 
 const JourneyPage = () => {
