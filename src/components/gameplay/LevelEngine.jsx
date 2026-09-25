@@ -7,13 +7,12 @@ import { minigamesData } from '../../data/minigames';
 import MiniGameManager from '../minigames/MiniGameManager';
 import FinalSequence from './FinalSequence';
 import { useAchievements } from '../../context/AchievementContext';
-import { Star, CheckCircle, ArrowRight, Bot, Target, Lock, Play, Hammer, Trophy } from 'lucide-react';
+import { Star, CheckCircle, ArrowRight, Bot, Target, Lock, Play, Hammer, Trophy, Search } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { levelThemes } from '../../data/levelThemes';
 import ResourceCard from './ResourceCard';
 import { getBuilderDataForLevel } from '../../data/civilizationBuilder';
 import { artifactInvestigations } from '../../data/artifactInvestigations';
-import { Search } from 'lucide-react';
 import BackButton from '../common/BackButton';
 import { adaptTextForAge, adaptQuestionForAge } from '../../utils/ageAdapter';
 
