@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -61,11 +61,11 @@ const OnboardingPage = () => {
           <div className="text-center animate-in fade-in slide-in-from-right-8 duration-500 max-w-2xl mx-auto">
             <h2 className="text-3xl font-serif font-bold text-content mb-8">{t('nav.howItWorks')}</h2>
             <div className="flex justify-center items-center gap-2 text-gold font-bold text-sm md:text-base tracking-wider uppercase flex-wrap mb-10">
-              <span>Explore</span> <span className="text-content/30">â†’</span>
-              <span>Discover</span> <span className="text-content/30">â†’</span>
-              <span>Learn</span> <span className="text-content/30">â†’</span>
-              <span>Play</span> <span className="text-content/30">â†’</span>
-              <span>Solve</span> <span className="text-content/30">â†’</span>
+              <span>Explore</span> <span className="text-content/30">→</span>
+              <span>Discover</span> <span className="text-content/30">→</span>
+              <span>Learn</span> <span className="text-content/30">→</span>
+              <span>Play</span> <span className="text-content/30">→</span>
+              <span>Solve</span> <span className="text-content/30">→</span>
               <span>Build</span>
             </div>
             <div className="bg-main/50 p-6 md:p-8 rounded-2xl border border-content/10 text-left shadow-inner">
@@ -114,7 +114,7 @@ const OnboardingPage = () => {
       case 4:
         return (
           <div className="text-center animate-in fade-in zoom-in duration-500 max-w-md mx-auto">
-            <div className="text-6xl mb-6">ðŸ›ï¸</div>
+            <div className="text-6xl mb-6">🏛️</div>
             <h1 className="text-4xl font-serif font-bold text-content mb-4">{t('common.continue')}</h1>
             <p className="text-xl text-gold mb-8">{t('auth.welcome')}, {gameState.name}.</p>
             <div className="bg-surface p-6 rounded-2xl border border-gold/30 mb-8 inline-block shadow-[0_0_30px_rgba(212,166,74,0.15)]">
@@ -129,7 +129,7 @@ const OnboardingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-main text-content flex flex-col relative overflow-hidden bg-[url('/pattern.svg')] bg-repeat">
+    <div className="min-h-screen bg-main text-content flex flex-col relative overflow-hidden  bg-repeat">
       <div className="absolute inset-0 bg-gradient-to-b from-main/80 to-main pointer-events-none" />
       
       {/* Header Progress */}

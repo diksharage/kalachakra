@@ -99,7 +99,7 @@ const InvestigationDetail = () => {
       </div>
 
       <div className={`aspect-video w-full rounded-2xl border ${levelThemeData.border} relative overflow-hidden flex items-center justify-center ${theme === 'light' ? levelThemeData.bg : 'bg-surface'}`}>
-        <div className="absolute inset-0 opacity-10 bg-[url('/pattern.svg')]"></div>
+        <div className="absolute inset-0 opacity-10 "></div>
         <div className="text-[100px] md:text-[150px] relative z-0 opacity-50 drop-shadow-2xl">{inv.icon}</div>
         
         {/* Hotspots for clues */}
