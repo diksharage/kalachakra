@@ -704,9 +704,51 @@ const LevelEngine = ({ config }) => {
                 <div className="text-6xl mb-4 opacity-50 grayscale">{data.icon}</div>
                 <h3 className={"text-2xl font-bold mb-2 uppercase " + theme.primary}>Unknown Location</h3>
                 <p className="text-content/80 mb-6">Investigate this area to find clues about {config.title}.</p>
-                <button onClick={() => markExplored(data)} className={"px-6 py-3 font-bold rounded-xl w-full " + theme.button}>
-                Mark as Explored
-              </button>
+                
+                {!data.exploreRole ? (
+                  <div className="animate-fade-in">
+                    <p className="mb-4 text-sm font-bold opacity-70">Choose your Explore approach:</p>
+                    <div className="grid grid-cols-2 gap-3 mb-6">
+                      <button onClick={() => setLevelState(prev => ({ ...prev, activePopup: { ...prev.activePopup, data: { ...prev.activePopup.data, exploreRole: 'Explorer' } } }))} className="p-3 bg-surface/50 border border-blue-500/30 rounded-xl hover:bg-blue-500/10 hover:border-blue-500 transition-colors">
+                        <div className="font-bold text-blue-500">Explorer</div>
+                        <div className="text-[10px] opacity-70 mt-1">Survey terrain</div>
+                      </button>
+                      <button onClick={() => setLevelState(prev => ({ ...prev, activePopup: { ...prev.activePopup, data: { ...prev.activePopup.data, exploreRole: 'Strategist' } } }))} className="p-3 bg-surface/50 border border-purple-500/30 rounded-xl hover:bg-purple-500/10 hover:border-purple-500 transition-colors">
+                        <div className="font-bold text-purple-500">Strategist</div>
+                        <div className="text-[10px] opacity-70 mt-1">Assess resources</div>
+                      </button>
+                      <button onClick={() => setLevelState(prev => ({ ...prev, activePopup: { ...prev.activePopup, data: { ...prev.activePopup.data, exploreRole: 'Historian' } } }))} className="p-3 bg-surface/50 border border-emerald-500/30 rounded-xl hover:bg-emerald-500/10 hover:border-emerald-500 transition-colors">
+                        <div className="font-bold text-emerald-500">Historian</div>
+                        <div className="text-[10px] opacity-70 mt-1">Seek context</div>
+                      </button>
+                      <button onClick={() => setLevelState(prev => ({ ...prev, activePopup: { ...prev.activePopup, data: { ...prev.activePopup.data, exploreRole: 'Builder' } } }))} className="p-3 bg-surface/50 border border-orange-500/30 rounded-xl hover:bg-orange-500/10 hover:border-orange-500 transition-colors">
+                        <div className="font-bold text-orange-500">Builder</div>
+                        <div className="text-[10px] opacity-70 mt-1">Analyze structures</div>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="animate-fade-in text-left">
+                    <div className="mb-6 bg-surface/50 p-5 rounded-xl border border-content/10">
+                      <h4 className="font-bold text-gold mb-3 flex items-center gap-2">
+                        <span>{data.exploreRole} Experience</span>
+                        <span className="px-2 py-0.5 rounded text-[10px] bg-gold/10 border border-gold/30">Active</span>
+                      </h4>
+                      <p className="text-sm text-content/90 mb-4 leading-relaxed">
+                        {data.exploreRole === 'Explorer' && "You scout the terrain, mapping the physical boundaries and discovering hidden paths in the area."}
+                        {data.exploreRole === 'Strategist' && "You evaluate the natural resources, trade routes, and geographical advantages of this site."}
+                        {data.exploreRole === 'Historian' && "You look for traces of past events, local lore, and contextual evidence in the landscape."}
+                        {data.exploreRole === 'Builder' && "You analyze the ground for its structural potential, material availability, and spatial layout."}
+                      </p>
+                      <div className="flex items-center gap-2 text-xs text-green-400 font-bold mb-4">
+                        <CheckCircle size={14} /> Objectives Completed
+                      </div>
+                      <button onClick={() => markExplored(data)} className={"px-6 py-3 font-bold rounded-xl w-full flex items-center justify-center gap-2 " + theme.button}>
+                        <Search size={16} /> Mark as Explored
+                      </button>
+                    </div>
+                  </div>
+                )}
             </>
           )}
 

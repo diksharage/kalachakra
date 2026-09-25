@@ -36,7 +36,7 @@ const MapMarker = ({ loc, isUnlocked, isDiscovered, isSelected, onClick, theme }
 
 const ExplorePage = () => {
   const { t } = useLanguage();
-  const { gameState, unlockArtifact, updateResources } = useGame();
+  const { gameState, unlockArtifact, updateResources, updateActiveLevelState } = useGame();
   const { theme } = useTheme();
   const navigate = useNavigate();
 
@@ -57,8 +57,25 @@ const ExplorePage = () => {
       unlockArtifact(loc.libraryId);
       updateResources({ legacy: 15 });
     }
-    // Also navigate to library to view it
-    navigate('/library?item=' + loc.libraryId);
+    
+    // Update the current level's Explore objective if they are actively playing this level
+    if (gameState.activeLevelId === loc.level && gameState.activeLevelState) {
+      const currentState = gameState.activeLevelState;
+      const currentExp = currentState.exploration || [];
+      if (!currentExp.includes(loc.id)) {
+        // We calculate if this triggers stage progression
+        const targetExplore = Math.min(
+          gameState.ageGroup === '6-8' || gameState.ageGroup === '9-11' ? 2 : 
+          gameState.activeLevelId >= 8 ? 4 : 3, 
+          5 // max default
+        ); // simplified approximation just for safety, LevelEngine does the exact check
+        
+        updateActiveLevelState(loc.level, {
+          ...currentState,
+          exploration: [...currentExp, loc.id]
+        });
+      }
+    }
   };
 
   const levelsOptions = [{ id: 'all', label: 'All Eras' }, ...civilizationLevels.map(l => ({ id: l.id, label: `Level ${l.id}` }))];

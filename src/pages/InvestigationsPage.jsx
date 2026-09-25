@@ -100,7 +100,7 @@ const InvestigationsPage = () => {
           );
         })}
       </div>
-      {availableInvestigations.length === 0 && (
+      {artifactInvestigations.length === 0 && (
         <div className="py-12 text-center text-content/50 border border-content/10 border-dashed rounded-2xl bg-surface/30">
           {t('investigation.no_entries', 'No investigations found.')}
         </div>
