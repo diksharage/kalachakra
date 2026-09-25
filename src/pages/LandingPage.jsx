@@ -5,7 +5,8 @@ import { useTheme } from '../context/ThemeContext';
 import { Compass, Book, Hammer, Trophy, Map, Brain, Shield, Gamepad2, ArrowRight, Sun, Moon } from 'lucide-react';
 
 const LandingPage = () => {
-  const { t, language, setLanguage } = useLanguage();
+  const { t } = useLanguage();
+
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
@@ -23,15 +24,6 @@ const LandingPage = () => {
           <button onClick={toggleTheme} className="p-2 hover:bg-surface rounded-full transition-colors text-gold">
             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
           </button>
-          <select 
-            value={language || 'en'}
-            onChange={(e) => setLanguage(e.target.value)}
-            className="bg-transparent text-content border border-gold/30 rounded px-2 py-1 focus:outline-none focus:border-gold transition-colors"
-          >
-            <option value="en" className="bg-main">EN</option>
-            <option value="hi" className="bg-main">HI</option>
-            <option value="te" className="bg-main">TE</option>
-          </select>
           <a href="#how-it-works" className="hidden sm:block hover:text-gold transition-colors">{t('nav.howItWorks')}</a>
           <a href="#journey-preview" className="hidden sm:block hover:text-gold transition-colors">Journey Preview</a>
           <button 

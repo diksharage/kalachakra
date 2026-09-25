@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
 import { authService } from '../services/authService';
@@ -17,7 +17,8 @@ const AuthPage = () => {
   const [loading, setLoading] = useState(false);
   
   const { loginUser, gameState } = useGame();
-  const { t, language, setLanguage } = useLanguage();
+  const { t } = useLanguage();
+
   const navigate = useNavigate();
 
   // Redirect if already authenticated
@@ -78,18 +79,6 @@ const AuthPage = () => {
       <div className="absolute inset-0 opacity-10 z-0 pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNENEE2NEEiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')] animate-drift" />
       <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#C49A45]/15 rounded-full blur-[100px] pointer-events-none animate-flicker" />
 
-      {/* Language Selector at the top right */}
-      <div className="absolute top-6 right-6 z-20">
-        <select 
-          value={language || 'en'}
-          onChange={(e) => setLanguage(e.target.value)}
-          className="bg-[#211A15]/80 text-[#E8D9B8] border border-[#A97932]/40 rounded-xl px-4 py-2 font-bold focus:outline-none focus:border-[#C49A45] shadow-lg backdrop-blur-md cursor-pointer hover:bg-[#285943]/40 transition-colors"
-        >
-          <option value="en">English</option>
-          <option value="hi">हिन्दी</option>
-          <option value="te">తెలుగు</option>
-        </select>
-      </div>
 
       <div className="relative z-10 w-full max-w-md">
         {/* Title & Atmosphere */}

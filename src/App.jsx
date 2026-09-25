@@ -1,13 +1,12 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { GameProvider } from './context/GameContext';
-import { LanguageProvider, useLanguage } from './context/LanguageContext';
+import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { AchievementProvider } from './context/AchievementContext';
 import { AudioProvider } from './context/AudioContext';
 import GameLayout from './components/layout/GameLayout';
 import ProtectedRoute from './components/layout/ProtectedRoute';
-import LanguageSelectionScreen from './components/LanguageSelectionScreen';
 
 // Pages
 import LandingPage from './pages/LandingPage';
@@ -35,17 +34,15 @@ import LevelIntroPage from './pages/LevelIntroPage';
 import LevelPlayPage from './pages/LevelPlayPage';
 
 const AppContent = () => {
-  const { language } = useLanguage();
-
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Navigate to="/auth" replace />} />
         <Route path="/auth" element={<AuthPage />} />
-        
+
         <Route element={<ProtectedRoute />}>
           <Route path="/onboarding" element={<OnboardingPage />} />
-          
+
           <Route element={<GameLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/journey" element={<JourneyPage />} />
@@ -60,7 +57,6 @@ const AppContent = () => {
             <Route path="/library/:categoryId/:bookId" element={<BookPage />} />
             <Route path="/achievements" element={<AchievementsPage />} />
             <Route path="/inventory" element={<InventoryPage />} />
-            <Route path="/library" element={<LibraryPage />} />
             <Route path="/investigations" element={<InvestigationsPage />} />
             <Route path="/quests" element={<QuestsPage />} />
             <Route path="/builder" element={<BuilderPage />} />
@@ -69,7 +65,7 @@ const AppContent = () => {
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Route>
-        
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
@@ -80,28 +76,16 @@ function App() {
   return (
     <AudioProvider>
       <GameProvider>
-      <ThemeProvider>
-        <LanguageProvider>
-          <AchievementProvider>
-            <AppContent />
-          </AchievementProvider>
-        </LanguageProvider>
-      </ThemeProvider>
-    </GameProvider>
+        <ThemeProvider>
+          <LanguageProvider>
+            <AchievementProvider>
+              <AppContent />
+            </AchievementProvider>
+          </LanguageProvider>
+        </ThemeProvider>
+      </GameProvider>
     </AudioProvider>
   );
 }
 
 export default App;
-
-
-
-
-
-
-
-
-
-
-
-
