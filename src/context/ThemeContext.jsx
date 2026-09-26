@@ -1,5 +1,4 @@
-﻿import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useGame } from './GameContext';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const ThemeContext = createContext();
 
@@ -13,16 +12,6 @@ export const ThemeProvider = ({ children }) => {
     }
     return 'dark'; // Kalachakra default identity is dark/heritage
   });
-
-  const { gameState, updateGameState } = useGame();
-
-  // Sync from gameState if available
-  useEffect(() => {
-    if (gameState?.theme && gameState.theme !== theme) {
-      setThemeState(gameState.theme);
-      localStorage.setItem('kalachakra_theme', gameState.theme);
-    }
-  }, [gameState?.theme]);
 
   // Apply theme to document element so CSS variables switch
   useEffect(() => {
@@ -39,9 +28,6 @@ export const ThemeProvider = ({ children }) => {
   const setTheme = (newTheme) => {
     setThemeState(newTheme);
     localStorage.setItem('kalachakra_theme', newTheme);
-    if (gameState?.name) {
-      updateGameState({ theme: newTheme });
-    }
   };
 
   const toggleTheme = () => {
@@ -56,6 +42,3 @@ export const ThemeProvider = ({ children }) => {
 };
 
 export const useTheme = () => useContext(ThemeContext);
-
-
-

@@ -1,8 +1,7 @@
-﻿import React from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useGame } from '../../context/GameContext';
-import { useTheme } from '../../context/ThemeContext';
 import { levelThemes } from '../../data/levelThemes';
 import { 
   Map, BookOpen, Compass, Search, Trophy, Hammer, Star, ChevronRight, Activity, Zap, CheckCircle, Lock, MapPin
