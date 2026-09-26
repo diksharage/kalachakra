@@ -557,12 +557,13 @@ export const GameProvider = ({ children }) => {
       clearRecentCompletedQuests,
       completeInvestigation,
       saveMiniGameResult,
-        completeChallenge,
+      completeChallenge,
       completeOnboarding,
       completeLevel,
       updateActiveLevelState,
       saveStatus,
-      lastSavedAt
+      lastSavedAt,
+      checkQuestProgress
     }}>
       {children}
     </GameContext.Provider>
