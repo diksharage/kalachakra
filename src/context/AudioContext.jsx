@@ -91,7 +91,6 @@ export const AudioProvider = ({ children }) => {
 
   const startAmbience = useCallback((levelId) => {
     if (settings.muted) return;
-    audioSynth.init();
     audioSynth.startAmbience(levelId);
   }, [settings.muted]);
 

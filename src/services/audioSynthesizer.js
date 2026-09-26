@@ -13,6 +13,7 @@ class AudioSynthesizer {
     this.muted = false;
 
     this.activeAmbienceNodes = [];
+    this.currentAmbienceLevel = null;
   }
 
   init() {
@@ -31,6 +32,9 @@ class AudioSynthesizer {
 
       this.updateVolumes();
       this.isInitialized = true;
+      if (this.currentAmbienceLevel !== null) {
+        this.startAmbience(this.currentAmbienceLevel);
+      }
     } catch (e) {
       console.warn("Web Audio API not supported or blocked", e);
     }
@@ -202,6 +206,7 @@ class AudioSynthesizer {
   }
 
   startAmbience(levelId) {
+    this.currentAmbienceLevel = levelId;
     if (!this.isInitialized) return;
     this.stopAmbience(); // Clear existing
     this.resume();
