@@ -698,58 +698,167 @@ const LevelEngine = ({ config }) => {
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
         <div className={"glass-panel p-0 md:p-0 rounded-2xl w-full max-h-full overflow-y-auto border shadow-2xl text-center flex flex-col " + theme.border + (type === 'challenge' && data.format === 'minigame' ? " max-w-4xl" : " max-w-lg p-5 md:p-8")}>
           
-          {type === 'explore' && (
+
+          {type === 'explore' && (() => {
+            // Build discovery points from location data
+            const getDiscoveries = (loc) => {
+              const base = [];
+              if (loc.yields) {
+                Object.entries(loc.yields).forEach(([res, amt]) => {
+                  base.push({
+                    id: `yield_${res}`,
+                    icon: res === 'wood' ? '🪵' : res === 'stone' ? '🪨' : res === 'plants' ? '🌿' : res === 'food' ? '🌾' : res === 'water' ? '💧' : res === 'knowledge' ? '📜' : '🔮',
+                    label: `Find ${res.charAt(0).toUpperCase() + res.slice(1)}`,
+                    feedback: `You collected ${amt} ${res} — a key resource for this civilization.`,
+                    reward: { [res]: amt },
+                  });
+                });
+              }
+              // Always add a contextual history discovery
+              base.push({
+                id: 'context',
+                icon: '🔍',
+                label: 'Investigate the area',
+                feedback: adaptTextForAge(loc.discoverMessage || `You found evidence of early activity at this location.`, ageGroup),
+                reward: {},
+              });
+              // For younger players fewer points, older players more
+              const max = isYoung ? 2 : 3;
+              return base.slice(0, max);
+            };
+
+            const discoveries = getDiscoveries(data);
+            const found = data.foundDiscoveries || [];
+            const allFound = found.length >= discoveries.length;
+            const lastFound = found.length > 0 ? discoveries.find(d => d.id === found[found.length - 1]) : null;
+
+            const handleDiscovery = (disc) => {
+              if (found.includes(disc.id)) return;
+              // Award small resource bonus if yields
+              if (disc.reward && Object.keys(disc.reward).length > 0 && !isReplay) {
+                updateResources(disc.reward);
+              }
+              playSound('discovery');
+              setLevelState(prev => ({
+                ...prev,
+                activePopup: {
+                  ...prev.activePopup,
+                  data: {
+                    ...prev.activePopup.data,
+                    foundDiscoveries: [...(prev.activePopup.data.foundDiscoveries || []), disc.id]
+                  }
+                }
+              }));
+            };
+
+            return (
               <>
-                <div className="text-6xl mb-4 opacity-50 grayscale">{data.icon}</div>
-                <h3 className={"text-2xl font-bold mb-2 uppercase " + theme.primary}>Unknown Location</h3>
-                <p className="text-content/80 mb-6">Investigate this area to find clues about {config.title}.</p>
-                
-                {!data.exploreRole ? (
-                  <div className="animate-fade-in">
-                    <p className="mb-4 text-sm font-bold opacity-70">Choose your Explore approach:</p>
-                    <div className="grid grid-cols-2 gap-3 mb-6">
-                      <button onClick={() => setLevelState(prev => ({ ...prev, activePopup: { ...prev.activePopup, data: { ...prev.activePopup.data, exploreRole: 'Explorer' } } }))} className="p-3 bg-surface/50 border border-blue-500/30 rounded-xl hover:bg-blue-500/10 hover:border-blue-500 transition-colors">
-                        <div className="font-bold text-blue-500">Explorer</div>
-                        <div className="text-[10px] opacity-70 mt-1">Survey terrain</div>
-                      </button>
-                      <button onClick={() => setLevelState(prev => ({ ...prev, activePopup: { ...prev.activePopup, data: { ...prev.activePopup.data, exploreRole: 'Strategist' } } }))} className="p-3 bg-surface/50 border border-purple-500/30 rounded-xl hover:bg-purple-500/10 hover:border-purple-500 transition-colors">
-                        <div className="font-bold text-purple-500">Strategist</div>
-                        <div className="text-[10px] opacity-70 mt-1">Assess resources</div>
-                      </button>
-                      <button onClick={() => setLevelState(prev => ({ ...prev, activePopup: { ...prev.activePopup, data: { ...prev.activePopup.data, exploreRole: 'Historian' } } }))} className="p-3 bg-surface/50 border border-emerald-500/30 rounded-xl hover:bg-emerald-500/10 hover:border-emerald-500 transition-colors">
-                        <div className="font-bold text-emerald-500">Historian</div>
-                        <div className="text-[10px] opacity-70 mt-1">Seek context</div>
-                      </button>
-                      <button onClick={() => setLevelState(prev => ({ ...prev, activePopup: { ...prev.activePopup, data: { ...prev.activePopup.data, exploreRole: 'Builder' } } }))} className="p-3 bg-surface/50 border border-orange-500/30 rounded-xl hover:bg-orange-500/10 hover:border-orange-500 transition-colors">
-                        <div className="font-bold text-orange-500">Builder</div>
-                        <div className="text-[10px] opacity-70 mt-1">Analyze structures</div>
-                      </button>
+                {/* Header */}
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-4xl">{data.icon}</span>
+                  <div className="text-left">
+                    <h3 className={`text-xl font-bold uppercase ${theme.primary}`}>
+                      Explore {data.label}
+                    </h3>
+                    <p className="text-xs text-content/60 font-bold uppercase tracking-wider">
+                      {found.length}/{discoveries.length} discoveries
+                    </p>
+                  </div>
+                  <div className="ml-auto">
+                    <div className="flex gap-1">
+                      {discoveries.map((_, i) => (
+                        <div key={i} className={`w-2 h-2 rounded-full transition-all ${i < found.length ? 'bg-gold' : 'bg-content/20'}`} />
+                      ))}
                     </div>
+                  </div>
+                </div>
+
+                {/* Context description */}
+                <p className="text-sm text-content/70 mb-5 text-left leading-relaxed">
+                  {adaptTextForAge(data.description || `Explore this location to find what early communities used here.`, ageGroup)}
+                </p>
+
+                {!allFound ? (
+                  <div className="space-y-3 mb-4">
+                    <p className="text-xs font-bold text-content/50 uppercase tracking-widest text-left mb-2">
+                      Click to investigate:
+                    </p>
+                    {discoveries.map((disc) => {
+                      const isFound = found.includes(disc.id);
+                      const isJustFound = lastFound?.id === disc.id;
+                      return (
+                        <button
+                          key={disc.id}
+                          onClick={() => handleDiscovery(disc)}
+                          disabled={isFound}
+                          className={`w-full text-left p-4 rounded-xl border transition-all flex items-center gap-3 ${
+                            isFound
+                              ? 'border-gold/40 bg-gold/5 cursor-default'
+                              : 'border-content/20 bg-surface/50 hover:border-gold/60 hover:bg-gold/5 active:scale-95 cursor-pointer'
+                          }`}
+                        >
+                          <span className={`text-2xl transition-all ${isFound ? '' : 'grayscale opacity-60'}`}>{disc.icon}</span>
+                          <div className="flex-1">
+                            <div className={`font-bold text-sm ${isFound ? 'text-gold' : 'text-content'}`}>{disc.label}</div>
+                            {isFound && (
+                              <div className="text-xs text-content/70 mt-0.5 leading-snug">{disc.feedback}</div>
+                            )}
+                            {isFound && disc.reward && Object.keys(disc.reward).length > 0 && (
+                              <div className="flex gap-1 mt-1 flex-wrap">
+                                {Object.entries(disc.reward).map(([res, amt]) => (
+                                  <span key={res} className="text-[10px] bg-gold/10 text-gold border border-gold/20 px-2 py-0.5 rounded font-bold">
+                                    +{amt} {res}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          {isFound
+                            ? <CheckCircle size={16} className="text-gold shrink-0" />
+                            : <span className="text-xs font-bold text-content/30 shrink-0">Tap to find</span>
+                          }
+                        </button>
+                      );
+                    })}
                   </div>
                 ) : (
-                  <div className="animate-fade-in text-left">
-                    <div className="mb-6 bg-surface/50 p-5 rounded-xl border border-content/10">
-                      <h4 className="font-bold text-gold mb-3 flex items-center gap-2">
-                        <span>{data.exploreRole} Experience</span>
-                        <span className="px-2 py-0.5 rounded text-[10px] bg-gold/10 border border-gold/30">Active</span>
-                      </h4>
-                      <p className="text-sm text-content/90 mb-4 leading-relaxed">
-                        {data.exploreRole === 'Explorer' && "You scout the terrain, mapping the physical boundaries and discovering hidden paths in the area."}
-                        {data.exploreRole === 'Strategist' && "You evaluate the natural resources, trade routes, and geographical advantages of this site."}
-                        {data.exploreRole === 'Historian' && "You look for traces of past events, local lore, and contextual evidence in the landscape."}
-                        {data.exploreRole === 'Builder' && "You analyze the ground for its structural potential, material availability, and spatial layout."}
-                      </p>
-                      <div className="flex items-center gap-2 text-xs text-green-400 font-bold mb-4">
-                        <CheckCircle size={14} /> Objectives Completed
+                  /* All discoveries complete — show summary */
+                  <div className="animate-in fade-in zoom-in duration-400">
+                    <div className="bg-gold/5 border border-gold/30 rounded-xl p-5 mb-5 text-left">
+                      <div className="flex items-center gap-2 text-gold font-bold mb-3">
+                        <CheckCircle size={18} /> Location Fully Explored!
                       </div>
-                      <button onClick={() => markExplored(data)} className={"px-6 py-3 font-bold rounded-xl w-full flex items-center justify-center gap-2 " + theme.button}>
-                        <Search size={16} /> Mark as Explored
-                      </button>
+                      <p className="text-sm text-content/80 mb-3 leading-relaxed">
+                        {adaptTextForAge(data.discoverMessage || `You thoroughly explored this location and uncovered important evidence.`, ageGroup)}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {discoveries.filter(d => Object.keys(d.reward || {}).length > 0).map(d =>
+                          Object.entries(d.reward).map(([res, amt]) => (
+                            <span key={res} className="text-xs bg-gold/10 text-gold border border-gold/20 px-2 py-1 rounded font-bold">
+                              +{amt} {res} collected
+                            </span>
+                          ))
+                        )}
+                      </div>
                     </div>
+                    <button
+                      onClick={() => markExplored(data)}
+                      className={`px-6 py-3 font-bold rounded-xl w-full flex items-center justify-center gap-2 ${theme.button}`}
+                    >
+                      <CheckCircle size={16} /> Complete Exploration
+                    </button>
                   </div>
                 )}
-            </>
-          )}
+
+                {!allFound && (
+                  <p className="text-xs text-content/40 mt-3 text-center">
+                    Investigate all {discoveries.length} points to complete this location
+                  </p>
+                )}
+              </>
+            );
+          })()}
+
 
           {type === 'discover' && (
               <>
