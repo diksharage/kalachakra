@@ -338,15 +338,51 @@ export const GameProvider = ({ children }) => {
 
     const startQuest = (id) => {
       setGameState(prev => {
-        if (prev.quests?.[id]) return prev;
+        if (prev.quests?.[id]?.status === 'completed') return prev;
         return {
           ...prev,
           quests: {
             ...(prev.quests || {}),
-            [id]: { status: 'in_progress', progress: {} }
+            [id]: { status: 'in_progress', progress: {}, ...(prev.quests?.[id] || {}) }
           }
         };
       });
+    };
+
+    // Called by QuestGameplay after the player finishes MCQ session
+    const completeQuestDirectly = (quest, { earnedLegacy, accuracy, mastery }) => {
+      setGameState(prev => {
+        const existingQ = prev.quests?.[quest.id] || {};
+        const completedProgress = {};
+        quest.objectives.forEach((obj, idx) => {
+          completedProgress[idx] = obj.required;
+        });
+        const newInventory = { ...(prev.inventory || {}) };
+        if (quest.rewards?.inventory) {
+          Object.entries(quest.rewards.inventory).forEach(([k, v]) => {
+            newInventory[k] = (newInventory[k] || 0) + v;
+          });
+        }
+        return {
+          ...prev,
+          legacy: (prev.legacy || 0) + (earnedLegacy || 0),
+          inventory: newInventory,
+          quests: {
+            ...(prev.quests || {}),
+            [quest.id]: {
+              ...existingQ,
+              status: 'completed',
+              progress: completedProgress,
+              completedAt: Date.now(),
+              accuracy: accuracy || 0,
+              stars: mastery || 1,
+            }
+          }
+        };
+      });
+      if (quest.rewards?.legacy) {
+        setRecentCompletedQuests(r => [...r, quest]);
+      }
     };
 
     const checkQuestProgress = (type, target) => {
@@ -505,6 +541,7 @@ export const GameProvider = ({ children }) => {
       addBuilding,
       unlockAchievement,
       startQuest,
+      completeQuestDirectly,
       placeBuilding,
       removeBuilding,
       resolveEvent,
