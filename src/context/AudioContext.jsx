@@ -6,23 +6,24 @@ const AudioContext = createContext();
 export const useAudio = () => useContext(AudioContext);
 
 export const AudioProvider = ({ children }) => {
-  const [settings, setSettings] = useState(() => {
-    const saved = localStorage.getItem('kalachakra_audio_prefs');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        // ignore
-      }
-    }
-    return {
-      masterVolume: 0.7,
-      sfxVolume: 1.0,
-      ambienceVolume: 0.5,
-      muted: false,
-      uiSoundsEnabled: true
-    };
+  const [settings, setSettings] = useState({
+    masterVolume: 0.7,
+    sfxVolume: 1.0,
+    ambienceVolume: 0.5,
+    muted: false,
+    uiSoundsEnabled: true
   });
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('kalachakra_audio_prefs');
+      if (saved) {
+        setSettings(JSON.parse(saved));
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, []);
 
   // Apply settings to synthesizer whenever they change
   useEffect(() => {

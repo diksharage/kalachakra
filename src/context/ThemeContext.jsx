@@ -3,15 +3,21 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setThemeState] = useState(() => {
-    const saved = localStorage.getItem('kalachakra_theme');
-    if (saved) return saved;
-    // Default to system preference for first-time users
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-      return 'light';
-    }
-    return 'dark'; // Kalachakra default identity is dark/heritage
-  });
+  const [theme, setThemeState] = useState('dark'); // Kalachakra default identity is dark/heritage
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('kalachakra_theme');
+      if (saved) {
+        setThemeState(saved);
+        return;
+      }
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+        setThemeState('light');
+        return;
+      }
+    } catch (e) {}
+  }, []);
 
   // Apply theme to document element so CSS variables switch
   useEffect(() => {
