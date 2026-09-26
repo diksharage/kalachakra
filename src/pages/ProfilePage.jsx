@@ -30,7 +30,7 @@ const TimelineItem = ({ day, title, desc, icon }) => (
 
 const ProfilePage = () => {
   const { t } = useLanguage();
-  const { theme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const { gameState } = useGame();
   const { settings: audioSettings, updateSetting, toggleMute } = useAudio();
   const navigate = useNavigate();
@@ -75,7 +75,13 @@ const ProfilePage = () => {
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 text-xs uppercase font-bold text-content/60 tracking-wider">
                 <span className="px-2 py-1 bg-surface border border-content/10 rounded-md">Age: {gameState.ageGroup}</span>
                 <span className="px-2 py-1 bg-surface border border-content/10 rounded-md">Style: {gameState.playerType}</span>
-                <span className="px-2 py-1 bg-surface border border-content/10 rounded-md">Theme: {theme}</span>
+                <button 
+                  onClick={toggleTheme}
+                  className="px-2 py-1 bg-surface border border-content/30 rounded-md hover:border-gold hover:text-gold transition-colors cursor-pointer"
+                  title="Click to toggle theme"
+                >
+                  Theme: {theme}
+                </button>
               </div>
             </div>
 

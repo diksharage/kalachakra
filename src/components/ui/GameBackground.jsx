@@ -1,11 +1,14 @@
 import React from 'react';
 import { useBackground } from '../../context/BackgroundContext';
+import { useTheme } from '../../context/ThemeContext';
 
 // SVG Noise Filter for cinematic texture (sandstone/dust/parchment feel)
 const textureOverlay = `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E")`;
 
 const GameBackground = () => {
   const { bgType, bgIntensity } = useBackground();
+  const { theme } = useTheme();
+  const isLight = theme === 'light';
 
   // Mapping contexts to cinematic color palettes
   const getBackgroundStyle = () => {
@@ -96,25 +99,27 @@ const GameBackground = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none bg-[#080808]">
+    <div className={`fixed inset-0 z-[-1] overflow-hidden pointer-events-none transition-colors duration-1000 ${isLight ? 'bg-[#E8D9B8]' : 'bg-[#080808]'}`}>
       {/* 1. Base Gradient Environment */}
       <div 
-        className={`absolute inset-0 transition-all duration-1000 ease-in-out ${getOpacity()}`}
+        className={`absolute inset-0 transition-all duration-1000 ease-in-out ${getOpacity()} ${isLight ? 'opacity-20 mix-blend-overlay' : ''}`}
         style={{ background: getBackgroundStyle() }}
       />
       
       {/* 2. Dust/Texture Overlay (Cinematic Grain) */}
       <div 
-        className="absolute inset-0 mix-blend-overlay opacity-30 pointer-events-none"
+        className={`absolute inset-0 pointer-events-none ${isLight ? 'mix-blend-multiply opacity-15' : 'mix-blend-overlay opacity-30'}`}
         style={{ backgroundImage: textureOverlay }}
       />
       
       {/* 3. Sunlight/Atmosphere (Soft Glow from Top) */}
-      <div className="absolute top-0 left-0 right-0 h-[60vh] bg-gradient-to-b from-amber-500/10 to-transparent mix-blend-screen pointer-events-none transition-opacity duration-1000" />
+      <div className={`absolute top-0 left-0 right-0 h-[60vh] bg-gradient-to-b from-amber-500/10 to-transparent pointer-events-none transition-opacity duration-1000 ${isLight ? 'mix-blend-multiply opacity-40' : 'mix-blend-screen'}`} />
 
       {/* 4. Cinematic Vignette (Dark Edges) */}
-      <div className="absolute inset-0 pointer-events-none transition-opacity duration-1000" style={{
-        background: 'radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.6) 85%, rgba(0,0,0,0.95) 100%)'
+      <div className={`absolute inset-0 pointer-events-none transition-all duration-1000 ${isLight ? 'opacity-50' : 'opacity-100'}`} style={{
+        background: isLight 
+          ? 'radial-gradient(circle at 50% 50%, transparent 40%, rgba(160,130,100,0.3) 85%, rgba(120,90,60,0.5) 100%)'
+          : 'radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.6) 85%, rgba(0,0,0,0.95) 100%)'
       }} />
     </div>
   );
