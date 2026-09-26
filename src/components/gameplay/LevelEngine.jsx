@@ -1148,7 +1148,10 @@ const LevelEngine = ({ config }) => {
                 })()}
               </div>
             </div>
+        </div>
 
+        {/* MAP / INTERACTIVE AREA */}
+        <div className={"flex-1 rounded-2xl border relative flex flex-col overflow-hidden " + theme.border + " " + theme.bg + "/10 backdrop-blur-sm"}>
           {stage === 6 ? (
               <div className="relative h-full p-6 md:p-8 flex flex-col items-center justify-center z-10 animate-fade-in text-center overflow-y-auto w-full">
                 {config.id === 14 ? (
