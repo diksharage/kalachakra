@@ -254,14 +254,17 @@ const ObjectiveTracker = ({ stage, levelState, locations, targetExplore, targetD
              <button 
                key={item.id} 
                onClick={item.onClick}
-               disabled={item.isDone || item.isLocked}
-               className={"flex items-center justify-between text-left p-2 rounded-lg transition-all " + (item.isDone ? 'opacity-60' : item.isLocked ? 'opacity-40 cursor-not-allowed bg-surface/20' : 'bg-surface/40 hover:bg-surface/80 border border-transparent hover:border-content/10')}
+               disabled={item.isDone || (item.isLocked && stage !== 5)}
+               className={"flex items-center justify-between text-left p-2 rounded-lg transition-all " + 
+                 (item.isDone ? 'opacity-60' : 
+                  item.isLocked ? (stage === 5 ? 'opacity-80 bg-surface/40 hover:bg-surface/80 border border-red-500/30 cursor-pointer' : 'opacity-40 cursor-not-allowed bg-surface/20') : 
+                  'bg-surface/40 hover:bg-surface/80 border border-transparent hover:border-content/10')}
              >
                 <div className="flex items-center gap-3">
                   {stateIcon}
                   <div className="flex flex-col">
                     <span className={"text-sm font-bold " + (item.isDone ? 'line-through' : '')}>{item.label}</span>
-                    {item.isLocked && <span className="text-[10px] uppercase text-red-400">{item.lockedReason}</span>}
+                    {item.isLocked && <span className={"text-[10px] uppercase font-bold " + (stage === 5 ? "text-red-400" : "text-content/50")}>{item.lockedReason} (Click to View)</span>}
                   </div>
                 </div>
                 {item.reward && !item.isDone && <span className="text-xs bg-gold/20 text-gold px-1.5 py-0.5 rounded ml-2">🎁</span>}
@@ -709,16 +712,22 @@ const LevelEngine = ({ config }) => {
 
   const handleLocationClick = (loc) => {
     playSound('ui');
-    if (stage === 1) {
-      if (!exploration.includes(loc.id)) {
+    
+    // Determine what interaction needs to happen based on progress, regardless of global stage
+    const needsExplore = !exploration.includes(loc.id);
+    const needsDiscover = exploration.includes(loc.id) && !discovery.includes(loc.id);
+    const needsLearn = discovery.includes(loc.id) && !learning.includes(loc.id);
+    
+    if (stage === 1 || (stage >= 1 && needsExplore)) {
+      if (needsExplore) {
         setLevelState(prev => ({ ...prev, activePopup: { type: 'explore', data: loc } }));
       }
-    } else if (stage === 2) {
-      if (exploration.includes(loc.id) && !discovery.includes(loc.id)) {
+    } else if (stage === 2 || (stage >= 2 && needsDiscover)) {
+      if (needsDiscover) {
         setLevelState(prev => ({ ...prev, activePopup: { type: 'discover', data: loc } }));
       }
-    } else if (stage === 3) {
-      if (discovery.includes(loc.id) && !learning.includes(loc.id)) {
+    } else if (stage === 3 || (stage >= 3 && needsLearn)) {
+      if (needsLearn) {
         setLevelState(prev => ({ ...prev, activePopup: { type: 'learn', data: loc } }));
       }
     } else if (stage === 4) {
@@ -986,9 +995,25 @@ const LevelEngine = ({ config }) => {
                 </div>
                 
                 {!canAfford && (
-                  <p className="text-red-400 text-sm font-bold mb-4 bg-red-900/20 py-2 rounded-lg border border-red-500/30">
-                    You do not have enough resources! Discover artifacts or complete challenges to earn more.
-                  </p>
+                  <div className="bg-red-900/20 py-4 px-4 rounded-xl border border-red-500/30 mb-6 text-left">
+                    <p className="text-red-400 text-sm font-bold mb-2">
+                      Missing Required Resources!
+                    </p>
+                    <p className="text-content/80 text-sm mb-4">
+                      You need more resources to construct this. You can earn them by completing additional challenges or exploring more locations in this era.
+                    </p>
+                    <button 
+                      onClick={() => {
+                        setLevelState(prev => ({
+                           ...prev,
+                           activePopup: { type: 'gather_resources' }
+                        }));
+                      }}
+                      className="px-4 py-2 bg-gold/20 text-gold font-bold text-sm rounded-lg border border-gold/30 hover:bg-gold/40 transition-colors w-full"
+                    >
+                      Get Resources
+                    </button>
+                  </div>
                 )}
 
                 <div className="flex justify-between gap-4">
@@ -1023,6 +1048,73 @@ const LevelEngine = ({ config }) => {
                 </div>
               </>
             );
+          })()}
+
+          {type === 'gather_resources' && (() => {
+             const uncompletedChallenges = allChallenges.filter(c => !levelState.completedChallenges.includes(c.id));
+             const uncompletedLocations = locations.filter(l => !levelState.learning.includes(l.id));
+
+             return (
+                <>
+                   <h3 className={"text-xl font-bold mb-4 uppercase " + theme.primary}>Gather Resources</h3>
+                   <p className="text-content/80 mb-6 text-sm">
+                     Complete additional tasks in this era to earn the resources you need.
+                   </p>
+                   
+                   <div className="flex flex-col gap-3 max-h-[50vh] overflow-y-auto mb-6 w-full text-left">
+                      {uncompletedChallenges.length > 0 && (
+                         <>
+                           <p className="text-xs uppercase font-bold text-gold tracking-widest mt-2">Available Challenges</p>
+                           {uncompletedChallenges.map(chal => (
+                             <button 
+                               key={`chal-${chal.id}`}
+                               onClick={() => {
+                                  setLevelState(prev => ({ ...prev, activePopup: null }));
+                                  startChallenge(chal);
+                                }}
+                               className="p-3 bg-surface/50 border border-content/10 hover:border-gold rounded-lg transition-colors flex items-center justify-between"
+                             >
+                               <span className="font-bold text-sm">{chal.title || chal.titleKey || 'Solve Challenge'}</span>
+                               <span className="text-xs bg-gold/20 text-gold px-2 py-1 rounded">Reward</span>
+                             </button>
+                           ))}
+                         </>
+                      )}
+                      
+                      {uncompletedLocations.length > 0 && (
+                         <>
+                           <p className="text-xs uppercase font-bold text-blue-400 tracking-widest mt-2">Unexplored Locations</p>
+                           {uncompletedLocations.map(loc => (
+                             <button 
+                               key={`loc-${loc.id}`}
+                               onClick={() => {
+                                  setLevelState(prev => ({ ...prev, activePopup: null }));
+                                  handleLocationClick(loc);
+                               }}
+                               className="p-3 bg-surface/50 border border-content/10 hover:border-blue-400 rounded-lg transition-colors flex items-center justify-between"
+                             >
+                               <span className="font-bold text-sm">{loc.label}</span>
+                               <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">Explore</span>
+                             </button>
+                           ))}
+                         </>
+                      )}
+
+                      {uncompletedChallenges.length === 0 && uncompletedLocations.length === 0 && (
+                         <p className="text-center text-content/50 text-sm py-4 italic">
+                           You have completed all available tasks in this era. No more resources are available here.
+                         </p>
+                      )}
+                   </div>
+
+                   <button 
+                     onClick={() => setLevelState(prev => ({ ...prev, activePopup: null }))}
+                     className="px-6 py-3 font-bold rounded-xl w-full border border-content/20 hover:bg-surface/50 transition-colors"
+                   >
+                     Return to Build Menu
+                   </button>
+                </>
+             );
           })()}
 
           {type === 'error' && (
@@ -1277,9 +1369,9 @@ const LevelEngine = ({ config }) => {
                 const isLearned = learning.includes(loc.id);
                 
                 let isClickable = false;
-                if (stage === 1 && !isExplored) isClickable = true;
-                if (stage === 2 && isExplored && !isDiscovered) isClickable = true;
-                if (stage === 3 && isDiscovered && !isLearned) isClickable = true;
+                if ((stage === 1 || stage > 1) && !isExplored) isClickable = true;
+                if ((stage === 2 || stage > 2) && isExplored && !isDiscovered) isClickable = true;
+                if ((stage === 3 || stage > 3) && isDiscovered && !isLearned) isClickable = true;
 
                 return (
                   <button
