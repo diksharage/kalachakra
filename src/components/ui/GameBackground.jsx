@@ -10,6 +10,19 @@ const GameBackground = () => {
   const { theme } = useTheme();
   const isLight = theme === 'light';
 
+  const getBackgroundImage = () => {
+    switch (bgType) {
+      case 'level1': case 'level2': case 'forest':
+        return "url('/assets/backgrounds/forest.jpg')";
+      case 'level3': case 'level4': case 'level5': case 'level6': case 'city':
+        return "url('/assets/backgrounds/city.jpg')";
+      case 'level7': case 'level8': case 'level9': case 'level10': case 'level11': case 'temple':
+        return "url('/assets/backgrounds/temple.jpg')";
+      case 'dashboard': case 'map': case 'level12': case 'level13': case 'level14': case 'quests': case 'legacy': default:
+        return "url('/assets/backgrounds/dashboard.jpg')";
+    }
+  };
+
   // Mapping contexts to cinematic color palettes
   const getBackgroundStyle = () => {
     switch (bgType) {
@@ -100,26 +113,34 @@ const GameBackground = () => {
 
   return (
     <div className={`fixed inset-0 z-[-1] overflow-hidden pointer-events-none transition-colors duration-1000 ${isLight ? 'bg-[#E8D9B8]' : 'bg-[#080808]'}`}>
-      {/* 1. Base Gradient Environment */}
+      
+      {/* 0. Cinematic AI Image Base */}
       <div 
-        className={`absolute inset-0 transition-all duration-1000 ease-in-out ${getOpacity()} ${isLight ? 'opacity-20 mix-blend-overlay' : ''}`}
+        className="absolute inset-0 bg-cover bg-center transition-all duration-1000"
+        style={{ backgroundImage: getBackgroundImage() }}
+      />
+
+      {/* 1. Base Readability Overlay & Civilization Colors */}
+      <div className={`absolute inset-0 transition-colors duration-1000 ${isLight ? 'bg-[#E8D9B8]/75' : 'bg-[#0a0a0c]/85'}`} />
+      <div 
+        className={`absolute inset-0 transition-all duration-1000 ease-in-out ${getOpacity()} mix-blend-color pointer-events-none`}
         style={{ background: getBackgroundStyle() }}
       />
       
       {/* 2. Dust/Texture Overlay (Cinematic Grain) */}
       <div 
-        className={`absolute inset-0 pointer-events-none ${isLight ? 'mix-blend-multiply opacity-15' : 'mix-blend-overlay opacity-30'}`}
+        className={`absolute inset-0 pointer-events-none ${isLight ? 'mix-blend-multiply opacity-20' : 'mix-blend-overlay opacity-30'}`}
         style={{ backgroundImage: textureOverlay }}
       />
       
       {/* 3. Sunlight/Atmosphere (Soft Glow from Top) */}
-      <div className={`absolute top-0 left-0 right-0 h-[60vh] bg-gradient-to-b from-amber-500/10 to-transparent pointer-events-none transition-opacity duration-1000 ${isLight ? 'mix-blend-multiply opacity-40' : 'mix-blend-screen'}`} />
+      <div className={`absolute top-0 left-0 right-0 h-[70vh] bg-gradient-to-b from-amber-500/15 to-transparent pointer-events-none transition-opacity duration-1000 ${isLight ? 'mix-blend-overlay opacity-80' : 'mix-blend-screen opacity-50'}`} />
 
-      {/* 4. Cinematic Vignette (Dark Edges) */}
-      <div className={`absolute inset-0 pointer-events-none transition-all duration-1000 ${isLight ? 'opacity-50' : 'opacity-100'}`} style={{
+      {/* 4. Cinematic Vignette (Dark Edges for depth) */}
+      <div className={`absolute inset-0 pointer-events-none transition-all duration-1000 ${isLight ? 'opacity-60' : 'opacity-100'}`} style={{
         background: isLight 
-          ? 'radial-gradient(circle at 50% 50%, transparent 40%, rgba(160,130,100,0.3) 85%, rgba(120,90,60,0.5) 100%)'
-          : 'radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.6) 85%, rgba(0,0,0,0.95) 100%)'
+          ? 'radial-gradient(circle at 50% 50%, transparent 30%, rgba(180,150,110,0.5) 80%, rgba(120,90,50,0.8) 100%)'
+          : 'radial-gradient(circle at 50% 50%, transparent 30%, rgba(0,0,0,0.7) 80%, rgba(0,0,0,0.95) 100%)'
       }} />
     </div>
   );
