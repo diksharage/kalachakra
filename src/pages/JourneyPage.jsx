@@ -8,11 +8,17 @@ import { levelThemes } from '../data/levelThemes';
 import { questData } from '../data/quests';
 import { Lock, Unlock, CheckCircle, Star, ArrowRight } from 'lucide-react';
 import BackButton from '../components/common/BackButton';
+import { useBackground } from '../context/BackgroundContext';
 
 const JourneyPage = () => {
   const { t } = useLanguage();
   const { gameState, notify } = useGame();
   const navigate = useNavigate();
+  const { setBgType } = useBackground();
+
+  React.useEffect(() => {
+    setBgType('map');
+  }, [setBgType]);
 
   // Progress logic
   const totalLevels = civilizationLevels.length;

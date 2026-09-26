@@ -9,10 +9,16 @@ import { Target, CheckCircle2, Lock, Star, Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BackButton from '../components/common/BackButton';
 import QuestGameplay from '../components/quests/QuestGameplay';
+import { useBackground } from '../context/BackgroundContext';
 
 const QuestsPage = () => {
   const { t } = useLanguage();
   const { gameState, startQuest, completeQuestDirectly } = useGame();
+  const { setBgType } = useBackground();
+
+  React.useEffect(() => {
+    setBgType('quests');
+  }, [setBgType]);
 
   const { theme } = useTheme();
   const { playSound } = useAudio();

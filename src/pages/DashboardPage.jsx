@@ -15,9 +15,16 @@ import {
   WorldEventWidget
 } from '../components/dashboard/DashboardWidgets';
 import { Map, BookOpen, Compass, Search, Trophy, Hammer } from 'lucide-react';
+import { useBackground } from '../context/BackgroundContext';
 
 const DashboardPage = () => {
   const { t } = useLanguage();
+  const { setBgType } = useBackground();
+  
+  React.useEffect(() => {
+    setBgType('dashboard');
+  }, [setBgType]);
+
   const { gameState } = useGame();
   const { playSound } = useAudio();
   const { theme } = useTheme();

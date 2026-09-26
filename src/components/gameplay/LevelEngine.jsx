@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../../context/GameContext';
+import { useBackground } from '../../context/BackgroundContext';
 import { useAudio } from '../../context/AudioContext';
 import { minigamesData } from '../../data/minigames';
 import MiniGameManager from '../minigames/MiniGameManager';
@@ -552,6 +553,7 @@ const OrderingGame = ({ data, onComplete, theme, isYoung, playSound }) => {
 
 const LevelEngine = ({ config }) => {
   const { t } = useLanguage();
+  const { setBgType } = useBackground();
   const { gameState, updateActiveLevelState, completeLevel, unlockArtifact, completeChallenge: globalCompleteChallenge, updateResources, notify, checkQuestProgress } = useGame();
   const { triggerEventAchievement } = useAchievements();
   const ageGroup = gameState.ageGroup || '9-11';
@@ -630,6 +632,16 @@ const LevelEngine = ({ config }) => {
     }
     return defaultState;
   });
+
+  useEffect(() => {
+    if (levelState.activePopup?.type === 'explore' || levelState.activePopup?.type === 'discover') {
+       setBgType(levelState.activePopup.data.id || `level${config.id}`);
+    } else if (levelState.activePopup?.type === 'challenge') {
+       setBgType('minigame');
+    } else {
+       setBgType(`level${config.id}`);
+    }
+  }, [levelState.activePopup, config.id, setBgType]);
 
   const theme = levelThemes[config.id] || levelThemes.default;
 

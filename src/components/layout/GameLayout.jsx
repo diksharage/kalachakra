@@ -47,7 +47,7 @@ const GameLayout = () => {
     };
   }, []);
   return (
-    <div className="flex h-screen bg-main text-content overflow-hidden">
+    <div className="flex h-screen text-content overflow-hidden bg-transparent">
       <Sidebar isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         <GlobalSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
@@ -56,7 +56,7 @@ const GameLayout = () => {
         
         
         <StatusBar onMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)} />
-        <main className="flex-1 overflow-y-auto p-6 bg-gradient-to-br from-main to-surface">
+        <main className="flex-1 overflow-y-auto p-6 bg-transparent">
           <div className="max-w-7xl mx-auto h-full">
             <Outlet />
           </div>

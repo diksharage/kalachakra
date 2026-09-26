@@ -1,12 +1,18 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { libraryCategories, libraryBooks } from '../data/libraryContent';
 import { BookOpen, Search, Filter } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useBackground } from '../context/BackgroundContext';
 
 const HeritageLibraryPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
   const navigate = useNavigate();
+  const { setBgType } = useBackground();
+
+  React.useEffect(() => {
+    setBgType('library');
+  }, [setBgType]);
 
   const filteredBooks = libraryBooks.filter(book => {
     const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase()) || 

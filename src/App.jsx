@@ -5,8 +5,10 @@ import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { AchievementProvider } from './context/AchievementContext';
 import { AudioProvider } from './context/AudioContext';
+import { BackgroundProvider } from './context/BackgroundContext';
 import GameLayout from './components/layout/GameLayout';
 import ProtectedRoute from './components/layout/ProtectedRoute';
+import GameBackground from './components/ui/GameBackground';
 
 // Pages
 import LandingPage from './pages/LandingPage';
@@ -36,6 +38,7 @@ import LevelPlayPage from './pages/LevelPlayPage';
 const AppContent = () => {
   return (
     <BrowserRouter>
+      <GameBackground />
       <Routes>
         <Route path="/" element={<Navigate to="/auth" replace />} />
         <Route path="/auth" element={<AuthPage />} />
@@ -79,7 +82,9 @@ function App() {
         <ThemeProvider>
           <LanguageProvider>
             <AchievementProvider>
-              <AppContent />
+              <BackgroundProvider>
+                <AppContent />
+              </BackgroundProvider>
             </AchievementProvider>
           </LanguageProvider>
         </ThemeProvider>
