@@ -74,20 +74,17 @@ const AuthPage = () => {
 
   return (
     <div 
-      className="min-h-screen w-full flex items-center justify-center lg:justify-end px-4 md:px-12 lg:px-24 bg-cover bg-center relative overflow-hidden" 
+      className="min-h-screen w-full flex items-center justify-center px-4 md:px-12 bg-cover bg-center bg-no-repeat relative overflow-hidden" 
       style={{ backgroundImage: "url('/assets/backgrounds/temple.jpg')" }}
     >
-      {/* Cinematic Gradient Overlay for text readability (darker on right) */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-black/40 to-[#080a08]/95 pointer-events-none" />
+      {/* Subtle Overlay for text readability */}
+      <div className="absolute inset-0 bg-black/50 pointer-events-none" />
       
-      {/* Sunlight/Atmosphere glow */}
-      <div className="absolute top-0 left-0 right-0 h-[50vh] bg-gradient-to-b from-amber-500/10 to-transparent mix-blend-overlay pointer-events-none" />
-
       {/* Main Content Container */}
-      <div className="relative z-10 w-full max-w-md flex flex-col items-center lg:items-end lg:mr-8 xl:mr-24 animate-slide-up">
+      <div className="relative z-10 w-full max-w-md flex flex-col items-center animate-slide-up">
         
         {/* Title & Atmosphere */}
-        <div className="text-center lg:text-right mb-8">
+        <div className="text-center mb-8">
           <h1 className="text-5xl md:text-6xl font-serif font-bold text-[#E8D9B8] drop-shadow-[0_4px_15px_rgba(0,0,0,0.9)] tracking-wide mb-3">
             KALACHAKRA
           </h1>
