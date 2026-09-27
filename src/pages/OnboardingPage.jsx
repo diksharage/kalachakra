@@ -58,18 +58,72 @@ const OnboardingPage = () => {
         );
       case 2:
         return (
-          <div className="text-center animate-in fade-in slide-in-from-right-8 duration-500 max-w-2xl mx-auto">
-            <h2 className="text-3xl font-serif font-bold text-content mb-8">{t('nav.howItWorks')}</h2>
-            <div className="flex justify-center items-center gap-2 text-gold font-bold text-sm md:text-base tracking-wider uppercase flex-wrap mb-10">
-              <span>Explore</span> <span className="text-content/30">→</span>
-              <span>Discover</span> <span className="text-content/30">→</span>
-              <span>Learn</span> <span className="text-content/30">→</span>
-              <span>Play</span> <span className="text-content/30">→</span>
-              <span>Solve</span> <span className="text-content/30">→</span>
-              <span>Build</span>
-            </div>
-            <div className="bg-main/50 p-6 md:p-8 rounded-2xl border border-content/10 text-left shadow-inner">
-              <p className="text-content text-lg leading-relaxed whitespace-pre-line">{conceptText}</p>
+          <div className="animate-in fade-in slide-in-from-right-8 duration-500 max-w-3xl mx-auto">
+            <h2 className="text-3xl font-serif font-bold text-center text-content mb-6">How KALACHAKRA Works</h2>
+            
+            <div className="bg-main/50 p-6 md:p-8 rounded-2xl border border-content/10 text-left shadow-inner max-h-[55vh] overflow-y-auto custom-scrollbar">
+              
+              <div className="mb-6">
+                <h3 className="text-lg font-bold text-gold mb-2 uppercase tracking-wider">1. What is Kalachakra?</h3>
+                <p className="text-content/90">Interactive game for experiencing Indian history, civilization and heritage.</p>
+              </div>
+
+              <div className="mb-6">
+                <h3 className="text-lg font-bold text-gold mb-2 uppercase tracking-wider">2. Core Gameplay</h3>
+                <div className="flex flex-wrap gap-2 text-sm font-bold text-content/80 mt-1">
+                  <span>EXPLORE</span> <span className="text-gold">→</span>
+                  <span>DISCOVER</span> <span className="text-gold">→</span>
+                  <span>LEARN</span> <span className="text-gold">→</span>
+                  <span>PLAY + SOLVE</span> <span className="text-gold">→</span>
+                  <span>BUILD + MANAGE</span> <span className="text-gold">→</span>
+                  <span>REWARDS</span> <span className="text-gold">→</span>
+                  <span>NEXT LEVEL</span>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <h3 className="text-lg font-bold text-gold mb-2 uppercase tracking-wider">3. What the Player Does</h3>
+                <ul className="list-disc list-inside space-y-1 text-content/90">
+                  <li>Explore historical environments</li>
+                  <li>Discover artifacts and resources</li>
+                  <li>Learn historical/cultural context</li>
+                  <li>Play civilization-specific mini-games</li>
+                  <li>Solve challenges</li>
+                  <li>Collect and use resources</li>
+                  <li>Build/manage civilizations</li>
+                  <li>Earn XP, Mastery, artifacts, badges and rewards</li>
+                </ul>
+              </div>
+
+              <div className="mb-6">
+                <h3 className="text-lg font-bold text-gold mb-2 uppercase tracking-wider">4. Age-Based Experience</h3>
+                <p className="text-content/90">Difficulty, hints and challenges adapt to the player's age.</p>
+              </div>
+
+              <div className="mb-6">
+                <h3 className="text-lg font-bold text-gold mb-2 uppercase tracking-wider">5. KALA — AI Guide</h3>
+                <p className="text-content/90">KALA provides contextual explanations, hints and guidance during exploration, learning and challenges.</p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gold mb-2 uppercase tracking-wider">6. 14-Level Journey</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1 text-content/90 text-sm mt-2">
+                  <div>1 Early Human Communities</div>
+                  <div>2 Early Farming Communities</div>
+                  <div>3 Indus Civilization</div>
+                  <div>4 Early Indian Trade Networks</div>
+                  <div>5 Mahajanapadas & Early Kingdoms</div>
+                  <div>6 Mauryan Empire</div>
+                  <div>7 Gupta Period & Knowledge</div>
+                  <div>8 Indian Architecture & Engineering</div>
+                  <div>9 Indian Cultural Traditions</div>
+                  <div>10 Chola & Regional Civilizations</div>
+                  <div>11 Vijayanagara & Medieval Heritage</div>
+                  <div>12 Stories, Literature & Folk Arts</div>
+                  <div>13 Traditional Indian Games</div>
+                  <div>14 Preserve the Legacy</div>
+                </div>
+              </div>
             </div>
           </div>
         );
@@ -177,12 +231,13 @@ const OnboardingPage = () => {
         {step === 1 && (
           <div className="flex gap-4 ml-auto">
             <button 
-              className="px-6 py-3 border border-gold text-gold font-bold rounded-xl hover:bg-gold/10 transition-colors hidden sm:block"
+              onClick={() => setStep(2)}
+              className="px-6 py-3 border border-gold text-gold font-bold rounded-xl hover:bg-gold/10 transition-colors"
             >
               Learn {t('nav.howItWorks')}
             </button>
             <button 
-              onClick={handleNext}
+              onClick={() => setStep(3)}
               className="px-8 py-3 bg-gold text-[#171B3A] font-bold rounded-xl shadow-xl shadow-gold/40 hover:bg-[#F5E8CC] transition-all transform hover:-translate-y-1"
             >
               Begin My Journey
@@ -192,10 +247,10 @@ const OnboardingPage = () => {
 
         {step === 2 && (
           <button 
-            onClick={handleNext}
-            className="px-8 py-3 bg-gold text-[#171B3A] font-bold rounded-xl shadow-xl shadow-gold/40 hover:bg-[#F5E8CC] transition-all transform hover:-translate-y-1"
+            onClick={() => setStep(3)}
+            className="px-8 py-3 bg-gold text-[#171B3A] font-bold rounded-xl shadow-xl shadow-gold/40 hover:bg-[#F5E8CC] transition-all transform hover:-translate-y-1 ml-auto"
           >
-            Continue
+            Start My Journey
           </button>
         )}
 
