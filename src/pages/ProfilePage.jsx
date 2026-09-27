@@ -1,7 +1,7 @@
 import React from 'react';
 import { useGame } from '../context/GameContext';
 import { useAudio } from '../context/AudioContext';
-import { User, Activity, Map, Trophy, Hexagon, Star, PlayCircle, BookOpen, Hammer, Search, CheckCircle, Volume2, VolumeX, ArrowRight } from 'lucide-react';
+import { User, Activity, Map, Trophy, Hexagon, Star, PlayCircle, BookOpen, Hammer, Search, CheckCircle, Volume2, VolumeX, ArrowRight, Settings, Moon, Sun } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import BackButton from '../components/common/BackButton';
@@ -178,29 +178,57 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          {/* AUDIO SETTINGS */}
-          <div className="glass-panel p-6 md:p-8 rounded-2xl border border-content/10">
-            <h2 className="text-xl font-serif font-bold text-content mb-6 flex items-center gap-3"><Volume2 className="text-blue-400"/> Audio Settings</h2>
-            <div className="flex flex-col gap-6">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        </div>
+
+        {/* RIGHT COLUMN: SETTINGS */}
+        <div className="lg:col-span-1 space-y-8">
+          
+          <div className="glass-panel p-6 rounded-2xl border border-content/10">
+            <h2 className="text-xl font-serif font-bold text-content mb-6 flex items-center gap-3"><Settings className="text-blue-400" /> App Settings</h2>
+            
+            {/* THEME TOGGLE */}
+            <div className="mb-8">
+              <div className="flex justify-between items-center mb-4">
                 <div>
-                  <h3 className="font-bold text-content mb-1">Mute All</h3>
-                  <p className="text-sm text-content/60">Quickly disable all game sounds and ambience.</p>
+                  <h3 className="font-bold text-content">Visual Theme</h3>
+                  <p className="text-sm text-content/60">Switch between light and dark mode.</p>
+                </div>
+              </div>
+              <button 
+                onClick={toggleTheme}
+                className="w-full flex items-center justify-between p-4 rounded-xl border border-content/20 bg-surface/50 hover:bg-surface transition-colors focus:outline-none focus:ring-2 focus:ring-gold"
+              >
+                <div className="flex items-center gap-3 font-bold text-content">
+                  {theme === 'light' ? <Sun className="text-orange-400" /> : <Moon className="text-blue-300" />}
+                  {theme === 'light' ? 'Light Mode' : 'Dark Mode'}
+                </div>
+                <div className={`w-12 h-6 rounded-full p-1 transition-colors ${theme === 'light' ? 'bg-gold' : 'bg-content/20'}`}>
+                  <div className={`w-4 h-4 rounded-full bg-main transition-transform ${theme === 'light' ? 'translate-x-6' : 'translate-x-0'}`} />
+                </div>
+              </button>
+            </div>
+
+            {/* AUDIO SETTINGS */}
+            <div className="border-t border-content/10 pt-6">
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <h3 className="font-bold text-content">Audio Settings</h3>
+                  <p className="text-sm text-content/60">Game sounds & ambience.</p>
                 </div>
                 <button 
                   onClick={toggleMute}
-                  className={`px-6 py-2 rounded-xl font-bold flex items-center gap-2 transition-all focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-[#171B3A] ${audioSettings.muted ? 'bg-red-900/20 text-red-400 border border-red-500/30' : 'bg-surface border border-content/20 text-content'}`}
+                  className={`p-2 rounded-lg font-bold transition-all focus:outline-none focus:ring-2 focus:ring-gold ${audioSettings.muted ? 'bg-red-900/20 text-red-400 border border-red-500/30' : 'bg-surface border border-content/20 text-content'}`}
+                  title={audioSettings.muted ? 'Unmute' : 'Mute All'}
                 >
                   {audioSettings.muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-                  {audioSettings.muted ? 'Muted' : 'Unmuted'}
                 </button>
               </div>
 
               {!audioSettings.muted && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-content/10">
+                <div className="space-y-4">
                   <div>
                     <div className="flex justify-between mb-2">
-                      <label className="text-sm font-bold opacity-80">Sound Effects (UI & Feedback)</label>
+                      <label className="text-sm font-bold opacity-80">Sound Effects</label>
                       <span className="text-xs opacity-60">{Math.round(audioSettings.sfxVolume * 100)}%</span>
                     </div>
                     <input 
@@ -212,7 +240,7 @@ const ProfilePage = () => {
                   </div>
                   <div>
                     <div className="flex justify-between mb-2">
-                      <label className="text-sm font-bold opacity-80">Atmospheric Ambience</label>
+                      <label className="text-sm font-bold opacity-80">Ambience</label>
                       <span className="text-xs opacity-60">{Math.round(audioSettings.ambienceVolume * 100)}%</span>
                     </div>
                     <input 
@@ -225,59 +253,7 @@ const ProfilePage = () => {
                 </div>
               )}
             </div>
-          </div>
 
-        </div>
-
-        {/* RIGHT COLUMN: RECENT ACTIVITY */}
-        <div className="lg:col-span-1">
-          <div className="glass-panel p-6 rounded-2xl border border-content/10 h-full">
-            <h2 className="text-xl font-serif font-bold text-content mb-6 flex items-center gap-3"><Activity className="text-blue-400" /> Recent Activity</h2>
-            
-            <div className="space-y-6 relative before:absolute before:inset-y-2 before:left-5 before:w-0.5 before:bg-content/10">
-               {isComplete && (
-                 <TimelineItem 
-                   day="Latest" 
-                   title="Preserver of the Legacy" 
-                   desc="You successfully completed the KALACHAKRA journey!"
-                   icon={<Star />}
-                 />
-               )}
-               
-               {gameState.completedLevels.length > 0 && (
-                 <TimelineItem 
-                   day="Recent" 
-                   title={`Completed Level ${gameState.completedLevels[gameState.completedLevels.length - 1]}`} 
-                   desc="Conquered the historical challenges and earned Legacy."
-                   icon={<CheckCircle />}
-                 />
-               )}
-               
-               {gameState.unlockedArtifacts.length > 0 && (
-                 <TimelineItem 
-                   day="Recent" 
-                   title="Historical Discovery" 
-                   desc={`Uncovered ${gameState.unlockedArtifacts.length} total ancient artifacts.`}
-                   icon={<Search />}
-                 />
-               )}
-
-               {gameState.buildings.length > 0 && (
-                 <TimelineItem 
-                   day="Recent" 
-                   title="Era Architect" 
-                   desc={`Constructed ${gameState.buildings.length} total monuments/structures.`}
-                   icon={<Hammer />}
-                 />
-               )}
-
-               <TimelineItem 
-                 day="Start" 
-                 title="Journey Began" 
-                 desc="Registered as a new explorer of ancient heritage."
-                 icon={<Map />}
-               />
-            </div>
           </div>
         </div>
 

@@ -9,7 +9,7 @@ import { levelThemes } from '../data/levelThemes';
 import { 
   JourneyProgressCard, 
   LegacyCard, 
-  PlayerTypeCard, 
+  
   RecommendedActions, 
   ActivityFeed,
   WorldEventWidget
@@ -82,13 +82,7 @@ const DashboardPage = () => {
           </p>
         </div>
         <div className="relative z-10 flex gap-3">
-          <div className="px-4 py-2 rounded-xl bg-main/80 backdrop-blur-md border border-gold/40 shadow-inner text-xs font-bold uppercase text-content/90 hover-card-fx">
-            {t(`onboarding.age_${gameState.ageGroup || '12-14'}`, gameState.ageGroup || '12-14')}
-          </div>
-          <div className="px-4 py-2 rounded-xl bg-main/80 backdrop-blur-md border border-gold/40 shadow-inner text-xs font-bold uppercase text-gold hover-card-fx">
-            {t(`onboarding.type_${gameState.playerType || 'explorer'}`, gameState.playerType || 'Explorer')}
-          </div>
-
+          {/* Deduplicated: Age and Player Type moved entirely to Profile Page */}
         </div>
       </header>
 
@@ -100,9 +94,8 @@ const DashboardPage = () => {
         <div className="lg:col-span-8">
           <JourneyProgressCard stats={stats} />
         </div>
-        <div className="lg:col-span-4 grid grid-rows-2 gap-6">
+        <div className="lg:col-span-4">
           <LegacyCard stats={stats} />
-          <PlayerTypeCard />
         </div>
       </div>
 

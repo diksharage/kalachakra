@@ -13,6 +13,8 @@ export const AudioProvider = ({ children }) => {
     muted: false,
     uiSoundsEnabled: true
   });
+  
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     try {
@@ -22,11 +24,15 @@ export const AudioProvider = ({ children }) => {
       }
     } catch (e) {
       // ignore
+    } finally {
+      setIsInitialized(true);
     }
   }, []);
 
   // Apply settings to synthesizer whenever they change
   useEffect(() => {
+    if (!isInitialized) return;
+    
     audioSynth.setSettings({
       master: settings.masterVolume,
       sfx: settings.sfxVolume,
@@ -34,7 +40,7 @@ export const AudioProvider = ({ children }) => {
       muted: settings.muted
     });
     localStorage.setItem('kalachakra_audio_prefs', JSON.stringify(settings));
-  }, [settings]);
+  }, [settings, isInitialized]);
 
   // Global Interaction Listener to initialize Audio Context safely
   useEffect(() => {
