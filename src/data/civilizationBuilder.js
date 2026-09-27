@@ -25,9 +25,9 @@ export const civilizationBuilderData = {
     terrain: { water: [2, 3, 4] },
     categories: ["Agriculture", "Storage", "Settlement"],
     buildings: [
-      { id: "l2_crops", category: "Agriculture", nameKey: "Wheat Field", descKey: "Clear land and plant early domesticated wheat.", requirements: { tools: 1, water: 1 }, effects: { food_production: 2 }, icon: "🌾" },
-      { id: "l2_storage", category: "Storage", nameKey: "Clay Granary", descKey: "Build a sealed granary using early pottery techniques.", requirements: { clay: 2, wood: 1 }, effects: { storage_capacity: 3 }, icon: "🏺" },
-      { id: "l2_settlement", category: "Settlement", nameKey: "Mudbrick House", descKey: "Construct a permanent dwelling.", requirements: { clay: 2, water: 1, stone: 1 }, effects: { community_capacity: 2 }, icon: "🧱" }
+      { id: "l2_crops", category: "Agriculture", nameKey: "Wheat Field", descKey: "Clear land and plant early domesticated wheat.", requirements: { materials: 1, water: 1 }, effects: { food_production: 2 }, icon: "🌾" },
+      { id: "l2_storage", category: "Storage", nameKey: "Clay Granary", descKey: "Build a sealed granary using early pottery techniques.", requirements: { materials: 2, food: 1 }, effects: { storage_capacity: 3 }, icon: "🏺" },
+      { id: "l2_settlement", category: "Settlement", nameKey: "Mudbrick House", descKey: "Construct a permanent dwelling.", requirements: { materials: 2, water: 1 }, effects: { community_capacity: 2 }, icon: "🧱" }
     ]
   },
   // Level 3 - Indus Civilization
