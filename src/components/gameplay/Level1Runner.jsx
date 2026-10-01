@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Sky, SoftShadows, Float } from '@react-three/drei';
 import * as THREE from 'three';
 import { Play, RotateCcw, AlertTriangle } from 'lucide-react';
+import { useAudio } from '../../context/AudioContext'; // Added Audio Integration
 
 const SPEED = 25;
 const LANE_WIDTH = 2.5;
@@ -37,13 +38,33 @@ const geos = {
   box: new THREE.BoxGeometry(1, 1, 1),
   sphere: new THREE.SphereGeometry(0.6, 16, 16),
   capsule: new THREE.CapsuleGeometry(0.3, 0.5, 4, 8),
-  waterPool: new THREE.PlaneGeometry(15, 15)
+  waterPool: new THREE.PlaneGeometry(15, 15),
+  spear: new THREE.CylinderGeometry(0.02, 0.02, 1.5, 4)
 };
 
 const objectives = { wood: 3, stone: 2, plants: 3, food: 1 };
 
+// --- Particle System ---
+const ParticleEffect = ({ position, color, onComplete }) => {
+  const mesh = useRef();
+  useFrame((state, delta) => {
+     if (!mesh.current) return;
+     mesh.current.scale.x += delta * 15;
+     mesh.current.scale.y += delta * 15;
+     mesh.current.scale.z += delta * 15;
+     mesh.current.material.opacity -= delta * 2;
+     if (mesh.current.material.opacity <= 0) onComplete();
+  });
+  return (
+    <mesh ref={mesh} position={position}>
+      <sphereGeometry args={[0.5, 8, 8]} />
+      <meshBasicMaterial color={color} transparent opacity={1} />
+    </mesh>
+  );
+};
+
 // --- Character ---
-const Player = ({ isPlaying, lane, isJumping, hitEffect }) => {
+const Player = ({ isPlaying, lane, hitEffect, isJumping }) => {
   const group = useRef();
   const leftLeg = useRef();
   const rightLeg = useRef();
@@ -52,34 +73,59 @@ const Player = ({ isPlaying, lane, isJumping, hitEffect }) => {
   const torso = useRef();
 
   const [visualLane, setVisualLane] = useState(0);
+  const phys = useRef({ y: 0, vy: 0, jumping: false });
+
+  useEffect(() => {
+     if (isJumping && !phys.current.jumping) {
+        phys.current.jumping = true;
+        phys.current.vy = 18; // upward jump velocity
+     }
+  }, [isJumping]);
 
   useFrame((state, delta) => {
-    setVisualLane(THREE.MathUtils.lerp(visualLane, lane * LANE_WIDTH, 10 * delta));
+    // Smoother lane shifting + Lean effect
+    const targetX = lane * LANE_WIDTH;
+    const diff = targetX - visualLane;
+    setVisualLane(v => v + diff * 10 * delta);
     group.current.position.x = visualLane;
+    group.current.rotation.z = -diff * 0.2;
 
-    if (isJumping) {
-      group.current.position.y = THREE.MathUtils.lerp(group.current.position.y, 3.5, 10 * delta);
-    } else {
-      group.current.position.y = THREE.MathUtils.lerp(group.current.position.y, 0, 10 * delta);
+    // Real gravity for jump
+    if (phys.current.jumping) {
+       phys.current.vy -= 50 * delta; 
+       phys.current.y += phys.current.vy * delta;
+       if (phys.current.y <= 0) {
+          phys.current.y = 0;
+          phys.current.jumping = false;
+       }
     }
+    group.current.position.y = phys.current.y;
 
     const t = state.clock.elapsedTime;
 
     if (hitEffect) {
-       group.current.rotation.z = Math.sin(t * 30) * 0.2;
+       group.current.rotation.y = Math.sin(t * 50) * 0.3;
+       torso.current.children[0].material.color.set('#ff0000');
     } else {
-       group.current.rotation.z = 0;
+       group.current.rotation.y = 0;
+       torso.current.children[0].material.color.set('#5c4033'); 
     }
 
-    if (isPlaying) {
-      const runSpeed = 15;
+    if (isPlaying && !phys.current.jumping) {
+      const runSpeed = 20; 
       const angle = Math.sin(t * runSpeed);
-      leftLeg.current.rotation.x = angle * 0.8;
-      rightLeg.current.rotation.x = -angle * 0.8;
-      leftArm.current.rotation.x = -angle * 0.8;
-      rightArm.current.rotation.x = angle * 0.8;
-      torso.current.position.y = 0.9 + Math.abs(Math.sin(t * runSpeed)) * 0.1;
-      group.current.rotation.x = 0.1; 
+      leftLeg.current.rotation.x = angle * 1.0;
+      rightLeg.current.rotation.x = -angle * 1.0;
+      leftArm.current.rotation.x = -angle * 1.0;
+      rightArm.current.rotation.x = angle * 1.0;
+      torso.current.position.y = 0.9 + Math.abs(angle) * 0.15;
+      group.current.rotation.x = 0.15;
+    } else if (phys.current.jumping) {
+      leftLeg.current.rotation.x = -0.5;
+      rightLeg.current.rotation.x = 0.5;
+      leftArm.current.rotation.x = 0.8;
+      rightArm.current.rotation.x = -0.8;
+      group.current.rotation.x = 0;
     } else {
       leftLeg.current.rotation.x = 0;
       rightLeg.current.rotation.x = 0;
@@ -93,7 +139,7 @@ const Player = ({ isPlaying, lane, isJumping, hitEffect }) => {
   return (
     <group ref={group}>
       <group ref={torso} position={[0, 0.9, 0]}>
-        <mesh geometry={geos.torso} material={hitEffect ? mats.skin : mats.cloth} castShadow receiveShadow />
+        <mesh geometry={geos.torso} material={mats.cloth} castShadow receiveShadow />
         <group position={[0, 0.7, 0]}>
           <mesh geometry={geos.head} material={mats.skin} castShadow />
           <mesh geometry={geos.head} material={mats.hair} position={[0, 0.05, -0.05]} scale={[1.05, 1.05, 1.05]} castShadow />
@@ -102,7 +148,9 @@ const Player = ({ isPlaying, lane, isJumping, hitEffect }) => {
           <mesh ref={leftArm} geometry={geos.limb} material={mats.skin} position={[0, -0.3, 0]} castShadow />
         </group>
         <group position={[0.45, 0.2, 0]}>
-          <mesh ref={rightArm} geometry={geos.limb} material={mats.skin} position={[0, -0.3, 0]} castShadow />
+          <mesh ref={rightArm} geometry={geos.limb} material={mats.skin} position={[0, -0.3, 0]} castShadow>
+             <mesh geometry={geos.spear} material={mats.wood} position={[0, -0.3, 0.4]} rotation={[Math.PI/2, 0, 0]} />
+          </mesh>
         </group>
         <group position={[-0.2, -0.4, 0]}>
           <mesh ref={leftLeg} geometry={geos.limb} material={mats.skin} position={[0, -0.3, 0]} castShadow />
@@ -122,14 +170,14 @@ const WorldItem = ({ item, onCollide }) => {
   useFrame((state, delta) => {
     if (!item.active) return;
     
-    // Z collision check
-    if (item.z > -1 && item.z < 1) {
+    // Exact Player is at Z=0, give slight leeway for lane shifting
+    if (item.z > -1.5 && item.z < 1.5) {
        onCollide(item);
     }
     
     if (!item.isObstacle && item.type !== 'waterSource') {
-       meshRef.current.rotation.y += 2 * delta;
-       meshRef.current.position.y = 1 + Math.sin(state.clock.elapsedTime * 3) * 0.2;
+       meshRef.current.rotation.y += 3 * delta;
+       meshRef.current.position.y = 1 + Math.sin(state.clock.elapsedTime * 4 + item.id) * 0.3;
     }
   });
 
@@ -143,9 +191,9 @@ const WorldItem = ({ item, onCollide }) => {
 
   if (item.isObstacle) {
     if (item.type === 'rock') {
-      return <mesh ref={meshRef} geometry={geos.rock} material={mats.rock} position={[item.lane * LANE_WIDTH, 0.5, item.z]} castShadow receiveShadow />;
+      return <mesh ref={meshRef} geometry={geos.rock} material={mats.rock} position={[item.lane * LANE_WIDTH, 0.5, item.z]} scale={[1.2, 1.2, 1.2]} castShadow receiveShadow />;
     } else {
-      return <mesh ref={meshRef} geometry={geos.trunk} material={mats.treeTrunk} position={[item.lane * LANE_WIDTH, 0.3, item.z]} rotation={[Math.PI/2, 0, 0]} scale={[1,2,1]} castShadow receiveShadow />;
+      return <mesh ref={meshRef} geometry={geos.trunk} material={mats.treeTrunk} position={[item.lane * LANE_WIDTH, 0.3, item.z]} rotation={[Math.PI/2, 0, 0]} scale={[1,2.5,1]} castShadow receiveShadow />;
     }
   }
 
@@ -153,9 +201,9 @@ const WorldItem = ({ item, onCollide }) => {
   const geoMap = { wood: geos.box, stone: geos.rock, plants: geos.capsule, food: geos.sphere };
   
   return (
-    <Float floatIntensity={2} rotationIntensity={1}>
-      <mesh ref={meshRef} geometry={geoMap[item.type]} material={mats[item.type]} position={[item.lane * LANE_WIDTH, 1, item.z]} scale={[0.6, 0.6, 0.6]} castShadow />
-      <pointLight position={[item.lane * LANE_WIDTH, 1, item.z]} color={colorMap[item.type]} intensity={0.5} distance={3} />
+    <Float floatIntensity={3} rotationIntensity={2}>
+      <mesh ref={meshRef} geometry={geoMap[item.type]} material={mats[item.type]} position={[item.lane * LANE_WIDTH, 1, item.z]} scale={[0.7, 0.7, 0.7]} castShadow />
+      <pointLight position={[item.lane * LANE_WIDTH, 1, item.z]} color={colorMap[item.type]} intensity={0.8} distance={4} />
     </Float>
   );
 };
@@ -184,12 +232,21 @@ const EnvironmentSetup = ({ distance, engineRef, onCollide }) => {
 
   return (
     <group>
-      <mesh geometry={geos.ground} material={mats.ground} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -500]} receiveShadow />
-      <mesh geometry={geos.path} material={mats.path} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, -500]} receiveShadow />
+      <mesh geometry={geos.ground} material={mats.ground} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, -500]} receiveShadow />
       
-      {/* Dynamic spawned items */}
+      {/* Path with edges */}
+      <mesh geometry={geos.path} material={mats.path} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -500]} receiveShadow />
+      <mesh geometry={geos.path} material={mats.ground} rotation={[-Math.PI / 2, 0, 0.02]} position={[-5, 0.05, -500]} scale={[0.1, 1, 1]} receiveShadow />
+      <mesh geometry={geos.path} material={mats.ground} rotation={[-Math.PI / 2, 0, -0.02]} position={[5, 0.05, -500]} scale={[0.1, 1, 1]} receiveShadow />
+
       {engineRef.current.items.map(item => (
         <WorldItem key={item.id} item={item} onCollide={onCollide} />
+      ))}
+      
+      {engineRef.current.particles.map(p => (
+        <ParticleEffect key={p.id} position={p.position} color={p.color} onComplete={() => {
+           engineRef.current.particles = engineRef.current.particles.filter(x => x.id !== p.id);
+        }} />
       ))}
 
       <group ref={worldGroup}>
@@ -211,8 +268,10 @@ const EnvironmentSetup = ({ distance, engineRef, onCollide }) => {
 // --- Camera ---
 const CameraController = () => {
   useFrame((state) => {
-    state.camera.position.lerp(new THREE.Vector3(0, 4, 8), 0.1);
-    state.camera.lookAt(0, 2, -10);
+    // Smoother dynamic camera with slight bob
+    const targetY = 3.5 + Math.sin(state.clock.elapsedTime * 2) * 0.1;
+    state.camera.position.lerp(new THREE.Vector3(0, targetY, 7), 0.1);
+    state.camera.lookAt(0, 1.5, -10);
   });
   return null;
 };
@@ -224,11 +283,11 @@ const Scene = ({ uiState, engineRef, onCollide }) => {
       <color attach="background" args={['#87CEEB']} />
       <fog attach="fog" args={['#87CEEB', 30, 200]} />
       
-      <ambientLight intensity={0.6} />
+      <ambientLight intensity={0.7} />
       <directionalLight 
         castShadow 
-        position={[40, 50, 20]} 
-        intensity={1.5} 
+        position={[40, 60, 20]} 
+        intensity={1.8} 
         shadow-mapSize={[2048, 2048]} 
         shadow-camera-far={150} 
         shadow-camera-left={-40} 
@@ -236,17 +295,18 @@ const Scene = ({ uiState, engineRef, onCollide }) => {
         shadow-camera-top={40} 
         shadow-camera-bottom={-40} 
       />
-      <Sky sunPosition={[100, 20, -100]} turbidity={0.1} rayleigh={0.5} />
+      <Sky sunPosition={[100, 20, -100]} turbidity={0.2} rayleigh={0.5} />
 
       <CameraController />
       <EnvironmentSetup distance={engineRef.current.distance} engineRef={engineRef} onCollide={onCollide} />
-      <Player isPlaying={uiState.status === 'playing'} lane={uiState.lane} isJumping={uiState.isJumping} hitEffect={uiState.hitEffect} />
+      <Player isPlaying={uiState.status === 'playing'} lane={uiState.lane} hitEffect={uiState.hitEffect} isJumping={uiState.isJumping} />
     </>
   );
 };
 
 // --- Wrapper Component ---
 const Level1Runner = ({ onComplete }) => {
+  const { playSound } = useAudio();
   const [uiState, setUiState] = useState({
      status: 'start',
      lane: 0,
@@ -260,6 +320,7 @@ const Level1Runner = ({ onComplete }) => {
   const engineRef = useRef({
      distance: 0,
      items: [],
+     particles: [],
      lastSpawnZ: -50
   });
 
@@ -271,7 +332,8 @@ const Level1Runner = ({ onComplete }) => {
        if (action === 'right' && prev.lane < 1) next.lane++;
        if (action === 'jump' && !prev.isJumping) {
           next.isJumping = true;
-          setTimeout(() => setUiState(s => ({ ...s, isJumping: false })), 500);
+          if (playSound) playSound('ui');
+          setTimeout(() => setUiState(s => ({ ...s, isJumping: false })), 600);
        }
        return next;
     });
@@ -281,7 +343,7 @@ const Level1Runner = ({ onComplete }) => {
     const handleKeyDown = (ev) => {
       if (ev.key === 'ArrowLeft' || ev.key === 'a') handleInput('left');
       if (ev.key === 'ArrowRight' || ev.key === 'd') handleInput('right');
-      if (ev.key === 'ArrowUp' || ev.key === 'w' || ev.key === ' ') handleInput('jump');
+      if (ev.key === 'ArrowUp' || ev.key === 'w' || ev.key === ' ' || ev.key === 'Spacebar') handleInput('jump');
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -289,19 +351,21 @@ const Level1Runner = ({ onComplete }) => {
 
   const showMessage = (msg) => {
      setUiState(prev => ({ ...prev, message: msg }));
-     setTimeout(() => setUiState(prev => ({ ...prev, message: '' })), 2000);
+     setTimeout(() => setUiState(prev => ({ ...prev, message: '' })), 2500);
   };
 
   const handleCollide = (item) => {
      if (uiState.status !== 'playing' || !item.active) return;
-     item.active = false; // Mark handled
      
      if (item.type === 'waterSource') {
+        item.active = false;
         setUiState(prev => {
            const done = Object.keys(objectives).every(k => prev.inventory[k] >= objectives[k]);
            if (done) {
+              if (playSound) playSound('success');
               return { ...prev, status: 'complete' };
            } else {
+              if (playSound) playSound('error');
               showMessage("Missing Resources! Keep searching!");
               return prev;
            }
@@ -311,8 +375,10 @@ const Level1Runner = ({ onComplete }) => {
      
      if (item.lane === uiState.lane) {
         if (item.isObstacle) {
-           if (uiState.isJumping && item.type === 'log') return; // successfully jumped log
+           if (uiState.isJumping && item.type === 'log') return; 
            
+           item.active = false;
+           if (playSound) playSound('error');
            setUiState(prev => {
               const newEnergy = Math.max(0, prev.energy - 25);
               return { 
@@ -322,8 +388,18 @@ const Level1Runner = ({ onComplete }) => {
                  status: newEnergy === 0 ? 'gameover' : prev.status 
               };
            });
-           setTimeout(() => setUiState(prev => ({ ...prev, hitEffect: false })), 500);
+           setTimeout(() => setUiState(prev => ({ ...prev, hitEffect: false })), 600);
         } else {
+           item.active = false;
+           if (playSound) playSound('discovery');
+           
+           const colorMap = { wood: '#8B5A2B', stone: '#708090', plants: '#228B22', food: '#DAA520' };
+           engineRef.current.particles.push({
+              id: Math.random(),
+              position: [item.lane * LANE_WIDTH, 1, 0],
+              color: colorMap[item.type]
+           });
+           
            setUiState(prev => ({
               ...prev,
               inventory: { ...prev.inventory, [item.type]: prev.inventory[item.type] + 1 }
@@ -344,40 +420,40 @@ const Level1Runner = ({ onComplete }) => {
        if (uiState.status === 'playing') {
           engineRef.current.distance += SPEED * safeDt;
           
-          // Move items
           engineRef.current.items.forEach(i => {
              if (i.active) i.z += SPEED * safeDt;
           });
           
-          // Cleanup passed items
           engineRef.current.items = engineRef.current.items.filter(i => i.z < 20);
           
-          // Spawn logic
+          // Smart Spawning
           if (engineRef.current.distance > engineRef.current.lastSpawnZ) {
-             const r = Math.random();
-             const isObstacle = r < 0.4;
-             let type = 'wood';
+             const dist = engineRef.current.distance;
              
-             // Check if we should spawn Water Source (every 500m)
-             if (engineRef.current.distance > 0 && Math.floor(engineRef.current.distance) % 500 < 5) {
-                // Spawn a water source pool spanning all lanes
-                engineRef.current.items.push({ id: Math.random(), type: 'waterSource', lane: 0, z: -150, active: true, isObstacle: false });
-                engineRef.current.lastSpawnZ = engineRef.current.distance + 150;
+             if (dist > 0 && Math.floor(dist) % 500 < 10) {
+                if (!engineRef.current.items.find(i => i.type === 'waterSource' && i.z < 0)) {
+                   engineRef.current.items.push({ id: Math.random(), type: 'waterSource', lane: 0, z: -200, active: true, isObstacle: false });
+                   engineRef.current.lastSpawnZ = dist + 200;
+                }
              } else {
+                const r = Math.random();
+                const isObstacle = r < 0.45;
+                let type = 'wood';
+                
                 if (isObstacle) {
                    type = Math.random() > 0.5 ? 'rock' : 'log';
                 } else {
-                   // Prefer spawning missing objectives
                    const missing = Object.keys(objectives).filter(k => uiState.inventory[k] < objectives[k]);
-                   if (missing.length > 0 && Math.random() > 0.3) {
+                   if (missing.length > 0 && Math.random() > 0.2) {
                       type = missing[Math.floor(Math.random() * missing.length)];
                    } else {
                       type = ['wood', 'stone', 'plants', 'food'][Math.floor(Math.random()*4)];
                    }
                 }
-                const lane = Math.floor(Math.random() * 3) - 1;
+                
+                let lane = Math.floor(Math.random() * 3) - 1;
                 engineRef.current.items.push({ id: Math.random(), type, lane, z: -150, active: true, isObstacle });
-                engineRef.current.lastSpawnZ = engineRef.current.distance + 20 + Math.random() * 40;
+                engineRef.current.lastSpawnZ = dist + 20 + Math.random() * 35;
              }
           }
        }
@@ -391,6 +467,7 @@ const Level1Runner = ({ onComplete }) => {
   const restart = () => {
      engineRef.current.distance = 0;
      engineRef.current.items = [];
+     engineRef.current.particles = [];
      engineRef.current.lastSpawnZ = -50;
      setUiState({
         status: 'playing', lane: 0, isJumping: false, hitEffect: false,
@@ -398,8 +475,23 @@ const Level1Runner = ({ onComplete }) => {
      });
   };
 
+  // Mobile Handlers
+  const touchStart = useRef({ x: 0, y: 0 });
+  const onTouchStart = (ev) => {
+    touchStart.current = { x: ev.touches[0].clientX, y: ev.touches[0].clientY };
+  };
+  const onTouchEnd = (ev) => {
+    const dx = ev.changedTouches[0].clientX - touchStart.current.x;
+    const dy = ev.changedTouches[0].clientY - touchStart.current.y;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 30) {
+      if (dx > 0) handleInput('right'); else handleInput('left');
+    } else if (Math.abs(dy) > 30 && dy < 0) {
+      handleInput('jump');
+    }
+  };
+
   return (
-    <div className="relative w-full h-[70vh] min-h-[500px] flex flex-col rounded-2xl overflow-hidden shadow-2xl bg-black border border-content/20">
+    <div className="relative w-full h-[70vh] min-h-[500px] flex flex-col rounded-3xl overflow-hidden shadow-2xl bg-black border border-content/20" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       
       <Canvas shadows camera={{ fov: 60 }}>
          <SoftShadows size={15} samples={16} focus={0.5} />
@@ -410,13 +502,15 @@ const Level1Runner = ({ onComplete }) => {
       <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-start z-20 pointer-events-none">
         <div className="flex flex-col gap-2">
            <h3 className="text-xl font-bold text-white drop-shadow-lg uppercase tracking-widest">Survival Run</h3>
-           <div className="flex flex-col gap-1 bg-black/70 p-3 rounded-lg border border-white/20 backdrop-blur-sm pointer-events-auto">
+           <div className="flex flex-col gap-1.5 bg-black/70 p-4 rounded-xl border border-white/20 backdrop-blur-md pointer-events-auto shadow-lg">
              {Object.entries(objectives).map(([k, max]) => {
                 const cur = uiState.inventory[k];
                 const done = cur >= max;
                 return (
-                  <div key={k} className={`flex items-center justify-between gap-4 text-xs font-bold uppercase tracking-widest ${done ? 'text-green-400' : 'text-white'}`}>
-                    <span>{k === 'wood' ? '🪵' : k === 'stone' ? '🪨' : k === 'plants' ? '🌿' : '🌾'} {k}</span>
+                  <div key={k} className={`flex items-center justify-between gap-6 text-sm font-bold uppercase tracking-widest ${done ? 'text-green-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.8)]' : 'text-white'}`}>
+                    <span className="flex items-center gap-2">
+                      {k === 'wood' ? '🪵' : k === 'stone' ? '🪨' : k === 'plants' ? '🌿' : '🌾'} {k}
+                    </span>
                     <span>{cur} / {max}</span>
                   </div>
                 );
@@ -425,10 +519,10 @@ const Level1Runner = ({ onComplete }) => {
         </div>
         
         <div className="flex flex-col items-end gap-2">
-           <div className="bg-black/70 px-4 py-2 rounded-lg border border-white/20 backdrop-blur-sm pointer-events-auto">
-             <div className="text-xs text-white/80 font-bold uppercase tracking-widest mb-1">Energy</div>
-             <div className="w-32 h-4 bg-black rounded-full overflow-hidden border border-white/10">
-               <div className={`h-full transition-all duration-300 ${uiState.energy > 30 ? 'bg-green-500' : 'bg-red-500'}`} style={{ width: `${uiState.energy}%` }} />
+           <div className="bg-black/70 px-5 py-3 rounded-xl border border-white/20 backdrop-blur-md pointer-events-auto shadow-lg">
+             <div className="text-xs text-white/80 font-bold uppercase tracking-widest mb-2">Energy</div>
+             <div className="w-32 h-5 bg-black rounded-full overflow-hidden border border-white/10 shadow-inner">
+               <div className={`h-full transition-all duration-300 ${uiState.energy > 30 ? 'bg-gradient-to-r from-green-600 to-green-400' : 'bg-gradient-to-r from-red-600 to-red-400'}`} style={{ width: `${uiState.energy}%` }} />
              </div>
            </div>
         </div>
@@ -436,53 +530,53 @@ const Level1Runner = ({ onComplete }) => {
 
       {/* IN-GAME MESSAGES */}
       {uiState.message && (
-         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 bg-red-900/90 text-white px-6 py-3 rounded-xl border border-red-500/50 font-bold text-xl tracking-wider backdrop-blur-md animate-bounce z-20 shadow-2xl">
+         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 bg-red-900/90 text-white px-8 py-4 rounded-2xl border border-red-500/50 font-extrabold text-2xl tracking-wider backdrop-blur-md animate-bounce z-20 shadow-[0_0_50px_rgba(220,38,38,0.6)] text-center">
             {uiState.message}
          </div>
       )}
 
       {/* MENUS */}
       {uiState.status === 'start' && (
-        <div className="absolute inset-0 z-30 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center animate-fade-in">
-          <h2 className="text-5xl font-extrabold text-white mb-4 font-serif drop-shadow-lg">Wilderness Survival</h2>
-          <p className="text-white/90 max-w-lg mb-8 text-lg leading-relaxed shadow-sm">
-            Collect the required resources and reach the water source! Avoid obstacles to maintain your energy.
+        <div className="absolute inset-0 z-30 bg-black/60 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center animate-fade-in">
+          <h2 className="text-5xl md:text-6xl font-extrabold text-white mb-6 font-serif drop-shadow-2xl">Wilderness Survival</h2>
+          <p className="text-white/90 max-w-xl mb-10 text-xl leading-relaxed shadow-sm">
+            Collect the required resources and reach the water source! Avoid rocks and logs to maintain your energy.
           </p>
-          <button onClick={() => setUiState(s => ({ ...s, status: 'playing' }))} className="px-10 py-5 bg-gold text-black font-extrabold rounded-2xl text-xl hover:scale-105 transition-transform shadow-xl flex items-center gap-2">
-            <Play fill="currentColor" /> Begin Run
+          <button onClick={() => setUiState(s => ({ ...s, status: 'playing' }))} className="px-10 py-5 bg-gold text-black font-extrabold rounded-2xl text-2xl hover:scale-105 transition-transform shadow-[0_0_40px_rgba(218,165,32,0.4)] flex items-center gap-3">
+            <Play fill="currentColor" className="w-6 h-6" /> Begin Run
           </button>
         </div>
       )}
 
       {uiState.status === 'gameover' && (
         <div className="absolute inset-0 z-40 bg-red-950/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center animate-fade-in">
-          <AlertTriangle className="w-16 h-16 text-red-500 mb-4" />
-          <h2 className="text-5xl font-extrabold text-white mb-4">Energy Depleted</h2>
-          <p className="text-white/80 mb-6 text-lg">You did not survive the wilderness.</p>
-          <div className="flex gap-4 mb-8 bg-black/40 p-4 rounded-xl">
+          <AlertTriangle className="w-20 h-20 text-red-500 mb-6 drop-shadow-[0_0_20px_rgba(239,68,68,0.8)]" />
+          <h2 className="text-5xl md:text-6xl font-extrabold text-white mb-4">Energy Depleted</h2>
+          <p className="text-white/80 mb-8 text-xl">You did not survive the wilderness.</p>
+          <div className="flex gap-6 mb-10 bg-black/40 p-6 rounded-2xl border border-white/10">
              {Object.entries(uiState.inventory).map(([k, v]) => (
-                <div key={k} className="flex flex-col items-center"><span className="text-xl">{v}</span><span className="text-xs uppercase text-white/50">{k}</span></div>
+                <div key={k} className="flex flex-col items-center"><span className="text-3xl font-bold text-white mb-1">{v}</span><span className="text-sm uppercase tracking-widest text-white/50">{k}</span></div>
              ))}
           </div>
-          <button onClick={restart} className="px-10 py-4 bg-red-600 text-white font-bold rounded-2xl text-xl hover:scale-105 transition-transform flex items-center gap-2">
-            <RotateCcw /> Restart Level
+          <button onClick={restart} className="px-10 py-5 bg-red-600 text-white font-extrabold rounded-2xl text-xl hover:scale-105 transition-transform flex items-center gap-3 shadow-[0_0_30px_rgba(220,38,38,0.5)]">
+            <RotateCcw className="w-6 h-6" /> Restart Level
           </button>
         </div>
       )}
 
       {uiState.status === 'complete' && (
         <div className="absolute inset-0 z-40 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center animate-fade-in slide-in-from-bottom-8">
-          <h2 className="text-5xl font-bold text-green-400 mb-4 font-serif">Level Complete!</h2>
-          <p className="text-white/80 mb-8 text-lg max-w-md">You gathered the required supplies and reached the water source safely.</p>
-          <div className="bg-surface/40 border border-content/10 p-6 rounded-2xl flex flex-wrap justify-center gap-6 mb-10 shadow-2xl">
+          <h2 className="text-5xl md:text-6xl font-extrabold text-green-400 mb-6 font-serif drop-shadow-[0_0_30px_rgba(74,222,128,0.4)]">Level Complete!</h2>
+          <p className="text-white/90 mb-10 text-xl max-w-lg">You successfully gathered the required supplies and secured a safe water source for your community.</p>
+          <div className="bg-surface/40 border border-content/10 p-8 rounded-3xl flex flex-wrap justify-center gap-8 mb-12 shadow-2xl">
              {Object.entries(uiState.inventory).map(([k, v]) => (
                 <div key={k} className="flex flex-col items-center">
-                  <span className="text-white font-extrabold text-2xl">{v}</span>
-                  <span className="text-white/60 text-xs uppercase">{k}</span>
+                  <span className="text-white font-extrabold text-3xl mb-2">{v}</span>
+                  <span className="text-white/60 text-sm uppercase tracking-widest">{k}</span>
                 </div>
              ))}
           </div>
-          <button onClick={() => onComplete(uiState.inventory, Math.floor(engineRef.current.distance))} className="px-10 py-5 bg-green-600 text-white font-bold rounded-2xl text-xl hover:scale-105 transition-transform shadow-[0_0_30px_rgba(22,163,74,0.4)]">
+          <button onClick={() => onComplete(uiState.inventory, Math.floor(engineRef.current.distance))} className="px-12 py-5 bg-green-600 text-white font-extrabold rounded-2xl text-2xl hover:scale-105 transition-transform shadow-[0_0_40px_rgba(22,163,74,0.6)]">
             Continue Journey
           </button>
         </div>
