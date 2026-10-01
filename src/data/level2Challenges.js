@@ -28,41 +28,27 @@ export const level2Challenges = {
   domestication: {
     id: "farming-animals-01",
     title: "Animal Domestication",
-    getQuestion: (ageGroup) => {
-      switch (ageGroup) {
-        case '6-8': return "Which of these animals would be easiest to keep in a village?";
-        case '9-11': return "Which animals were most commonly kept by early farming communities for food and resources?";
-        case '12-14': return "Which combination of animals represents species that were historically domesticated by early settled communities?";
-        case '15-17': return "Animal domestication provided reliable calories and materials. Which species group represents early pastoral/agricultural integration?";
-        case '18+': return "Zooarchaeological evidence indicates that certain species were selected for domestication based on their social structures and diet. Which group fits this profile?";
-        default: return "Which animals did early farmers keep?";
-      }
-    },
-    options: [
-      { id: 'tiger', label: 'Tigers and Bears', icon: '🐅', isCorrect: false },
-      { id: 'goat', label: 'Goats, Sheep and Cattle', icon: '🐐', isCorrect: true },
-      { id: 'eagle', label: 'Eagles and Hawks', icon: '🦅', isCorrect: false }
+    format: "matching",
+    getQuestion: (ageGroup) => "Match the domesticated animal to its primary historical benefit:",
+    pairs: [
+      { left: { id: 'l1', label: 'Goats & Cattle', icon: '🐐' }, right: { id: 'r1', label: 'Milk & Meat' } },
+      { left: { id: 'l2', label: 'Sheep', icon: '🐑' }, right: { id: 'r2', label: 'Wool & Warmth' } },
+      { left: { id: 'l3', label: 'Dogs', icon: '🐕' }, right: { id: 'r3', label: 'Hunting & Guarding' } }
     ],
     explanation: "Humans developed relationships with animals like goats, sheep, and cattle. This provided reliable access to milk, meat, wool, and labor. Domestication practices varied widely across regions."
   },
   pottery: {
     id: "farming-pottery-01",
     title: "Pottery & Storage",
-    getQuestion: (ageGroup) => {
-      switch (ageGroup) {
-        case '6-8': return "You have grown a lot of grain. Where should you keep it?";
-        case '9-11': return "What was the main reason early farmers started making clay pottery?";
-        case '12-14': return "Why was the invention of pottery particularly important for agricultural communities?";
-        case '15-17': return "How did the development of ceramic technology fundamentally change resource management in settled communities?";
-        case '18+': return "The appearance of pottery in the archaeological record often correlates with sedentism. What primary functional advantage did ceramics provide to early farmers?";
-        default: return "Why did early farmers need pottery?";
-      }
-    },
-    options: [
-      { id: 'hands', label: 'Hold it in their hands', icon: '🤲', isCorrect: false },
-      { id: 'clay_pots', label: 'Store it in clay pots to keep it safe', icon: '🏺', isCorrect: true },
-      { id: 'leave', label: 'Leave it outside on the ground', icon: '🍂', isCorrect: false }
+    format: "ordering",
+    getQuestion: (ageGroup) => "Order the steps of creating and using early pottery for agriculture:",
+    items: [
+      { id: 'step1', label: 'Gather river clay and shape it into a vessel.' },
+      { id: 'step2', label: 'Fire the clay in a hot pit to harden it.' },
+      { id: 'step3', label: 'Harvest surplus grain from the fields.' },
+      { id: 'step4', label: 'Store the grain inside to protect it from pests.' }
     ],
+    correctOrder: ['step1', 'step2', 'step3', 'step4'],
     explanation: "Pottery allowed communities to safely store surplus food, protect seeds for the next planting season from pests and moisture, and transport water."
   },
   resource_management: {

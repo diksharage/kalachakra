@@ -282,6 +282,56 @@ const ObjectiveTracker = ({ stage, levelState, locations, targetExplore, targetD
   );
 };
 
+const ArtifactDiscoverer = ({ data, theme, ageGroup, onComplete }) => {
+  const [clicks, setClicks] = useState(0);
+  const required = 3;
+  const progress = Math.min((clicks / required) * 100, 100);
+  
+  return (
+    <>
+      <div className="text-center animate-fade-in w-full">
+        <h3 className={"text-xl font-bold mb-4 uppercase " + theme.primary}>Uncover Artifact</h3>
+        <p className="text-sm opacity-70 mb-4">Carefully clear away the debris to reveal the discovery.</p>
+        
+        <button 
+          onClick={() => setClicks(c => c + 1)}
+          disabled={clicks >= required}
+          className="relative w-32 h-32 mx-auto rounded-full border-4 border-dashed border-content/30 flex items-center justify-center hover:scale-105 transition-all overflow-hidden bg-surface/50 mb-6"
+        >
+          <div className="absolute bottom-0 left-0 right-0 bg-gold/20 transition-all duration-300" style={{ height: `${progress}%` }} />
+          <span className="text-6xl relative z-10 transition-all duration-500" style={{ filter: `blur(${Math.max(0, 10 - clicks * 3.3)}px) grayscale(${100 - progress}%)` }}>
+            {data.icon}
+          </span>
+        </button>
+
+        {clicks >= required ? (
+          <div className="animate-in fade-in zoom-in duration-500">
+            <h3 className={"text-2xl font-bold mb-2 uppercase " + theme.primary}>{data.label}</h3>
+            <p className="text-content/90 mb-6 text-lg font-serif">
+              {data.getDiscoverMessage ? data.getDiscoverMessage(ageGroup) : (data.discoverMessage || "You uncovered something significant here!")}
+            </p>
+            {data.yields && Object.keys(data.yields).length > 0 && (
+              <div className="mb-6 bg-surface/40 p-3 rounded-xl border border-content/10">
+                <p className="text-xs uppercase tracking-widest font-bold opacity-70 mb-2">Rewards Earned</p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {Object.entries(data.yields).map(([res, amt]) => (
+                    <span key={res} className="bg-gold/10 text-gold px-3 py-1 rounded-lg border border-gold/30 font-bold text-sm">+{amt} {res}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            <button onClick={onComplete} className={"px-6 py-3 font-bold rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-surface " + theme.button}>
+              Collect Artifact & Resources
+            </button>
+          </div>
+        ) : (
+          <p className="text-xs font-bold uppercase tracking-widest text-gold animate-pulse">Tap to excavate!</p>
+        )}
+      </div>
+    </>
+  );
+};
+
 const ExplorePanel = ({ data, theme, ageGroup, isYoung, isReplay, playSound, updateResources, setLevelState, markExplored }) => {
   // Build discovery points from location data
   const getDiscoveries = (loc) => {
@@ -881,27 +931,8 @@ const LevelEngine = ({ config }) => {
         <div className={"glass-panel p-0 md:p-0 rounded-2xl w-full max-h-full overflow-y-auto border shadow-2xl text-center flex flex-col " + theme.border + (type === 'challenge' && data.format === 'minigame' ? " max-w-4xl" : " max-w-lg p-5 md:p-8")}>
 
           {type === 'discover' && (
-              <>
-                <div className="text-6xl mb-4">{data.icon}</div>
-                <h3 className={"text-2xl font-bold mb-2 uppercase " + theme.primary}>{data.label}</h3>
-                <p className="text-content/90 mb-6 text-lg font-serif">
-                  {data.getDiscoverMessage ? data.getDiscoverMessage(ageGroup) : adaptTextForAge(data.discoverMessage || "You uncovered something significant here!", ageGroup)}
-                </p>
-                {data.yields && Object.keys(data.yields).length > 0 && (
-                  <div className="mb-6 bg-surface/40 p-3 rounded-xl border border-content/10">
-                    <p className="text-xs uppercase tracking-widest font-bold opacity-70 mb-2">Rewards Earned</p>
-                    <div className="flex flex-wrap justify-center gap-2">
-                      {Object.entries(data.yields).map(([res, amt]) => (
-                        <span key={res} className="bg-gold/10 text-gold px-3 py-1 rounded-lg border border-gold/30 font-bold text-sm">+{amt} {res}</span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                <button onClick={() => markDiscovered(data)} className={"px-6 py-3 font-bold rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-surface " + theme.button}>
-                  Collect Artifact & Resources
-                </button>
-              </>
-            )}
+            <ArtifactDiscoverer data={data} theme={theme} ageGroup={ageGroup} onComplete={() => markDiscovered(data)} />
+          )}
 
             {type === 'learn' && (
               <InteractiveLearnNode data={data} onComplete={() => markLearned(data)} theme={theme} isYoung={isYoung} playSound={playSound} ageGroup={ageGroup} />
