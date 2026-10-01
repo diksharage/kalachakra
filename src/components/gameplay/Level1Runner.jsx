@@ -1,295 +1,214 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Sky, Cloud, Stars, Float, Text, SoftShadows } from '@react-three/drei';
-import { useTheme } from '../../context/ThemeContext';
-import { Play, RotateCcw, ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Heart } from 'lucide-react';
+import React, { useRef, useState, useMemo, useEffect } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Sky, SoftShadows } from '@react-three/drei';
 import * as THREE from 'three';
 
+const SPEED = 20;
 const LANE_WIDTH = 2.5;
-const SPEED = 25;
-const MAX_DISTANCE = 5000;
 
-// Reusable Primitive Geometries/Materials
-const materials = {
-  wood: new THREE.MeshStandardMaterial({ color: '#8B5A2B', roughness: 0.9 }),
-  stone: new THREE.MeshStandardMaterial({ color: '#708090', roughness: 0.8 }),
-  plant: new THREE.MeshStandardMaterial({ color: '#228B22', roughness: 0.6 }),
-  food: new THREE.MeshStandardMaterial({ color: '#DAA520', roughness: 0.4 }),
-  water: new THREE.MeshPhysicalMaterial({ color: '#00BFFF', transmission: 0.9, opacity: 1, transparent: true, roughness: 0 }),
-  rock: new THREE.MeshStandardMaterial({ color: '#4a4a4a', roughness: 1 }),
-  log: new THREE.MeshStandardMaterial({ color: '#3d2817', roughness: 0.9 }),
-  skin: new THREE.MeshStandardMaterial({ color: '#8d5524', roughness: 0.4 }),
-  cloth: new THREE.MeshStandardMaterial({ color: '#654321', roughness: 0.9 }),
+// --- Materials ---
+const mats = {
+  skin: new THREE.MeshStandardMaterial({ color: '#8d5524', roughness: 0.6 }),
+  cloth: new THREE.MeshStandardMaterial({ color: '#5c4033', roughness: 0.9 }),
   hair: new THREE.MeshStandardMaterial({ color: '#1a1a1a', roughness: 0.8 }),
   ground: new THREE.MeshStandardMaterial({ color: '#2e7d32', roughness: 1 }),
+  path: new THREE.MeshStandardMaterial({ color: '#6d4c41', roughness: 1 }),
+  treeTrunk: new THREE.MeshStandardMaterial({ color: '#3e2723', roughness: 1 }),
+  treeLeaves: new THREE.MeshStandardMaterial({ color: '#1b5e20', roughness: 0.8 }),
+  rock: new THREE.MeshStandardMaterial({ color: '#607d8b', roughness: 0.7 }),
+  water: new THREE.MeshPhysicalMaterial({ color: '#00bcd4', transparent: true, opacity: 0.8, roughness: 0.1, transmission: 0.9 }),
 };
 
-const geometries = {
-  box: new THREE.BoxGeometry(1, 1, 1),
-  sphere: new THREE.SphereGeometry(0.5, 16, 16),
+// --- Geometries ---
+const geos = {
+  head: new THREE.SphereGeometry(0.35, 16, 16),
+  torso: new THREE.CapsuleGeometry(0.3, 0.6, 4, 8),
+  limb: new THREE.CapsuleGeometry(0.15, 0.4, 4, 8),
+  ground: new THREE.PlaneGeometry(500, 2000),
+  path: new THREE.PlaneGeometry(10, 2000),
   rock: new THREE.DodecahedronGeometry(1, 1),
-  log: new THREE.CylinderGeometry(0.5, 0.5, 3, 8),
-  capsule: new THREE.CapsuleGeometry(0.2, 0.5, 4, 8),
-  ground: new THREE.PlaneGeometry(100, 400),
+  trunk: new THREE.CylinderGeometry(0.2, 0.4, 2, 8),
+  leaves: new THREE.ConeGeometry(1.5, 3, 8),
 };
 
-// Character Component
-const PlayerCharacter = ({ lane, isJumping, isSliding, hitState }) => {
+// --- Character ---
+const Player = ({ isPlaying, lane, isJumping }) => {
   const group = useRef();
+  const leftLeg = useRef();
+  const rightLeg = useRef();
+  const leftArm = useRef();
+  const rightArm = useRef();
+  const torso = useRef();
+
   const [visualLane, setVisualLane] = useState(0);
-  
+
   useFrame((state, delta) => {
     // Smooth lane transition
     setVisualLane(THREE.MathUtils.lerp(visualLane, lane * LANE_WIDTH, 10 * delta));
     group.current.position.x = visualLane;
-    
-    // Jump/Slide logic
+
+    // Smooth Jump
     if (isJumping) {
-      group.current.position.y = THREE.MathUtils.lerp(group.current.position.y, 2.5, 10 * delta);
-    } else if (isSliding) {
-      group.current.position.y = THREE.MathUtils.lerp(group.current.position.y, 0.2, 15 * delta);
-      group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, Math.PI / 2, 10 * delta);
+      group.current.position.y = THREE.MathUtils.lerp(group.current.position.y, 3, 10 * delta);
     } else {
       group.current.position.y = THREE.MathUtils.lerp(group.current.position.y, 0, 10 * delta);
-      group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, 0, 10 * delta);
     }
 
-    // Hit effect
-    if (hitState) {
-       group.current.rotation.z = Math.sin(state.clock.elapsedTime * 40) * 0.2;
+    const t = state.clock.elapsedTime;
+
+    if (isPlaying) {
+      // Running Animation
+      const runSpeed = 15;
+      const angle = Math.sin(t * runSpeed);
+      
+      leftLeg.current.rotation.x = angle * 0.8;
+      rightLeg.current.rotation.x = -angle * 0.8;
+      leftArm.current.rotation.x = -angle * 0.8;
+      rightArm.current.rotation.x = angle * 0.8;
+      
+      torso.current.position.y = 0.9 + Math.abs(Math.sin(t * runSpeed)) * 0.1;
+      group.current.rotation.x = 0.1; 
     } else {
-       group.current.rotation.z = 0;
-    }
-
-    // Running Animation (swinging arms/legs)
-    if (!isJumping && !isSliding && !hitState) {
-       const t = state.clock.elapsedTime * 15;
-       group.current.children[1].rotation.x = Math.sin(t) * 0.8; // Left leg
-       group.current.children[2].rotation.x = -Math.sin(t) * 0.8; // Right leg
-       group.current.children[3].rotation.x = -Math.sin(t) * 0.8; // Left arm
-       group.current.children[4].rotation.x = Math.sin(t) * 0.8; // Right arm
+      // Idle Animation
+      leftLeg.current.rotation.x = 0;
+      rightLeg.current.rotation.x = 0;
+      leftArm.current.rotation.x = Math.sin(t * 2) * 0.1;
+      rightArm.current.rotation.x = -Math.sin(t * 2) * 0.1;
+      
+      torso.current.position.y = 0.9 + Math.sin(t * 3) * 0.05; 
+      group.current.rotation.x = 0;
     }
   });
 
   return (
-    <group ref={group} castShadow>
-      {/* Torso */}
-      <mesh geometry={geometries.capsule} material={materials.cloth} position={[0, 1, 0]} castShadow />
-      {/* Left Leg */}
-      <mesh geometry={geometries.capsule} material={materials.skin} position={[-0.3, 0.4, 0]} scale={[0.8, 0.8, 0.8]} castShadow />
-      {/* Right Leg */}
-      <mesh geometry={geometries.capsule} material={materials.skin} position={[0.3, 0.4, 0]} scale={[0.8, 0.8, 0.8]} castShadow />
-      {/* Left Arm */}
-      <mesh geometry={geometries.capsule} material={materials.skin} position={[-0.4, 1.2, 0]} scale={[0.7, 0.7, 0.7]} castShadow />
-      {/* Right Arm */}
-      <mesh geometry={geometries.capsule} material={materials.skin} position={[0.4, 1.2, 0]} scale={[0.7, 0.7, 0.7]} castShadow />
-      {/* Head */}
-      <mesh geometry={geometries.sphere} material={materials.skin} position={[0, 1.7, 0]} scale={[0.6, 0.6, 0.6]} castShadow />
-      {/* Hair */}
-      <mesh geometry={geometries.sphere} material={materials.hair} position={[0, 1.8, -0.05]} scale={[0.65, 0.65, 0.65]} />
+    <group ref={group}>
+      <group ref={torso} position={[0, 0.9, 0]}>
+        <mesh geometry={geos.torso} material={mats.cloth} castShadow receiveShadow />
+        
+        <group position={[0, 0.7, 0]}>
+          <mesh geometry={geos.head} material={mats.skin} castShadow />
+          <mesh geometry={geos.head} material={mats.hair} position={[0, 0.05, -0.05]} scale={[1.05, 1.05, 1.05]} castShadow />
+        </group>
+
+        <group position={[-0.45, 0.2, 0]}>
+          <mesh ref={leftArm} geometry={geos.limb} material={mats.skin} position={[0, -0.3, 0]} castShadow />
+        </group>
+        <group position={[0.45, 0.2, 0]}>
+          <mesh ref={rightArm} geometry={geos.limb} material={mats.skin} position={[0, -0.3, 0]} castShadow />
+        </group>
+
+        <group position={[-0.2, -0.4, 0]}>
+          <mesh ref={leftLeg} geometry={geos.limb} material={mats.skin} position={[0, -0.3, 0]} castShadow />
+        </group>
+        <group position={[0.2, -0.4, 0]}>
+          <mesh ref={rightLeg} geometry={geos.limb} material={mats.skin} position={[0, -0.3, 0]} castShadow />
+        </group>
+      </group>
     </group>
   );
 };
 
-// Environment Item (Collectibles & Obstacles)
-const WorldItem = ({ type, lane, zOffset, isObstacle, onCollide }) => {
-  const meshRef = useRef();
-  
-  useFrame((state, delta) => {
-    meshRef.current.position.z += SPEED * delta;
-    
-    // Check collision (Player is at z=0)
-    if (meshRef.current.position.z > -1 && meshRef.current.position.z < 1) {
-       onCollide(type, lane, isObstacle, meshRef.current);
+// --- Environment ---
+const EnvironmentSetup = ({ distance }) => {
+  const worldGroup = useRef();
+
+  const scenery = useMemo(() => {
+    const items = [];
+    // Plant trees and rocks randomly, extending 1500 units ahead
+    for (let i = 0; i < 300; i++) {
+      const z = -(Math.random() * 1500); 
+      const side = Math.random() > 0.5 ? 1 : -1;
+      const x = side * (6 + Math.random() * 50); 
+      const scale = 0.5 + Math.random() * 2;
+      const isRock = Math.random() > 0.7;
+      items.push({ x, z, scale, isRock, id: i });
     }
-    
-    if (!isObstacle) {
-       meshRef.current.rotation.y += 2 * delta;
-       meshRef.current.position.y = 1 + Math.sin(state.clock.elapsedTime * 3) * 0.2;
-    }
-  });
+    return items;
+  }, []);
 
-  if (isObstacle) {
-    if (type === 'rock') {
-      return (
-         <mesh ref={meshRef} geometry={geometries.rock} material={materials.rock} position={[lane * LANE_WIDTH, 0.5, zOffset]} scale={[1, 1, 1]} castShadow receiveShadow />
-      );
-    } else if (type === 'log') {
-      return (
-         <mesh ref={meshRef} geometry={geometries.log} material={materials.log} position={[lane * LANE_WIDTH, 0.3, zOffset]} rotation={[0, 0, Math.PI/2]} castShadow receiveShadow />
-      );
-    }
-  }
-
-  // Collectibles
-  const colorMap = { wood: '#8B5A2B', stone: '#708090', plants: '#228B22', food: '#DAA520', water: '#00BFFF' };
-  const geoMap = { wood: geometries.box, stone: geometries.rock, plants: geometries.capsule, food: geometries.sphere, water: geometries.sphere };
-  
-  return (
-    <Float floatIntensity={2} rotationIntensity={1} ref={meshRef} position={[lane * LANE_WIDTH, 1, zOffset]}>
-      <mesh geometry={geoMap[type]} material={materials[type]} scale={[0.6, 0.6, 0.6]} castShadow />
-      <pointLight color={colorMap[type]} intensity={0.5} distance={3} />
-    </Float>
-  );
-};
-
-// Ground & Scenery
-const Scenery = () => {
-  const groundRef = useRef();
-  const trees = useMemo(() => Array.from({ length: 40 }).map((_, i) => ({
-     x: (Math.random() > 0.5 ? 1 : -1) * (5 + Math.random() * 15),
-     z: -Math.random() * 200,
-     scale: 1 + Math.random() * 2
-  })), []);
-
-  useFrame((state, delta) => {
-    // Scroll ground texture (if we had one) or just move trees
+  useFrame(() => {
+    // Loop the world wrapping around smoothly to simulate endless running
+    const zOffset = distance % 1500;
+    worldGroup.current.position.z = zOffset;
   });
 
   return (
     <group>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, -100]} receiveShadow>
-        <planeGeometry args={[100, 400]} />
-        <meshStandardMaterial color="#2e7d32" roughness={1} />
-      </mesh>
+      {/* Static huge ground */}
+      <mesh geometry={geos.ground} material={mats.ground} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -500]} receiveShadow />
       
-      {/* Simple Trees */}
-      {trees.map((t, i) => (
-         <group key={i} position={[t.x, 0, t.z]} scale={[t.scale, t.scale, t.scale]}>
-           <mesh geometry={geometries.log} material={materials.log} position={[0, 1.5, 0]} scale={[0.3, 1, 0.3]} castShadow />
-           <mesh geometry={geometries.rock} material={materials.plant} position={[0, 3.5, 0]} scale={[1.5, 2, 1.5]} castShadow />
-         </group>
-      ))}
+      {/* Dirt Path running down the middle */}
+      <mesh geometry={geos.path} material={mats.path} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, -500]} receiveShadow />
+
+      {/* Moving World Elements */}
+      <group ref={worldGroup}>
+        {scenery.map(item => (
+          item.isRock ? (
+            <mesh key={item.id} geometry={geos.rock} material={mats.rock} position={[item.x, item.scale*0.5, item.z]} scale={[item.scale, item.scale, item.scale]} castShadow receiveShadow />
+          ) : (
+            <group key={item.id} position={[item.x, 0, item.z]} scale={[item.scale, item.scale, item.scale]}>
+              <mesh geometry={geos.trunk} material={mats.treeTrunk} position={[0, 1, 0]} castShadow receiveShadow />
+              <mesh geometry={geos.leaves} material={mats.treeLeaves} position={[0, 3, 0]} castShadow receiveShadow />
+            </group>
+          )
+        ))}
+      </group>
     </group>
   );
 };
 
-// Camera Controller
-const CameraController = ({ isJumping, isSliding }) => {
+// --- Camera ---
+const CameraController = () => {
   useFrame((state) => {
-    const targetY = isJumping ? 4 : isSliding ? 2.5 : 3.5;
-    state.camera.position.lerp(new THREE.Vector3(0, targetY, 6), 0.1);
-    state.camera.lookAt(0, 1.5, -5);
+    state.camera.position.lerp(new THREE.Vector3(0, 4, 8), 0.1);
+    state.camera.lookAt(0, 2, -10);
   });
   return null;
 };
 
-const GameWorld = ({ engineState, setEngineState, onCollect, onHit, targetObjectives }) => {
-  const [items, setItems] = useState([]);
-  
-  // Spawner
-  useEffect(() => {
-    if (engineState.status !== 'playing') return;
-    
-    let zCursor = -20;
-    const interval = setInterval(() => {
-       if (engineState.distance > MAX_DISTANCE) return;
-       
-       const lane = Math.floor(Math.random() * 3) - 1;
-       const isObstacle = Math.random() > 0.5;
-       
-       let type = 'wood';
-       if (isObstacle) {
-          type = Math.random() > 0.5 ? 'rock' : 'log';
-       } else {
-          // Weighted random based on remaining objectives
-          const missing = Object.keys(targetObjectives).filter(k => engineState.inventory[k] < targetObjectives[k]);
-          if (missing.length > 0) {
-             type = missing[Math.floor(Math.random() * missing.length)];
-          } else {
-             const dist = engineState.distance;
-             if (dist > MAX_DISTANCE * 0.8) type = 'water';
-             else if (dist > MAX_DISTANCE * 0.6) type = 'food';
-             else type = ['wood', 'stone', 'plants'][Math.floor(Math.random()*3)];
-          }
-       }
-       
-       const newItem = { id: Math.random(), type, lane, zOffset: -100, isObstacle };
-       setItems(prev => [...prev.slice(-30), newItem]); // keep max 30 items
-       
-       engineState.distance += SPEED * 0.4; // sync distance loosely
-    }, 400);
-    
-    return () => clearInterval(interval);
-  }, [engineState.status]);
-
-  const handleCollide = (type, lane, isObstacle, mesh) => {
-     if (engineState.status !== 'playing') return;
-     if (mesh.userData.collected) return; // prevent multi-trigger
-     
-     // Only hit if in same lane
-     if (lane === engineState.lane) {
-        if (isObstacle) {
-           // Ducking log or jumping rock
-           if (type === 'log' && engineState.isSliding) return;
-           if (type === 'rock' && engineState.isJumping) return;
-           
-           mesh.userData.collected = true;
-           onHit();
-        } else {
-           mesh.userData.collected = true;
-           mesh.visible = false; // Hide immediately
-           onCollect(type);
-        }
-     }
-  };
-
+// --- Main Render Scene ---
+const Scene = ({ isPlaying, lane, isJumping, distance }) => {
   return (
     <>
-      <ambientLight intensity={0.4} />
-      <directionalLight castShadow position={[10, 20, 5]} intensity={1.5} shadow-mapSize={[1024, 1024]} shadow-camera-far={50} shadow-camera-left={-20} shadow-camera-right={20} shadow-camera-top={20} shadow-camera-bottom={-20} />
-      <Sky sunPosition={[100, 20, -100]} turbidity={0.1} />
+      <color attach="background" args={['#87CEEB']} />
+      <fog attach="fog" args={['#87CEEB', 30, 200]} />
       
-      <Scenery />
-      
-      <PlayerCharacter 
-         lane={engineState.lane} 
-         isJumping={engineState.isJumping} 
-         isSliding={engineState.isSliding} 
-         hitState={engineState.hitState} 
+      <ambientLight intensity={0.6} />
+      <directionalLight 
+        castShadow 
+        position={[40, 50, 20]} 
+        intensity={1.5} 
+        shadow-mapSize={[2048, 2048]} 
+        shadow-camera-far={150} 
+        shadow-camera-left={-40} 
+        shadow-camera-right={40} 
+        shadow-camera-top={40} 
+        shadow-camera-bottom={-40} 
       />
-      
-      {items.map(item => (
-         <WorldItem key={item.id} {...item} onCollide={handleCollide} />
-      ))}
-      
-      <CameraController isJumping={engineState.isJumping} isSliding={engineState.isSliding} />
+      <Sky sunPosition={[100, 20, -100]} turbidity={0.1} rayleigh={0.5} />
+
+      <CameraController />
+      <EnvironmentSetup distance={distance} />
+      <Player isPlaying={isPlaying} lane={lane} isJumping={isJumping} />
     </>
   );
 };
 
-
-const Level1Runner = ({ onComplete, ageGroup }) => {
-  const { theme } = useTheme();
-  const targetObjectives = { wood: 3, stone: 2, plants: 3, food: 1, water: 1 };
-  
-  const [engineState, setEngineState] = useState({
-     status: 'start', // start, playing, gameover, complete
-     lane: 0,
-     isJumping: false,
-     isSliding: false,
-     hitState: false,
-     health: 3,
-     distance: 0,
-     inventory: { wood: 0, stone: 0, plants: 0, food: 0, water: 0 }
-  });
+// --- Wrapper Component ---
+const Level1Runner = () => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [lane, setLane] = useState(0);
+  const [isJumping, setIsJumping] = useState(false);
+  const [distance, setDistance] = useState(0);
 
   const handleInput = (action) => {
-    if (engineState.status !== 'playing') return;
-    setEngineState(prev => {
-       const next = { ...prev };
-       if (action === 'left' && prev.lane > -1) next.lane--;
-       if (action === 'right' && prev.lane < 1) next.lane++;
-       if (action === 'jump' && !prev.isJumping && !prev.isSliding) {
-          next.isJumping = true;
-          setTimeout(() => setEngineState(s => ({ ...s, isJumping: false })), 600);
-       }
-       if (action === 'slide' && !prev.isJumping && !prev.isSliding) {
-          next.isSliding = true;
-          setTimeout(() => setEngineState(s => ({ ...s, isSliding: false })), 600);
-       }
-       return next;
-    });
+    if (!isPlaying) return;
+    if (action === 'left' && lane > -1) setLane(l => l - 1);
+    if (action === 'right' && lane < 1) setLane(l => l + 1);
+    if (action === 'jump' && !isJumping) {
+      setIsJumping(true);
+      setTimeout(() => setIsJumping(false), 500);
+    }
   };
 
   useEffect(() => {
@@ -297,146 +216,66 @@ const Level1Runner = ({ onComplete, ageGroup }) => {
       if (ev.key === 'ArrowLeft' || ev.key === 'a') handleInput('left');
       if (ev.key === 'ArrowRight' || ev.key === 'd') handleInput('right');
       if (ev.key === 'ArrowUp' || ev.key === 'w' || ev.key === ' ') handleInput('jump');
-      if (ev.key === 'ArrowDown' || ev.key === 's') handleInput('slide');
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [engineState.status]);
+  }, [isPlaying, lane, isJumping]);
 
-  const touchStart = useRef({ x: 0, y: 0 });
-  const onTouchStart = (ev) => {
-    touchStart.current = { x: ev.touches[0].clientX, y: ev.touches[0].clientY };
-  };
-  const onTouchEnd = (ev) => {
-    const dx = ev.changedTouches[0].clientX - touchStart.current.x;
-    const dy = ev.changedTouches[0].clientY - touchStart.current.y;
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 30) {
-      if (dx > 0) handleInput('right'); else handleInput('left');
-    } else if (Math.abs(dy) > 30) {
-      if (dy < 0) handleInput('jump'); else handleInput('slide');
-    }
-  };
-
-  const onCollect = (type) => {
-     setEngineState(prev => {
-        const next = { ...prev, inventory: { ...prev.inventory, [type]: prev.inventory[type] + 1 } };
-        // Check win condition
-        const allMet = Object.keys(targetObjectives).every(k => next.inventory[k] >= targetObjectives[k]);
-        if (allMet && prev.distance >= MAX_DISTANCE * 0.9) {
-           next.status = 'complete';
-        }
-        return next;
-     });
-  };
-
-  const onHit = () => {
-     setEngineState(prev => {
-        if (prev.hitState) return prev; // immune
-        const next = { ...prev, health: prev.health - 1, hitState: true };
-        if (next.health <= 0) next.status = 'gameover';
-        
-        // Reset hit state after 1s
-        setTimeout(() => setEngineState(s => ({ ...s, hitState: false })), 1000);
-        return next;
-     });
-  };
-
-  const restart = () => {
-     setEngineState({
-        status: 'playing',
-        lane: 0, isJumping: false, isSliding: false, hitState: false,
-        health: 3, distance: 0,
-        inventory: { wood: 0, stone: 0, plants: 0, food: 0, water: 0 }
-     });
-  };
+  useEffect(() => {
+    let animationFrameId;
+    let lastTime = performance.now();
+    
+    const loop = (time) => {
+       const dt = (time - lastTime) / 1000;
+       lastTime = time;
+       
+       // Max cap delta time to avoid huge jumps when tab is inactive
+       const safeDt = Math.min(dt, 0.1);
+       
+       if (isPlaying) {
+          setDistance(d => d + SPEED * safeDt);
+       }
+       animationFrameId = requestAnimationFrame(loop);
+    };
+    
+    animationFrameId = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [isPlaying]);
 
   return (
-    <div className="relative w-full h-[70vh] min-h-[500px] flex flex-col rounded-2xl overflow-hidden shadow-2xl bg-black border border-content/20" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+    <div className="relative w-full h-[70vh] min-h-[500px] flex flex-col rounded-2xl overflow-hidden shadow-2xl bg-black border border-content/20">
       
-      {/* 3D Canvas */}
-      <Canvas shadows camera={{ position: [0, 3, 6], fov: 60 }} className="w-full h-full">
-         <SoftShadows size={10} samples={10} focus={0.5} />
-         <GameWorld engineState={engineState} setEngineState={setEngineState} onCollect={onCollect} onHit={onHit} targetObjectives={targetObjectives} />
+      <Canvas shadows camera={{ fov: 60 }}>
+         <SoftShadows size={15} samples={16} focus={0.5} />
+         <Scene isPlaying={isPlaying} lane={lane} isJumping={isJumping} distance={distance} />
       </Canvas>
 
-      {/* HUD */}
-      <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-start z-20 pointer-events-none">
-        <div className="flex flex-col gap-2">
-           <h3 className="text-xl font-bold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">SURVIVAL RUN</h3>
-           <div className="flex flex-col gap-1 bg-black/60 p-3 rounded-lg border border-white/20 backdrop-blur-sm pointer-events-auto">
-             {Object.entries(targetObjectives).map(([k, max]) => {
-                const cur = engineState.inventory[k];
-                const done = cur >= max;
-                return (
-                  <div key={k} className={`flex items-center justify-between gap-4 text-sm font-bold uppercase tracking-widest ${done ? 'text-green-400' : 'text-white'}`}>
-                    <span className="flex items-center gap-2">
-                       {k === 'wood' ? '🪵' : k === 'stone' ? '🪨' : k === 'plants' ? '🌿' : k === 'food' ? '🌾' : '💧'} {k}
-                    </span>
-                    <span>{cur} / {max}</span>
-                  </div>
-                );
-             })}
-           </div>
-        </div>
-        
-        <div className="flex flex-col items-end gap-2">
-           <div className="flex gap-1 bg-black/60 p-2 rounded-lg border border-white/20 backdrop-blur-sm">
-             {[1,2,3].map(h => (
-                <Heart key={h} className={`w-6 h-6 ${h <= engineState.health ? 'text-red-500 fill-red-500' : 'text-white/20'}`} />
-             ))}
-           </div>
-           <div className="text-right text-white font-bold drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] mt-2">
-             <p className="text-sm opacity-80 uppercase tracking-widest">Distance</p>
-             <p className="text-xl">{Math.floor(engineState.distance)}m</p>
-           </div>
-        </div>
-      </div>
-
-      {/* OVERLAYS */}
-      {engineState.status === 'start' && (
-        <div className="absolute inset-0 z-30 bg-black/70 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center animate-fade-in">
-          <h2 className="text-5xl font-extrabold text-white mb-4 font-serif">Wilderness Survival</h2>
-          <p className="text-white/90 max-w-lg mb-8 text-lg">
-            Navigate the harsh ancient environment. Collect all required resources and reach the water source to survive.
+      {!isPlaying && (
+        <div className="absolute inset-0 z-30 bg-black/50 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center animate-fade-in">
+          <h2 className="text-5xl font-extrabold text-white mb-4 font-serif drop-shadow-lg">Wilderness Sandbox</h2>
+          <p className="text-white/90 max-w-lg mb-8 text-lg leading-relaxed shadow-sm">
+            Experience a gorgeous 3D prehistoric environment. Explore the running mechanics and lighting foundation.
           </p>
-          
-          <div className="flex gap-8 mb-8 bg-white/10 p-4 rounded-xl border border-white/20 text-white font-bold">
-            <div className="text-center"><span className="text-2xl block mb-2">⬅️ ➡️</span>Move / Swipe</div>
+          <div className="flex gap-8 mb-8 bg-black/40 p-5 rounded-2xl border border-white/20 text-white font-bold backdrop-blur-md shadow-lg">
+            <div className="text-center"><span className="text-2xl block mb-2">A / D</span>Move Left/Right</div>
             <div className="w-px bg-white/20" />
-            <div className="text-center"><span className="text-2xl block mb-2">⬆️</span>Jump / Swipe Up</div>
-            <div className="w-px bg-white/20" />
-            <div className="text-center"><span className="text-2xl block mb-2">⬇️</span>Duck / Swipe Down</div>
+            <div className="text-center"><span className="text-2xl block mb-2">SPACE</span>Jump</div>
           </div>
-
-          <button onClick={() => setEngineState(s => ({ ...s, status: 'playing' }))} className="px-10 py-5 bg-gold text-black font-extrabold rounded-2xl text-xl hover:scale-105 transition-transform flex items-center gap-3">
-            <Play fill="currentColor" /> Start Survival Run
+          <button 
+            onClick={() => setIsPlaying(true)} 
+            className="px-10 py-5 bg-white text-black font-extrabold rounded-2xl text-xl hover:scale-105 transition-transform shadow-[0_0_40px_rgba(255,255,255,0.3)]"
+          >
+            Enter 3D World
           </button>
         </div>
       )}
-
-      {engineState.status === 'gameover' && (
-        <div className="absolute inset-0 z-40 bg-red-950/80 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center animate-fade-in">
-          <h2 className="text-5xl font-extrabold text-red-500 mb-2">GAME OVER</h2>
-          <p className="text-white/80 mb-8 text-lg">You succumbed to the hazards of the wilderness.</p>
-          <button onClick={restart} className="px-10 py-5 bg-red-600 text-white font-bold rounded-2xl text-xl hover:scale-105 transition-transform flex items-center gap-3">
-            <RotateCcw /> Retry Survival
-          </button>
-        </div>
+      
+      {isPlaying && (
+         <div className="absolute top-4 left-4 bg-black/40 text-white px-4 py-2 rounded-xl backdrop-blur-md border border-white/10 text-sm font-bold tracking-widest uppercase">
+            Distance: {Math.floor(distance)}m
+         </div>
       )}
 
-      {engineState.status === 'complete' && (
-        <div className="absolute inset-0 z-40 bg-black/80 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center animate-fade-in slide-in-from-bottom-8">
-          <div className="w-24 h-24 bg-green-500/20 rounded-full flex items-center justify-center mb-6 border border-green-500/50">
-             <CheckCircle className="w-12 h-12 text-green-400" />
-          </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-3">Survival Successful!</h2>
-          <p className="text-white/80 mb-8 text-lg max-w-md">You gathered the required supplies and secured a safe water source for your community.</p>
-          
-          <button onClick={() => onComplete(engineState.inventory, Math.floor(engineState.distance))} className="px-10 py-5 bg-green-600 text-white font-bold rounded-2xl text-xl hover:scale-105 transition-transform flex items-center gap-3 shadow-[0_0_30px_rgba(22,163,74,0.4)]">
-            Establish Camp <ArrowRight className="w-6 h-6" />
-          </button>
-        </div>
-      )}
     </div>
   );
 };
