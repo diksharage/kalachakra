@@ -1386,13 +1386,20 @@ const LevelEngine = ({ config }) => {
                   ageGroup={ageGroup}
                   onComplete={(gatheredResources, runnerScore) => {
                      playSound('level_unlock');
-                     if (!isReplay) updateResources(gatheredResources);
+                     if (!isReplay) {
+                       updateResources({ 
+                         ...gatheredResources, 
+                         knowledge: runnerScore || 150, 
+                         culture: 50, 
+                         legacy: 20 
+                       });
+                     }
                      setLevelState(prev => {
                        const next = { ...prev, exploration: locations.map(l => l.id), activePopup: null };
                        next.stage = 2; // Jump to Discover
                        return next;
                      });
-                     notify('SUCCESS', 'Exploration Complete', `Gathered resources in the wild!`, { icon: '🏃' });
+                     notify('SUCCESS', 'Exploration Complete', `Gathered resources and earned XP!`, { icon: '🏃' });
                   }}
                 />
             ) : activePopup?.type === 'explore' ? (

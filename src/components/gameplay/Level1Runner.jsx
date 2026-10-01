@@ -482,7 +482,7 @@ const Level1Runner = ({ onComplete }) => {
                 </div>
              ))}
           </div>
-          <button onClick={() => onComplete()} className="px-10 py-5 bg-green-600 text-white font-bold rounded-2xl text-xl hover:scale-105 transition-transform shadow-[0_0_30px_rgba(22,163,74,0.4)]">
+          <button onClick={() => onComplete(uiState.inventory, Math.floor(engineRef.current.distance))} className="px-10 py-5 bg-green-600 text-white font-bold rounded-2xl text-xl hover:scale-105 transition-transform shadow-[0_0_30px_rgba(22,163,74,0.4)]">
             Continue Journey
           </button>
         </div>
