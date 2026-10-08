@@ -1021,6 +1021,28 @@ const LevelEngine = ({ config }) => {
   };
 
 
+  
+  const calculateLevelStars = () => {
+    let stars = 1; 
+    let minigameScore = 0;
+    const mgResults = gameState.miniGameResults || {};
+    let mgCount = 0;
+    
+    levelState.completedChallenges.forEach(cid => {
+      if (mgResults[cid] && mgResults[cid].stars >= 2) minigameScore += 1;
+      if (mgResults[cid]) mgCount++;
+    });
+    
+    const hasGoodMinigames = mgCount > 0 && minigameScore >= Math.floor(mgCount / 2);
+    if (hasGoodMinigames) stars += 1;
+    
+    const totalExplorable = config.locations ? config.locations.length : 0;
+    const hasAllExplored = totalExplorable > 0 && levelState.discovery.length >= totalExplorable;
+    if (hasAllExplored) stars += 1;
+    
+    return { stars, hasGoodMinigames, hasAllExplored };
+  };
+
   const handleCompleteLevel = () => {
     if (!isReplay) {
       if (config.id === 1) triggerEventAchievement('start_journey');
@@ -1470,9 +1492,39 @@ const LevelEngine = ({ config }) => {
           {stage === 6 && activePopup?.type !== 'reward' ? (
              <div className="relative h-full p-6 md:p-8 flex flex-col items-center justify-center z-10 animate-fade-in text-center overflow-y-auto w-full">
                 <div className="w-full max-w-2xl mx-auto flex flex-col items-center py-10 bg-surface/80 p-8 rounded-3xl border border-gold/30 shadow-2xl backdrop-blur-md">
-                   <Trophy className="w-20 h-20 mb-6 text-gold drop-shadow-[0_0_20px_rgba(255,215,0,0.5)] animate-pulse-slow" />
-                   <h3 className="text-4xl font-serif font-bold mb-4 text-gold">Level Objectives Met</h3>
-                   <p className="text-lg text-content/80 mb-8">You have successfully Explored, Discovered, Learned, Solved, and Built your civilization.</p>
+                   
+                     <Trophy className="w-20 h-20 mb-6 text-gold drop-shadow-[0_0_20px_rgba(255,215,0,0.5)] animate-pulse-slow" />
+                     <h3 className="text-4xl font-serif font-bold mb-4 text-gold">Level Objectives Met</h3>
+                     
+                     {(() => {
+                        const { stars, hasGoodMinigames, hasAllExplored } = calculateLevelStars();
+                        return (
+                          <div className="flex flex-col items-center mb-8 w-full max-w-sm">
+                            <div className="flex gap-4 mb-4">
+                               {[1, 2, 3].map(s => (
+                                  <Star key={s} className={`w-12 h-12 transition-all duration-1000 ${s <= stars ? 'text-gold fill-gold drop-shadow-[0_0_15px_rgba(255,215,0,0.8)] scale-110' : 'text-content/20'}`} />
+                               ))}
+                            </div>
+                            <div className="text-left bg-black/40 border border-content/10 p-4 rounded-xl w-full text-sm space-y-2">
+                              <p className="flex justify-between items-center text-content/90">
+                                <span>⭐ Completion</span> 
+                                <CheckCircle className="text-green-500 w-4 h-4"/>
+                              </p>
+                              <p className="flex justify-between items-center text-content/90">
+                                <span>⭐ Objective Accuracy</span> 
+                                {hasGoodMinigames ? <CheckCircle className="text-green-500 w-4 h-4"/> : <span className="text-content/40">Missed</span>}
+                              </p>
+                              <p className="flex justify-between items-center text-content/90">
+                                <span>⭐ Bonus Exploration</span> 
+                                {hasAllExplored ? <CheckCircle className="text-green-500 w-4 h-4"/> : <span className="text-content/40">Missed</span>}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                     })()}
+
+                     <p className="text-lg text-content/80 mb-8">You have successfully Explored, Discovered, Learned, Solved, and Built your civilization.</p>
+
                    <button 
                      onClick={() => {
                         playSound('success');

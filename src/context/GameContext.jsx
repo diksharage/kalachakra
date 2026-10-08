@@ -491,10 +491,18 @@ export const GameProvider = ({ children }) => {
     }
   };
 
-  const completeLevel = (levelId) => {
+  const completeLevel = (levelId, stars = 1) => {
     setGameState(prev => {
       // Don't re-complete if already completed
-      if (prev.completedLevels.includes(levelId)) return prev;
+      const currentStars = prev.levelStars?.[levelId] || 0;
+        const newStars = Math.max(currentStars, stars);
+        
+        if (prev.completedLevels.includes(levelId)) {
+          return {
+             ...prev,
+             levelStars: { ...(prev.levelStars || {}), [levelId]: newStars }
+          };
+        }
 
       const newCompleted = [...prev.completedLevels, levelId];
       const nextLevel = levelId + 1;
@@ -508,6 +516,7 @@ export const GameProvider = ({ children }) => {
       return {
         ...prev,
         completedLevels: newCompleted,
+          levelStars: { ...(prev.levelStars || {}), [levelId]: newStars },
         unlockedLevels: newUnlocked,
         currentLevel: prev.currentLevel === levelId ? nextLevel : prev.currentLevel,
         legacy: prev.legacy + 100, // Reward legacy points for completing a level

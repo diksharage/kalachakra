@@ -116,7 +116,19 @@ const JourneyPage = () => {
                     <h3 className="text-2xl font-serif font-bold text-[#E8D9B8] group-hover:text-[#C49A45] transition-colors">{t(`levels.${level.id}.title`, level.title)}</h3>
                   </div>
                   <div className="flex items-center gap-2">
-                    {isCompleted && <CheckCircle className="w-6 h-6 text-[#A97932]" />}
+                    {isCompleted && (
+                        <div className="flex flex-col items-end gap-1">
+                           <div className="flex gap-1">
+                             {[1, 2, 3].map(s => {
+                                const levelStars = gameState.levelStars?.[level.id] || 1;
+                                return (
+                                  <Star key={s} className={`w-4 h-4 ${s <= levelStars ? 'text-[#C49A45] fill-[#C49A45]' : 'text-[#625B4A]'}`} />
+                                );
+                             })}
+                           </div>
+                           <span className="text-[#A97932] text-xs font-bold uppercase tracking-widest flex items-center gap-1"><CheckCircle className="w-4 h-4" /> Cleared</span>
+                        </div>
+                      )}
                     {!isUnlocked && (
                         <div className="flex flex-col items-end">
                           <Lock className="w-6 h-6 text-[#625B4A] mb-1" />
