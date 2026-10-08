@@ -692,38 +692,93 @@ export const minigamesData = {
       }
     ]
   },
-  "mg-l9-culture": {
-    id: "mg-l9-culture", levelId: 9,
+
+  "mg-l9-crafts": {
+    id: "mg-l9-crafts", levelId: 9,
     variations: [
       {
-        variationId: "v1", type: "artifactMatch", title: "Roots of Tradition",
-        rewards: [
-          { type: 'artifact', id: 'bronze_statue', amount: 1, label: 'Lost-Wax Bronze Statue', destination: 'Artifact Collection', usage: 'View in Library' },
-          { type: 'artifact', id: 'folk_instrument', amount: 1, label: 'Traditional Instrument', destination: 'Artifact Collection', usage: 'View in Library' }
-        ],
-        description: "Match the classical Indian art form to its ancient treatise or origin.",
+        variationId: "v1", type: "artifactMatch", title: "Regional Textiles",
+        description: "Match the traditional textile craft to its geographic region of origin.",
         difficulty: "medium", maxScore: 100,
         pairs: [
-          { id: '1', left: 'Classical Dance', right: 'Natyashastra', icon: '💃' },
-          { id: '2', left: 'Ayurveda', right: 'Charaka Samhita', icon: '🌿' },
-          { id: '3', left: 'Carnatic Music', right: 'Sama Veda chants', icon: '🎵' },
-          { id: '4', left: 'Yoga', right: 'Patanjalis Sutras', icon: '🧘' }
+          { id: '1', left: 'Kanjeevaram Silk', right: 'Tamil Nadu', icon: '🧵' },
+          { id: '2', left: 'Pashmina Shawl', right: 'Kashmir', icon: '🧣' },
+          { id: '3', left: 'Ikat Weaving', right: 'Telangana & Odisha', icon: '👘' },
+          { id: '4', left: 'Chikankari Embroidery', right: 'Uttar Pradesh', icon: '🪡' }
         ]
-      },
+      }
+    ]
+  },
+  "mg-l9-performance": {
+    id: "mg-l9-performance", levelId: 9,
+    variations: [
       {
-        variationId: "v2", type: "timeline", title: "Evolution of Indian Art",
-        rewards: [
-          { type: 'artifact', id: 'bronze_statue', amount: 1, label: 'Lost-Wax Bronze Statue', destination: 'Artifact Collection', usage: 'View in Library' },
-          { type: 'artifact', id: 'folk_instrument', amount: 1, label: 'Traditional Instrument', destination: 'Artifact Collection', usage: 'View in Library' }
-        ],
-        description: "Sequence the development of artistic expression in ancient India.",
-        difficulty: "medium", maxScore: 100,
+        variationId: "v1", type: "timeline", title: "Rhythm and Rasa",
+        description: "Sequence the elements of a traditional Indian classical dance performance.",
+        difficulty: "hard", maxScore: 100,
         events: [
-          { id: 't1', label: 'Prehistoric Cave Paintings (Bhimbetka)', order: 1 },
-          { id: 't2', label: 'Harappan Terracotta and Bronze Art', order: 2 },
-          { id: 't3', label: 'Mauryan Polished Stone Pillars', order: 3 },
-          { id: 't4', label: 'Gupta Classical Sculpture', order: 4 },
-          { id: 't5', label: 'Chola Bronze Idols (Nataraja)', order: 5 }
+          { id: 't1', label: 'Mangalacharan (Invocation of deities)', order: 1 },
+          { id: 't2', label: 'Nritta (Pure rhythmic dance without narrative)', order: 2 },
+          { id: 't3', label: 'Abhinaya (Expressional dance conveying a story)', order: 3 },
+          { id: 't4', label: 'Moksha (Conclusion and spiritual liberation)', order: 4 }
+        ]
+      }
+    ]
+  },
+  "mg-l9-festivals": {
+    id: "mg-l9-festivals", levelId: 9,
+    variations: [
+      {
+        variationId: "v1", type: "historicalDecision", title: "Seasonal Festivals",
+        description: "Understand the agricultural and social roots of Indian festivals.",
+        difficulty: "medium", maxScore: 100,
+        scenarios: [
+          {
+            id: "sc1",
+            prompt: "The winter harvest is complete in Punjab. How does the community celebrate and mark the changing of the solar season?",
+            options: [
+              { response: "By lighting bonfires and celebrating Lohri", score: 50, explanation: "Correct. Lohri marks the passing of the winter solstice and the harvest of rabi crops." },
+              { response: "By fasting for a month", score: -20, explanation: "Harvest festivals are typically times of feast and community gathering, not prolonged fasting." },
+              { response: "By remaining entirely silent", score: 0, explanation: "Lohri is famous for its singing, dancing (Bhangra), and joyous communal energy." }
+            ]
+          },
+          {
+            id: "sc2",
+            prompt: "In Kerala, the legendary King Mahabali is believed to return once a year. Which festival honors his equitable rule and the rice harvest?",
+            options: [
+              { response: "Onam", score: 50, explanation: "Onam is the major harvest festival of Kerala, marked by boat races, flower carpets (Pookkalam), and feasts." },
+              { response: "Diwali", score: -20, explanation: "Diwali is widely celebrated across India but is primarily associated with the return of Lord Rama to Ayodhya, not Mahabali." },
+              { response: "Holi", score: 0, explanation: "Holi is the festival of colors, primarily celebrating the arrival of spring." }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "mg-l9-preservation": {
+    id: "mg-l9-preservation", levelId: 9,
+    variations: [
+      {
+        variationId: "v1", type: "tradeRoute", title: "Preserving the Past",
+        description: "Travel to document and preserve fading cultural practices.",
+        difficulty: "hard", maxScore: 150,
+        route: [
+          {
+            id: 'leg1',
+            prompt: "You meet an elderly artisan who is the last master of a unique bronze casting method. How do you preserve this knowledge?",
+            options: [
+              { text: "Apprentice young students to learn it hands-on", isSafe: true, msg: "Living heritage is best preserved through active, generational practice." },
+              { text: "Just take a photograph", isSafe: false, msg: "A photograph cannot teach the tactile skills and unwritten knowledge of the craft. The lineage dies." }
+            ]
+          },
+          {
+            id: 'leg2',
+            prompt: "A tribal community shares an oral epic song with you. How should it be recorded?",
+            options: [
+              { text: "Record the audio with the community's context and permission", isSafe: true, msg: "Ethical documentation respects the community's ownership while archiving the song." },
+              { text: "Write down the lyrics and claim you wrote it", isSafe: false, msg: "This is cultural theft. The community bans you from their village." }
+            ]
+          }
         ]
       }
     ]
