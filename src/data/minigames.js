@@ -969,38 +969,84 @@ export const minigamesData = {
       }
     ]
   },
-  "mg-l12-stories": {
-    id: "mg-l12-stories", levelId: 12,
+
+  "mg-l12-story-seq": {
+    id: "mg-l12-story-seq", levelId: 12,
     variations: [
       {
-        variationId: "v1", type: "timeline", title: "The Monkey and the Crocodile",
-        rewards: [
-          { type: 'knowledge', id: 'palm_leaf_manuscript', amount: 1, label: 'Palm-Leaf Manuscript', destination: 'Knowledge Library', usage: 'Preserving Epics' },
-          { type: 'knowledge', id: 'folk_tale', amount: 1, label: 'Oral Folk Tale', destination: 'Knowledge Library', usage: 'Lore Unlocked' }
-        ],
-        description: "Sequence this famous Panchatantra fable correctly.",
-        difficulty: "easy", maxScore: 100,
+        variationId: "v1", type: "timeline", title: "The Panchatantra",
+        description: "Sequence the classic fable of 'The Monkey and the Crocodile' to restore the narrative logic.",
+        difficulty: "medium", maxScore: 100,
         events: [
-          { id: 't1', label: 'The monkey feeds the crocodile sweet rose apples', order: 1 },
-          { id: 't2', label: 'The crocodiles wife demands the monkeys heart', order: 2 },
-          { id: 't3', label: 'The crocodile tricks the monkey onto his back', order: 3 },
-          { id: 't4', label: 'The monkey says he left his heart in the tree', order: 4 },
-          { id: 't5', label: 'The monkey escapes back into the branches', order: 5 }
+          { id: 't1', label: 'The monkey shares sweet jamun fruits with his friend, the crocodile.', order: 1 },
+          { id: 't2', label: 'The crocodile\'s wife demands to eat the monkey\'s sweet heart.', order: 2 },
+          { id: 't3', label: 'The crocodile invites the monkey for a ride across the river to his home.', order: 3 },
+          { id: 't4', label: 'The monkey tricks the crocodile, saying he left his heart on the tree.', order: 4 }
         ]
-      },
+      }
+    ]
+  },
+  "mg-l12-folk-art": {
+    id: "mg-l12-folk-art", levelId: 12,
+    variations: [
       {
-        variationId: "v2", type: "artifactMatch", title: "Epics and Fables",
-        rewards: [
-          { type: 'knowledge', id: 'palm_leaf_manuscript', amount: 1, label: 'Palm-Leaf Manuscript', destination: 'Knowledge Library', usage: 'Preserving Epics' },
-          { type: 'knowledge', id: 'folk_tale', amount: 1, label: 'Oral Folk Tale', destination: 'Knowledge Library', usage: 'Lore Unlocked' }
-        ],
-        description: "Match the ancient Indian text to its core theme.",
-        difficulty: "easy", maxScore: 100,
+        variationId: "v1", type: "artifactMatch", title: "Folk Art Traditions",
+        description: "Match the traditional Indian folk art style to its regional context or canvas.",
+        difficulty: "medium", maxScore: 100,
         pairs: [
-          { id: '1', left: 'Panchatantra', right: 'Animal fables teaching political strategy', icon: '🐒' },
-          { id: '2', left: 'Jataka Tales', right: 'Stories of the Buddhas previous lives', icon: '☸️' },
-          { id: '3', left: 'Mahabharata', right: 'Epic of duty, war, and philosophy', icon: '🏹' },
-          { id: '4', left: 'Ramayana', right: 'Epic of dharma and the journey of Rama', icon: '📖' }
+          { id: '1', left: 'Warli Painting', right: 'Tribal art using rice paste on mud walls (Maharashtra)', icon: '🔺' },
+          { id: '2', left: 'Madhubani (Mithila)', right: 'Intricate geometric patterns from Bihar', icon: '🎨' },
+          { id: '3', left: 'Pattachitra', right: 'Cloth-based scroll painting from Odisha', icon: '📜' },
+          { id: '4', left: 'Kalighat Painting', right: 'Watercolor folk art from Bengal', icon: '🖌️' }
+        ]
+      }
+    ]
+  },
+  "mg-l12-language": {
+    id: "mg-l12-language", levelId: 12,
+    variations: [
+      {
+        variationId: "v1", type: "historicalDecision", title: "Scripts and Languages",
+        description: "Identify how classical Indian literature was recorded and preserved.",
+        difficulty: "medium", maxScore: 100,
+        scenarios: [
+          {
+            id: "sc1",
+            prompt: "You want to record a royal decree that will last for centuries and be read by commoners. What script and medium do you choose?",
+            options: [
+              { response: "Carve it into a rock face using Brahmi script", score: 50, explanation: "Correct. Brahmi was the mother script for many Indian languages, and rock inscriptions survive for millennia." },
+              { response: "Write it on palm leaves in Sanskrit", score: -20, explanation: "Palm leaves decay over time, and classical Sanskrit was not the language of the common masses." },
+              { response: "Memorize it and tell the court", score: 0, explanation: "Oral traditions are powerful but decrees need permanent, unalterable records." }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "mg-l12-story-dec": {
+    id: "mg-l12-story-dec", levelId: 12,
+    variations: [
+      {
+        variationId: "v1", type: "tradeRoute", title: "The Bard's Tale",
+        description: "You are a wandering storyteller (Kathakar). Navigate the challenges of performance.",
+        difficulty: "hard", maxScore: 150,
+        route: [
+          {
+            id: 'leg1',
+            prompt: "You arrive at a village square. The crowd is diverse—farmers, children, and elders. What do you perform?",
+            options: [
+              { text: "A localized, relatable folk version of the Ramayana", isSafe: true, msg: "The crowd loves it. Regional adaptations (like the Kamba Ramayanam) connected deeply with local audiences." },
+              { text: "A complex philosophical treatise in high Sanskrit", isSafe: false, msg: "The crowd is bored and leaves. You earn no alms." }
+            ]
+          },
+          {
+            id: 'leg2',
+            prompt: "To accompany your story, which traditional prop do you use?",
+            options: [
+              { text: "A painted scroll (Phad) showing the sequence of events", isSafe: true, msg: "Scrolls like the Phad or Kalamkari were vital visual aids for storytellers." },
+              { text: "A heavy stone inscription", isSafe: false, msg: "You can't carry it, and the crowd can't read it from afar." }
+            ]
+          }
         ]
       }
     ]
