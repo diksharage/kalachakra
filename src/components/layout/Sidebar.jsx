@@ -6,8 +6,6 @@ import { useLanguage } from '../../context/LanguageContext';
 
 const Sidebar = ({ isOpen, onClose }) => {
   const { t } = useLanguage();
-  const { logoutUser } = useGame();
-  
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Journey', path: '/journey', icon: Map },
@@ -61,9 +59,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           <button className="flex items-center gap-3 px-3 py-2 w-full text-left text-content/70 hover:text-content transition-colors rounded-lg hover:bg-surface/50">
             <span className="font-medium text-sm">Settings</span>
           </button>
-          <button onClick={() => { logoutUser(); onClose && onClose(); }} className="flex items-center gap-3 px-3 py-2 mt-2 w-full text-left text-red-400 hover:text-red-300 transition-colors rounded-lg hover:bg-red-900/20">
-            <span className="font-medium text-sm">Logout</span>
-          </button>
+          
         </div>
       </div>
     </>

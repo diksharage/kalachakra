@@ -1,7 +1,7 @@
 import React from 'react';
 import { useGame } from '../context/GameContext';
 import { useAudio } from '../context/AudioContext';
-import { User, Activity, Map, Trophy, Hexagon, Star, PlayCircle, BookOpen, Hammer, Search, CheckCircle, Volume2, VolumeX, ArrowRight, Settings, Moon, Sun } from 'lucide-react';
+import { User, Activity, Map, Trophy, Hexagon, Star, PlayCircle, BookOpen, Hammer, Search, CheckCircle, Volume2, VolumeX, ArrowRight, Settings, Moon, Sun, LogOut } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import BackButton from '../components/common/BackButton';
@@ -31,7 +31,7 @@ const TimelineItem = ({ day, title, desc, icon }) => (
 const ProfilePage = () => {
   const { t } = useLanguage();
   const { theme, toggleTheme } = useTheme();
-  const { gameState } = useGame();
+  const { gameState, logoutUser } = useGame();
   const { settings: audioSettings, updateSetting, toggleMute } = useAudio();
   const navigate = useNavigate();
   
@@ -212,10 +212,11 @@ const ProfilePage = () => {
                       <span className="text-xs opacity-60">{Math.round(audioSettings.sfxVolume * 100)}%</span>
                     </div>
                     <input 
-                      type="range" min="0" max="1" step="0.1" 
+                      type="range" min="0" max="1" step="0.01" 
                       value={audioSettings.sfxVolume}
                       onChange={(e) => updateSetting('sfxVolume', parseFloat(e.target.value))}
-                      className="w-full accent-gold"
+                      className="w-full h-2 rounded-full custom-slider"
+                      style={{ background: `linear-gradient(to right, #D4A64A ${audioSettings.sfxVolume * 100}%, rgba(255,255,255,0.2) ${audioSettings.sfxVolume * 100}%)` }}
                     />
                   </div>
                   <div>
@@ -224,19 +225,30 @@ const ProfilePage = () => {
                       <span className="text-xs opacity-60">{Math.round(audioSettings.ambienceVolume * 100)}%</span>
                     </div>
                     <input 
-                      type="range" min="0" max="1" step="0.1" 
+                      type="range" min="0" max="1" step="0.01" 
                       value={audioSettings.ambienceVolume}
                       onChange={(e) => updateSetting('ambienceVolume', parseFloat(e.target.value))}
-                      className="w-full accent-gold"
+                      className="w-full h-2 rounded-full custom-slider"
+                      style={{ background: `linear-gradient(to right, #D4A64A ${audioSettings.ambienceVolume * 100}%, rgba(255,255,255,0.2) ${audioSettings.ambienceVolume * 100}%)` }}
                     />
                   </div>
                 </div>
               )}
             </div>
 
+            {/* LOGOUT SETTING */}
+            <div className="border-t border-content/10 pt-6 mt-6">
+              <button 
+                onClick={() => logoutUser()}
+                className="w-full flex items-center justify-center gap-3 p-4 rounded-xl border border-red-500/30 bg-red-900/10 text-red-400 hover:bg-red-900/30 hover:border-red-500/50 transition-colors font-bold"
+              >
+                <LogOut size={20} />
+                Log Out
+              </button>
+            </div>
           </div>
-        </div>
 
+        </div>
       </div>
     </div>
   );
