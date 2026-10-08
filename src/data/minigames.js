@@ -191,35 +191,114 @@ export const minigamesData = {
       }
     ]
   },
-  "mg-l4-trade": {
-    id: "mg-l4-trade", levelId: 4,
+  
+  "mg-l4-route": {
+    id: "mg-l4-route", levelId: 4,
     variations: [
       {
-        variationId: "v1", type: "tradeRoute", title: "The Meluhha Voyage",
-        rewards: [
-          { type: 'resource', id: 'textiles', amount: 2, label: 'Woven Textiles', destination: 'Inventory', usage: 'Used for Export Trade' },
-          { type: 'artifact', id: 'spices', amount: 1, label: 'Exotic Spices', destination: 'Artifact Collection', usage: 'View in Library' }
-        ],
-        description: "Navigate a trade ship from the Indus Valley to Mesopotamia.",
-        difficulty: "medium", maxScore: 100,
-        legs: [
-          { start: "Lothal Dockyard", context: "Your ship is loaded with carnelian. Which body of water do you enter first?", options: [{ label: "Arabian Sea", isCorrect: true }, { label: "Bay of Bengal", isCorrect: false }] },
-          { start: "Arabian Sea", context: "You are sailing westward. Where do you stop to resupply?", options: [{ label: "Dilmun (Bahrain)", isCorrect: true }, { label: "Magan (Oman)", isCorrect: false }] },
-          { start: "Persian Gulf", context: "You reach the great rivers of Mesopotamia. Which port do you dock at?", options: [{ label: "Ur", isCorrect: true }, { label: "Memphis", isCorrect: false }] }
+        variationId: "v1", type: "tradeRoute", title: "The Silk & Spice Path",
+        description: "Choose safe and efficient routes to establish your trade network.",
+        difficulty: "hard", maxScore: 150,
+        route: [
+          {
+            id: 'leg1',
+            prompt: "You depart from the coastal ports of Gujarat. Do you hug the coastline towards the Persian Gulf or sail directly across the Arabian Sea?",
+            options: [
+              { text: "Follow the coastline safely", isSafe: true, msg: "A long but safe journey. Supplies hold steady." },
+              { text: "Sail directly across", isSafe: false, msg: "Without monsoon knowledge, your ship is lost at sea!" }
+            ]
+          },
+          {
+            id: 'leg2',
+            prompt: "You reach the entrepôt of Dilmun. You can restock supplies here or push through to Ur directly.",
+            options: [
+              { text: "Restock in Dilmun", isSafe: true, msg: "Dilmun's fresh water keeps your crew healthy." },
+              { text: "Push through to Ur", isSafe: false, msg: "Your crew runs out of water and perishes." }
+            ]
+          },
+          {
+            id: 'leg3',
+            prompt: "In Mesopotamia, a rival merchant tries to undercut your Carnelian bead prices. How do you respond?",
+            options: [
+              { text: "Show the authentic Indus seal", isSafe: true, msg: "Your seal proves the high quality. Sold for maximum profit!" },
+              { text: "Lower the prices", isSafe: false, msg: "You take a massive loss and cannot afford the return trip." }
+            ]
+          }
         ]
-      },
+      }
+    ]
+  },
+  "mg-l4-cargo": {
+    id: "mg-l4-cargo", levelId: 4,
+    variations: [
       {
-        variationId: "v2", type: "artifactMatch", title: "Goods of the Ancient World",
-        rewards: [
-          { type: 'resource', id: 'textiles', amount: 2, label: 'Woven Textiles', destination: 'Inventory', usage: 'Used for Export Trade' },
-          { type: 'artifact', id: 'spices', amount: 1, label: 'Exotic Spices', destination: 'Artifact Collection', usage: 'View in Library' }
-        ],
+        variationId: "v1", type: "historicalDecision", title: "Manage the Cargo",
+        description: "Select suitable trade goods and manage your caravan's capacity.",
+        difficulty: "medium", maxScore: 100,
+        scenarios: [
+          {
+            id: "sc1",
+            prompt: "Your caravan can only carry a limited weight. Which goods will yield the highest profit density in distant lands?",
+            options: [
+              { response: "Lapis Lazuli and Carnelian Beads", score: 50, explanation: "Correct! High-value, low-weight luxury items were perfect for long-distance trade." },
+              { response: "Heavy clay pottery", score: -20, explanation: "Pottery is heavy, fragile, and not worth transporting across continents." },
+              { response: "Raw unsmelted copper ore", score: 0, explanation: "Too heavy. It's better to smelt it first or trade finished goods." }
+            ]
+          },
+          {
+            id: "sc2",
+            prompt: "You are packing fragile spices for a long maritime journey. How do you store them?",
+            options: [
+              { response: "Sealed in specialized storage jars", score: 50, explanation: "Exactly. Specialized Harappan jars have been found as far as Oman, used for transporting perishables." },
+              { response: "In open woven baskets", score: -20, explanation: "Saltwater and humidity will ruin the spices instantly." },
+              { response: "Loose in the ship hull", score: 0, explanation: "They will be contaminated by bilge water." }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "mg-l4-exchange": {
+    id: "mg-l4-exchange", levelId: 4,
+    variations: [
+      {
+        variationId: "v1", type: "historicalDecision", title: "Merchant Exchanges",
+        description: "Interact with foreign merchants and capitalize on trade opportunities.",
+        difficulty: "medium", maxScore: 100,
+        scenarios: [
+          {
+            id: "sc1",
+            prompt: "A merchant from Magan offers raw copper in exchange for your finished textiles and beads. Do you accept?",
+            options: [
+              { response: "Accept the trade", score: 50, explanation: "A great deal! The Indus cities lacked local copper but were masters at textile weaving." },
+              { response: "Demand gold instead", score: -20, explanation: "Magan was known for copper, not gold. The merchant is insulted." },
+              { response: "Refuse. We don't need copper.", score: 0, explanation: "You miss a vital resource for your bronze tools." }
+            ]
+          },
+          {
+            id: "sc2",
+            prompt: "A local chieftain demands a toll for your caravan to pass through the mountain pass.",
+            options: [
+              { response: "Pay the toll with a few trade goods", score: 50, explanation: "A small price to pay to secure safe passage and future trade relations." },
+              { response: "Fight the chieftain", score: -20, explanation: "Your merchants are not soldiers. You lose your goods and your life." },
+              { response: "Turn around and go home", score: 0, explanation: "You survive, but the expedition is a financial failure." }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "mg-l4-artifacts": {
+    id: "mg-l4-artifacts", levelId: 4,
+    variations: [
+      {
+        variationId: "v1", type: "artifactMatch", title: "Goods of the Ancient World",
         description: "Match the trade good to its destination or origin.",
         difficulty: "medium", maxScore: 100,
         pairs: [
-          { id: '1', left: 'Carnelian Beads', right: 'Exported from Lothal', icon: '🔴' },
-          { id: '2', left: 'Copper', right: 'Imported from Magan (Oman)', icon: '⛏️' },
-          { id: '3', left: 'Lapis Lazuli', right: 'Sourced from Afghanistan', icon: '🔷' },
+          { id: '1', left: 'Carnelian Beads', right: 'Exported from Lothal', icon: '💎' },
+          { id: '2', left: 'Copper', right: 'Imported from Magan (Oman)', icon: '🥉' },
+          { id: '3', left: 'Lapis Lazuli', right: 'Sourced from Afghanistan', icon: '💠' },
           { id: '4', left: 'Cylinder Seals', right: 'Found from Mesopotamia', icon: '📜' }
         ]
       }
