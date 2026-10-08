@@ -11,6 +11,19 @@ const ArtifactsPage = () => {
       <div>
         <h1 className="text-3xl font-serif font-bold gold-gradient-text mb-2">Artifacts Collection</h1>
         <p className="text-content/70">Relics of the past you have uncovered during your explorations.</p>
+        
+        <div className="mt-6 bg-surface/50 border border-content/10 p-6 rounded-2xl flex items-center justify-between">
+           <div>
+             <h3 className="text-gold font-bold uppercase tracking-widest text-sm mb-1">Collection Progress</h3>
+             <p className="text-2xl font-serif text-white">{gameState.unlockedArtifacts.length} <span className="text-content/50 text-lg">/ {artifacts.length}</span></p>
+           </div>
+           <div className="w-1/2 bg-black/40 h-4 rounded-full overflow-hidden border border-content/10">
+             <div 
+               className="h-full bg-gradient-to-r from-gold/50 to-gold transition-all duration-1000"
+               style={{ width: `${Math.min(100, (gameState.unlockedArtifacts.length / Math.max(1, artifacts.length)) * 100)}%` }}
+             />
+           </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

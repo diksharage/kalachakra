@@ -1,4 +1,62 @@
 export const achievementsData = [
+  {
+    id: "artifact_collector",
+    titleKey: "artifactCollector.title",
+    descKey: "artifactCollector.description",
+    icon: "🏺",
+    category: "exploration",
+    target: 5,
+    rarity: "uncommon",
+    reward: 100,
+    type: "artifacts"
+  },
+  {
+    id: "master_builder",
+    titleKey: "masterBuilder.title",
+    descKey: "masterBuilder.description",
+    icon: "dY?>,?",
+    category: "building",
+    target: 10,
+    rarity: "rare",
+    reward: 200,
+    type: "event" 
+  },
+  {
+    id: "trade_master",
+    titleKey: "tradeMaster.title",
+    descKey: "tradeMaster.description",
+    icon: "⛵",
+    category: "journey",
+    target: 4,
+    rarity: "uncommon",
+    reward: 150,
+    type: "level_complete",
+    levelId: 4
+  },
+  {
+    id: "historian",
+    titleKey: "historian.title",
+    descKey: "historian.description",
+    icon: "📜",
+    category: "knowledge",
+    target: 10,
+    rarity: "rare",
+    reward: 250,
+    type: "challenges"
+  },
+  {
+    id: "perfect_civilization",
+    titleKey: "perfectCivilization.title",
+    descKey: "perfectCivilization.description",
+    icon: "⭐",
+    category: "journey",
+    target: 1,
+    rarity: "legendary",
+    reward: 500,
+    type: "minigame_stars",
+    starsRequired: 3
+  },
+
   // EXPLORATION
   {
     id: "first_discovery",
