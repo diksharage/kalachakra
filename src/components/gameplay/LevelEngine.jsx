@@ -1691,9 +1691,7 @@ const LevelEngine = ({ config }) => {
                              navigate('/journey');
                            }}
                            className="flex-1 max-w-[280px] px-8 py-5 bg-gradient-to-r from-gold to-emerald-600 text-[#111] font-extrabold text-lg rounded-2xl hover:shadow-[0_0_30px_rgba(212,166,74,0.6)] hover:scale-105 transition-all"
-                         >
-                           Continue Journey
-                         </button>
+                         >{levelId === 14 ? "Complete Heritage Journey" : "Continue Journey"}</button>
                          <button 
                            onClick={() => {
                              playSound('ui');

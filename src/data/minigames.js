@@ -1126,35 +1126,92 @@ export const minigamesData = {
       }
     ]
   },
-  "mg-l14-preserve": {
-    id: "mg-l14-preserve", levelId: 14,
+
+  "mg-l14-archive": {
+    id: "mg-l14-archive", levelId: 14,
     variations: [
       {
-        variationId: "v1", type: "historicalDecision", title: "Archivist's Dilemma",
-        rewards: [
-          { type: 'knowledge', id: 'heritage_archive', amount: 1, label: 'Digital Heritage Archive', destination: 'Knowledge Library', usage: 'Protecting History' },
-          { type: 'knowledge', id: 'preservation_record', amount: 1, label: 'Restoration Record', destination: 'Knowledge Library', usage: 'Lore Unlocked' }
-        ],
-        description: "Make crucial decisions to preserve ancient artifacts for future generations.",
+        variationId: "v1", type: "historicalDecision", title: "Digital Archive",
+        description: "Make crucial archival decisions to preserve ancient artifacts for future generations.",
         difficulty: "hard", maxScore: 100,
         scenarios: [
-          { text: "You discover brittle palm-leaf manuscripts. How do you preserve them?", options: [{ label: "Digitize them immediately and control humidity", score: 10, response: "The texts are saved forever digitally!" }, { label: "Laminate them in modern plastic", score: -10, response: "The chemicals destroyed the ancient ink!" }] },
-          { text: "A bronze Chola statue is heavily oxidized (green rust). What is your treatment?", options: [{ label: "Use gentle chemical cleaning to reveal details", score: 10, response: "The statue is restored to its glory!" }, { label: "Scrub it with wire brushes", score: -10, response: "You scratched and ruined the historical surface." }] }
+          {
+            id: "sc1",
+            prompt: "You discover a vault of extremely brittle palm-leaf manuscripts. How do you preserve them?",
+            options: [
+              { response: "Digitize them with non-destructive scanning and control humidity", score: 50, explanation: "Correct. High-resolution digitization ensures the knowledge survives even if the physical medium eventually decays." },
+              { response: "Laminate them in modern plastic", score: -20, explanation: "The chemical adhesives in the plastic will permanently destroy the ancient ink." },
+              { response: "Leave them in a sunny room to dry out", score: 0, explanation: "UV light and dryness will cause them to crumble into dust instantly." }
+            ]
+          }
         ]
-      },
+      }
+    ]
+  },
+  "mg-l14-restore": {
+    id: "mg-l14-restore", levelId: 14,
+    variations: [
       {
-        variationId: "v2", type: "tradeRoute", title: "Returning Stolen Heritage",
-        rewards: [
-          { type: 'knowledge', id: 'heritage_archive', amount: 1, label: 'Digital Heritage Archive', destination: 'Knowledge Library', usage: 'Protecting History' },
-          { type: 'knowledge', id: 'preservation_record', amount: 1, label: 'Restoration Record', destination: 'Knowledge Library', usage: 'Lore Unlocked' }
-        ],
-        description: "Navigate international channels to repatriate a stolen Nataraja idol.",
+        variationId: "v1", type: "historicalDecision", title: "Artifact Restoration",
+        description: "Apply scientific conservation techniques to ancient relics.",
         difficulty: "hard", maxScore: 100,
-        legs: [
-          { start: "Black Market", context: "You identify a stolen idol in a foreign gallery. What is your first legal step?", options: [{ label: "File a claim with UNESCO and Interpol", isCorrect: true }, { label: "Demand it back on social media", isCorrect: false }] },
-          { start: "Interpol", context: "You need to prove it belongs to India. What evidence do you provide?", options: [{ label: "Photographic archives from the original temple", isCorrect: true }, { label: "A receipt from a local antique shop", isCorrect: false }] },
-          { start: "Court of Law", context: "The gallery agrees to return it. Where should the idol go?", options: [{ label: "Back to the Archaeological Survey of India (ASI) or the original temple", isCorrect: true }, { label: "To a private collector in Delhi", isCorrect: false }] }
+        scenarios: [
+          {
+            id: "sc1",
+            prompt: "A bronze Chola Nataraja statue is heavily oxidized with 'bronze disease' (malignant green rust). What is your treatment?",
+            options: [
+              { response: "Use gentle chemical stabilization (BTA) to halt corrosion while keeping the historic patina", score: 50, explanation: "Modern conservation halts active decay but respects the artifact's historical aging (patina)." },
+              { response: "Scrub it down with wire brushes and polish it till it shines", score: -20, explanation: "You just scratched and destroyed the historical surface and erased its archaeological value." },
+              { response: "Melt it down and recast it", score: 0, explanation: "You destroyed a priceless historical artifact." }
+            ]
+          }
         ]
+      }
+    ]
+  },
+  "mg-l14-repatriation": {
+    id: "mg-l14-repatriation", levelId: 14,
+    variations: [
+      {
+        variationId: "v1", type: "tradeRoute", title: "Returning Stolen Heritage",
+        description: "Navigate international channels to repatriate a stolen temple idol.",
+        difficulty: "hard", maxScore: 150,
+        route: [
+          {
+            id: 'leg1',
+            prompt: "You identify a stolen 11th-century idol in a foreign gallery catalog. What is your first legal step?",
+            options: [
+              { text: "File a formal claim via the government with Interpol and UNESCO", isSafe: true, msg: "Using official international legal frameworks is the only way to compel repatriation." },
+              { text: "Demand it back angrily on social media", isSafe: false, msg: "The gallery ignores you and moves the idol to an anonymous private buyer. It is lost." }
+            ]
+          },
+          {
+            id: 'leg2',
+            prompt: "You need to prove to the foreign court that the idol was stolen from India. What evidence do you provide?",
+            options: [
+              { text: "Archival photographs from the original temple taken 50 years ago", isSafe: true, msg: "Photographic evidence proving prior context is the gold standard for restitution claims." },
+              { text: "A recent receipt from a local antique shop", isSafe: false, msg: "The court rejects this as it does not prove historical provenance. Claim denied." }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "mg-l14-legacy": {
+    id: "mg-l14-legacy", levelId: 14,
+    variations: [
+      {
+        variationId: "v1", type: "buildFromMemory", title: "The Grand Exhibition",
+        description: "Curate the final museum exhibition representing India's civilization.",
+        difficulty: "hard", maxScore: 150, memorizeTime: 8,
+        components: [
+          { id: 'c1', label: 'Harappan Dancing Girl (Indus Valley)', icon: '🏺', required: true },
+          { id: 'c2', label: 'Ashokan Pillar Capital (Mauryan)', icon: '🦁', required: true },
+          { id: 'c3', label: 'Sushruta Samhita Manuscript (Gupta)', icon: '📜', required: true },
+          { id: 'c4', label: 'Chola Bronze Nataraja (Medieval)', icon: '🕺', required: true },
+          { id: 'c5', label: 'Vitthala Temple Blueprint (Vijayanagara)', icon: '🗺️', required: true }
+        ],
+        deco: ['🏛️', '🌟']
       }
     ]
   }
