@@ -66,6 +66,93 @@ export const minigamesData = {
       }
     ]
   },
+  
+  "mg-l3-city": {
+    id: "mg-l3-city", levelId: 3,
+    variations: [
+      {
+        variationId: "v1", type: "buildFromMemory", title: "Plan Mohenjo-Daro",
+        description: "Memorize the layout of a classic Harappan city with its advanced drainage and grid system.",
+        difficulty: "medium", maxScore: 100, memorizeTime: 7,
+        components: [
+          { id: 'c1', label: 'The Citadel', icon: '🏛️', required: true },
+          { id: 'c2', label: 'Grid Streets', icon: '🛣️', required: true },
+          { id: 'c3', label: 'Covered Drains', icon: '🚰', required: true },
+          { id: 'c4', label: 'Great Bath', icon: '🌊', required: true },
+          { id: 'c5', label: 'Lower Town Housing', icon: '🏘️', required: true },
+          { id: 'c6', label: 'Granary', icon: '🌾', required: true }
+        ],
+        deco: ['🧱', '🏺', '☀️']
+      }
+    ]
+  },
+  "mg-l3-trade": {
+    id: "mg-l3-trade", levelId: 3,
+    variations: [
+      {
+        variationId: "v1", type: "tradeRoute", title: "Lothal Dockyard Expedition",
+        description: "Navigate your merchant ship from the Indus port of Lothal to Mesopotamia.",
+        difficulty: "hard", maxScore: 150,
+        route: [
+          {
+            id: 'leg1',
+            prompt: "Departing Lothal. The monsoon winds are strong. Do you stick to the coastline or sail into open waters?",
+            options: [
+              { text: "Follow the Makran Coastline", isSafe: true, msg: "A safe route. The coastal ports provide shelter." },
+              { text: "Sail open waters", isSafe: false, msg: "The winds overwhelm the vessel. Cargo is lost!" }
+            ]
+          },
+          {
+            id: 'leg2',
+            prompt: "Arriving near Dilmun (Bahrain). Local traders offer copper for your carnelian beads. Exchange?",
+            options: [
+              { text: "Trade for Copper", isSafe: true, msg: "A wise trade. Dilmun is a vital midway exchange hub." },
+              { text: "Refuse and sail on", isSafe: false, msg: "You arrive in Mesopotamia with wrong goods. Trade fails." }
+            ]
+          },
+          {
+            id: 'leg3',
+            prompt: "Reaching the ports of Ur in Mesopotamia. How do you identify your goods?",
+            options: [
+              { text: "Use Steatite Seals", isSafe: true, msg: "The famous Indus seals guarantee authenticity. Huge profit!" },
+              { text: "Use verbal promises", isSafe: false, msg: "Mesopotamian merchants distrust unsealed goods." }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "mg-l3-crafts": {
+    id: "mg-l3-crafts", levelId: 3,
+    variations: [
+      {
+        variationId: "v1", type: "historicalDecision", title: "Resource Management",
+        description: "Make crucial civic decisions for the survival and prosperity of the city.",
+        difficulty: "medium", maxScore: 100,
+        scenarios: [
+          {
+            id: "sc1",
+            prompt: "The monsoon season is approaching, and the Ghaggar-Hakra river is rising. What is the priority?",
+            options: [
+              { response: "Clear the covered drainage system", score: 50, explanation: "Excellent. Indus cities were famous for their advanced sanitation and drainage." },
+              { response: "Build higher temples", score: -20, explanation: "Unlike Mesopotamia, Indus cities lack massive monumental temples. Drainage was key." },
+              { response: "Evacuate the city immediately", score: 0, explanation: "Premature. The city's infrastructure could handle normal floods." }
+            ]
+          },
+          {
+            id: "sc2",
+            prompt: "Local artisans have discovered a new way to etch Carnelian beads. How do we utilize this?",
+            options: [
+              { response: "Export them to Mesopotamia", score: 50, explanation: "Yes! Etched carnelian beads were a major luxury export to Mesopotamia." },
+              { response: "Keep them a secret", score: 0, explanation: "You miss out on vital foreign trade." },
+              { response: "Use them for weapons", score: -20, explanation: "Carnelian is a semi-precious stone for jewelry, not weapons." }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
   "mg-l3-artifacts": {
     id: "mg-l3-artifacts", levelId: 3,
     variations: [
