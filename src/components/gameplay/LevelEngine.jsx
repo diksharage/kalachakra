@@ -767,7 +767,10 @@ const LevelEngine = ({ config }) => {
   const targetDiscover = targetExplore;
   const targetLearn = targetExplore;
   
-  const targetChallenges = Math.min(isBeginner ? 2 : isIntermediate ? 3 : isAdvanced ? 4 : 4, maxChallenges);
+  const targetChallenges = Math.min(
+      Math.min(isBeginner ? 2 : isIntermediate ? 3 : isAdvanced ? 4 : 4, maxChallenges),
+      allChallenges.length
+    );
   const targetBuilds = Math.min(isBeginner ? 2 : isIntermediate ? 3 : isAdvanced ? 4 : 5, maxBuilds);
 
   const defaultState = {
