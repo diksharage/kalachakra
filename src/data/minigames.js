@@ -597,37 +597,97 @@ export const minigamesData = {
       }
     ]
   },
-  "mg-l8-architecture": {
-    id: "mg-l8-architecture", levelId: 8,
+
+  "mg-l8-rockcut": {
+    id: "mg-l8-rockcut", levelId: 8,
     variations: [
       {
-        variationId: "v1", type: "buildFromMemory", title: "Rock-Cut Temple",
-        rewards: [
-          { type: 'resource', id: 'carved_stone', amount: 5, label: 'Carved Stone Blocks', destination: 'Inventory', usage: 'Used for Temple Building' },
-          { type: 'knowledge', id: 'architectural_plan', amount: 1, label: 'Master Architect Plan', destination: 'Knowledge Library', usage: 'Lore Unlocked' }
-        ],
-        description: "Rebuild the structural blueprint of an ancient Indian temple.",
-        difficulty: "hard", maxScore: 100, memorizeTime: 5,
-        components: [
-          { id: 'cb1', label: 'Garbhagriha (Sanctum)', icon: '🕉️', required: true },
-          { id: 'cb2', label: 'Mandapa (Hall)', icon: '🏛️', required: true },
-          { id: 'cb3', label: 'Shikhara (Spire)', icon: '⛰️', required: true },
-          { id: 'cb4', label: 'Amalaka (Stone Disk)', icon: '🔘', required: true },
-          { id: 'cb5', label: 'Moat', icon: '🌊', required: false },
-          { id: 'cb6', label: 'Glass Windows', icon: '🪟', required: false }
+        variationId: "v1", type: "timeline", title: "Excavation Sequence",
+        description: "Arrange the stages of excavating a monolithic rock-cut temple like Kailasanatha.",
+        difficulty: "hard", maxScore: 100,
+        events: [
+          { id: 't1', label: 'Trenching: Cutting deep trenches into the basalt cliff', order: 1 },
+          { id: 't2', label: 'Top-Down Excavation: Carving the roof before the base', order: 2 },
+          { id: 't3', label: 'Rough Hewing: Blocking out the main structural shapes', order: 3 },
+          { id: 't4', label: 'Detailed Relief Carving: Sculpting intricate panels', order: 4 }
         ]
-      },
+      }
+    ]
+  },
+  "mg-l8-engineering": {
+    id: "mg-l8-engineering", levelId: 8,
+    variations: [
       {
-        variationId: "v2", type: "historicalDecision", title: "Carving Kailasanatha",
-        rewards: [
-          { type: 'resource', id: 'carved_stone', amount: 5, label: 'Carved Stone Blocks', destination: 'Inventory', usage: 'Used for Temple Building' },
-          { type: 'knowledge', id: 'architectural_plan', amount: 1, label: 'Master Architect Plan', destination: 'Knowledge Library', usage: 'Lore Unlocked' }
-        ],
-        description: "Make engineering choices for carving a monolithic temple at Ellora.",
+        variationId: "v1", type: "historicalDecision", title: "Structural Planning",
+        description: "Solve ancient engineering and material challenges.",
         difficulty: "hard", maxScore: 100,
         scenarios: [
-          { text: "Where do you begin carving the massive rock?", options: [{ label: "Start from the top and carve downwards", score: 10, response: "Correct! This prevented the need for scaffolding." }, { label: "Start from the bottom and carve upwards", score: -10, response: "The rock collapsed!" }] },
-          { text: "How do you ensure the interior receives enough light?", options: [{ label: "Carve precise courtyards and light shafts", score: 10, response: "Light beautifully illuminated the sanctum." }, { label: "Use torches exclusively", score: -10, response: "The soot damaged the fine carvings." }] }
+          {
+            id: "sc1",
+            prompt: "You are building a massive brick stupa. How do you prevent the massive dome from collapsing outward under its own weight?",
+            options: [
+              { response: "Use interlocking bricks and a solid core", score: 50, explanation: "Correct. Ancient stupas like Sanchi used a solid rubble core surrounded by interlocking baked bricks to distribute the load." },
+              { response: "Support it entirely with wooden pillars", score: -20, explanation: "Wood rots over time and cannot support the sheer weight of a massive masonry dome." },
+              { response: "Build it hollow", score: 0, explanation: "A hollow masonry dome of that size without a reinforcing core would collapse." }
+            ]
+          },
+          {
+            id: "sc2",
+            prompt: "You need to construct a tall temple tower (Shikhara) using dry masonry (no mortar). How do you ensure stability?",
+            options: [
+              { response: "Use corbelling techniques and iron dowels", score: 50, explanation: "Brilliant. Indian architects used corbelled arches and iron clamps/dowels to hold giant stones together without mortar." },
+              { response: "Stack the stones loosely", score: -20, explanation: "The tower collapses during the first monsoon storm." },
+              { response: "Glue them with mud", score: 0, explanation: "Mud washes away. True dry masonry relies on gravity and precision." }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "mg-l8-temple": {
+    id: "mg-l8-temple", levelId: 8,
+    variations: [
+      {
+        variationId: "v1", type: "buildFromMemory", title: "Nagara Architecture",
+        description: "Memorize and reconstruct the classic components of a North Indian (Nagara) temple.",
+        difficulty: "medium", maxScore: 100, memorizeTime: 6,
+        components: [
+          { id: 'c1', label: 'Jagati (Raised Platform)', icon: '🧱', required: true },
+          { id: 'c2', label: 'Mandapa (Assembly Hall)', icon: '🏛️', required: true },
+          { id: 'c3', label: 'Garbhagriha (Inner Sanctum)', icon: '🕉️', required: true },
+          { id: 'c4', label: 'Shikhara (Tower)', icon: '🏔️', required: true },
+          { id: 'c5', label: 'Amalaka (Crowning Disk)', icon: '⚙️', required: true }
+        ],
+        deco: ['🚩', '🔔']
+      }
+    ]
+  },
+  "mg-l8-water": {
+    id: "mg-l8-water", levelId: 8,
+    variations: [
+      {
+        variationId: "v1", type: "historicalDecision", title: "Stepwell Hydraulics",
+        description: "Design a stepwell (Baoli) that can survive the harsh dry seasons and monsoons.",
+        difficulty: "medium", maxScore: 100,
+        scenarios: [
+          {
+            id: "sc1",
+            prompt: "The region has a deeply fluctuating water table. How do you design the well to ensure year-round access?",
+            options: [
+              { response: "Build a deep, multi-storied stepped trench to the lowest water table", score: 50, explanation: "This allows people to simply walk down the steps to the water level, regardless of the season." },
+              { response: "Build a shallow, wide pool on the surface", score: -20, explanation: "The water evaporates quickly in the summer heat." },
+              { response: "Rely solely on rainfall", score: 0, explanation: "Fails during the dry season." }
+            ]
+          },
+          {
+            id: "sc2",
+            prompt: "The walls of the deep stepwell face immense pressure from the surrounding earth. How do you stabilize them?",
+            options: [
+              { response: "Build subterranean pavilions and cross-bracing columns", score: 50, explanation: "Correct! The multi-storied pavilions not only provided shade but acted as structural cross-bracing." },
+              { response: "Line it with thin mud-brick", score: -20, explanation: "The walls collapse inward, destroying the well." },
+              { response: "Dig wider rather than deeper", score: 0, explanation: "You fail to reach the permanent water table." }
+            ]
+          }
         ]
       }
     ]
