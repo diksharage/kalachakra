@@ -281,7 +281,10 @@ export const levelConfigs = {
       if (stage === 4 && locId === 'indus_workshop') return { type: 'challenge', id: 'crafts' };
       if (stage === 5 && (locId === 'indus_storage' || locId === 'indus_house')) return { type: 'challenge', id: 'exchange' };
       // During stage 6, they discover artifacts/sites. No strict challenge popup, just discovery reading!
-      return { type: 'discover' };
+        if (stage === 6 && level3ArtifactLocations.find(l => l.id === locId)) {
+          return { type: 'artifact' };
+        }
+        return { type: 'discover' };
     },
 
     isLocationTarget: (stage, locId, isDiscovered) => {

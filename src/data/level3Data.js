@@ -88,25 +88,73 @@ export const level3ArtifactLocations = [
   {
     id: 'artifact_seal',
     label: 'Steatite Seal',
-    icon: '🔖',
-    description: 'A carved stone with symbols.',
-    discoverMessage: 'What we know: Seals were used for trade and administration.\nWhat remains uncertain: The Indus script has not been conclusively deciphered.',
-    yields: {}
+    icon: '🪨',
+    description: 'A small, finely carved square stone.',
+    discoverMessage: 'What we know: Seals were used for trade and administration. What remains uncertain: The Indus script has not been conclusively deciphered.',
+    yields: {},
+    isArtifact: true,
+    investigation: {
+      clues: [
+        { text: "Intricate Script", observation: "There are symbols at the top that look like writing, but they are unreadable." },
+        { text: "Unicorn Motif", observation: "A one-horned animal is carved with great precision." },
+        { text: "Boss on Back", observation: "The back has a pierced boss, meaning a string was passed through it." }
+      ],
+      question: "Based on the boss for a string and the deeply carved symbols, how was this primarily used?",
+      options: [
+        { label: "As currency to buy goods.", isCorrect: false },
+        { label: "Pressed into wet clay to mark ownership or seal trade goods.", isCorrect: true, explanation: "Seals were stamped onto clay tags attached to trade bundles, identifying the sender." },
+        { label: "As a decorative pendant with no practical purpose.", isCorrect: false }
+      ],
+      hint: "Think about why someone would need a carved 'stamp' when trading goods across long distances.",
+      reward: { xp: 50, knowledge: 2, legacy: 10 }
+    }
   },
   {
     id: 'artifact_weights',
     label: 'Chert Weights',
     icon: '⚖️',
-    description: 'Cubical stone weights.',
-    discoverMessage: 'What we know: Standardized weights suggest a regulated system of exchange across vast distances.\nWhat remains uncertain: The exact political authority enforcing this system.',
-    yields: {}
+    description: 'Perfectly cubical stone weights found across many cities.',
+    discoverMessage: 'What we know: Standardized weights suggest a regulated system of exchange across vast distances. What remains uncertain: The exact political authority enforcing this system.',
+    yields: {},
+    isArtifact: true,
+    investigation: {
+      clues: [
+        { text: "Perfect Cubes", observation: "They are shaped exactly the same, in multiple identical sizes." },
+        { text: "Binary Ratios", observation: "They follow a strict mathematical progression (1, 2, 4, 8, 16...)." },
+        { text: "Wide Distribution", observation: "The exact same weight system is found in cities hundreds of miles apart." }
+      ],
+      question: "What does the extreme standardization of these weights across the entire civilization suggest?",
+      options: [
+        { label: "They were toys for children.", isCorrect: false },
+        { label: "Each city had a different measuring system.", isCorrect: false },
+        { label: "A highly organized trade network and central authority enforcing standards.", isCorrect: true, explanation: "Standardized weights were crucial for fair trade, taxation, and administration across the vast Indus territory." }
+      ],
+      hint: "If a merchant travels 500 miles to another city, why is it important that a 'pound' weighs exactly the same there?",
+      reward: { xp: 50, mastery: 1, legacy: 10 }
+    }
   },
   {
     id: 'artifact_beads',
     label: 'Carnelian Beads',
     icon: '📿',
     description: 'Long, carefully drilled red beads.',
-    discoverMessage: 'What we know: These beads required immense skill and were traded as far away as Mesopotamia.\nWhat remains uncertain: Their specific cultural or status meaning.',
-    yields: {}
+    discoverMessage: 'What we know: These beads required immense skill and were traded as far away as Mesopotamia. What remains uncertain: Their specific cultural or status meaning.',
+    yields: {},
+    isArtifact: true,
+    investigation: {
+      clues: [
+        { text: "Micro-Drilling", observation: "The holes are incredibly thin and straight, requiring specialized bronze drills." },
+        { text: "Heat Treatment", observation: "The red color was achieved by carefully baking the stone in kilns." },
+        { text: "Found Abroad", observation: "Identical beads have been found in royal tombs in Mesopotamia." }
+      ],
+      question: "What does the presence of these beads in distant Mesopotamian tombs tell us?",
+      options: [
+        { label: "The Indus people conquered Mesopotamia.", isCorrect: false },
+        { label: "There was active, long-distance luxury trade between the Indus Valley and Mesopotamia.", isCorrect: true, explanation: "Mesopotamian records even mention importing goods from 'Meluhha', widely believed to be the Indus Valley." },
+        { label: "Carnelian beads naturally formed in both places.", isCorrect: false }
+      ],
+      hint: "Consider how luxury goods move between completely different ancient civilizations.",
+      reward: { xp: 50, culture: 1, legacy: 10 }
+    }
   }
 ];
