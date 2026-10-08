@@ -1527,8 +1527,8 @@ const LevelEngine = ({ config }) => {
 
                    <button 
                      onClick={() => {
-                        playSound('success');
-                        setLevelState(prev => ({ ...prev, stage: 7 }));
+                        playSound('reward');
+                          setLevelState(prev => ({ ...prev, stage: 7 }));
                         updateResources({ knowledge: 200, culture: 150, legacy: 100 });
                      }}
                      className="px-8 py-4 bg-gold text-black font-extrabold text-xl rounded-xl hover:scale-105 transition-transform"

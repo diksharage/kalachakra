@@ -87,6 +87,22 @@ class AudioSynthesizer {
     osc.stop(this.ctx.currentTime + duration);
   }
 
+  playExploration() {
+    this.playTone(300, 'sine', 0.1, 0.1);
+    setTimeout(() => this.playTone(400, 'sine', 0.1, 0.1), 100);
+  }
+
+  playResource() {
+    this.playTone(800, 'sine', 0.05, 0.1);
+    setTimeout(() => this.playTone(1200, 'sine', 0.05, 0.1), 50);
+  }
+
+  playReward() {
+    this.playTone(523.25, 'sine', 0.1, 0.1);
+    setTimeout(() => this.playTone(659.25, 'sine', 0.1, 0.1), 100);
+    setTimeout(() => this.playTone(783.99, 'sine', 0.2, 0.1), 200);
+  }
+
   playUI() {
     this.playTone(600, 'sine', 0.1, 0.2);
   }
