@@ -133,6 +133,8 @@ const ObjectiveTracker = ({ stage, levelState, locations, targetExplore, targetD
       case 3: return "LEARN";
       case 4: return "PLAY + SOLVE";
       case 5: return "BUILD / MANAGE";
+      case 6: return "REWARD";
+      case 7: return "COMPLETE";
       default: return "";
     }
   };
@@ -155,6 +157,8 @@ const ObjectiveTracker = ({ stage, levelState, locations, targetExplore, targetD
       case 3: return "Next: Read the remaining historical contexts.";
       case 4: return "Next: Solve the next available challenge.";
       case 5: return "Next: Construct the required era structures.";
+      case 6: return "Next: Claim your rewards.";
+      case 7: return "Next: Complete the level.";
       default: return "";
     }
   };
@@ -333,6 +337,21 @@ const ArtifactDiscoverer = ({ data, theme, ageGroup, onComplete }) => {
 };
 
 const ExplorePanel = ({ data, theme, ageGroup, isYoung, isReplay, playSound, updateResources, setLevelState, markExplored }) => {
+  
+  useEffect(() => {
+    if (!document.getElementById('explore-styles')) {
+      const style = document.createElement('style');
+      style.id = 'explore-styles';
+      style.innerHTML = `
+        @keyframes fillBar {
+          0% { width: 0%; }
+          100% { width: 100%; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
+
   // Build discovery points from location data
   const getDiscoveries = (loc) => {
     const base = [];
@@ -364,6 +383,25 @@ const ExplorePanel = ({ data, theme, ageGroup, isYoung, isReplay, playSound, upd
   const found = data.foundDiscoveries || [];
   const allFound = found.length >= discoveries.length;
   const lastFound = found.length > 0 ? discoveries.find(d => d.id === found[found.length - 1]) : null;
+
+  
+  const [investigating, setInvestigating] = useState(null);
+  const investigateTimer = useRef(null);
+
+  const startInvestigate = (disc) => {
+    if (found.includes(disc.id)) return;
+    setInvestigating(disc.id);
+    playSound('ui');
+    investigateTimer.current = setTimeout(() => {
+       handleDiscovery(disc);
+       setInvestigating(null);
+    }, 800);
+  };
+  
+  const stopInvestigate = () => {
+    setInvestigating(null);
+    if (investigateTimer.current) clearTimeout(investigateTimer.current);
+  };
 
   const handleDiscovery = (disc) => {
     if (found.includes(disc.id)) return;
@@ -419,15 +457,23 @@ const ExplorePanel = ({ data, theme, ageGroup, isYoung, isReplay, playSound, upd
             return (
               <button
                 key={disc.id}
-                onClick={() => handleDiscovery(disc)}
+                onMouseDown={() => startInvestigate(disc)}
+   onMouseUp={stopInvestigate}
+   onMouseLeave={stopInvestigate}
+   onTouchStart={() => startInvestigate(disc)}
+   onTouchEnd={stopInvestigate}
                 disabled={isFound}
-                className={`w-full text-left p-5 rounded-2xl border transition-all duration-300 flex items-start gap-4 ${
+                className={`relative overflow-hidden w-full text-left p-5 rounded-2xl border transition-all duration-300 flex items-start gap-4 ${
                   isFound
                     ? 'border-gold/40 bg-gold/5 cursor-default'
                     : 'border-content/20 bg-surface hover:border-gold/60 hover:bg-gold/10 hover:-translate-y-1 hover:shadow-lg active:scale-95 cursor-pointer'
                 }`}
+   style={{ transform: investigating === disc.id ? 'scale(0.98)' : 'scale(1)' }}
               >
-                <span className={`text-3xl transition-all duration-500 ${isFound ? 'scale-110' : 'grayscale opacity-60'}`}>{disc.icon}</span>
+                {investigating === disc.id && (
+      <div className="absolute left-0 bottom-0 h-1 bg-gold transition-all duration-[800ms] ease-linear w-full" style={{ width: '100%', animation: 'fillBar 0.8s linear forwards' }} />
+   )}
+   <span className={`text-3xl transition-all duration-500 ${isFound ? 'scale-110' : 'grayscale opacity-60'}`}>{disc.icon}</span>
                 <div className="flex-1 pt-1">
                   <div className={`font-bold text-base ${isFound ? 'text-gold' : 'text-content'}`}>{disc.label}</div>
                   {isFound && (
@@ -757,6 +803,8 @@ const LevelEngine = ({ config }) => {
     if (currentStage === 3 && newState.learning.length >= targetLearn) currentStage = 4;
     if (currentStage === 4 && newState.completedChallenges.length >= targetChallenges) currentStage = 5;
     if (currentStage === 5 && newState.builtItems.length >= targetBuilds) currentStage = 6;
+    // Stage 6 is REWARD (manual click to claim)
+    // Stage 7 is COMPLETE
     return currentStage;
   };
 
@@ -1275,7 +1323,27 @@ const LevelEngine = ({ config }) => {
 
         {/* MAP / INTERACTIVE AREA */}
         <div className={"flex-1 rounded-2xl border relative flex flex-col overflow-hidden " + theme.border + " " + theme.bg + "/10 backdrop-blur-sm"}>
-          {stage === 6 ? (
+          
+          {stage === 6 && activePopup?.type !== 'reward' ? (
+             <div className="relative h-full p-6 md:p-8 flex flex-col items-center justify-center z-10 animate-fade-in text-center overflow-y-auto w-full">
+                <div className="w-full max-w-2xl mx-auto flex flex-col items-center py-10 bg-surface/80 p-8 rounded-3xl border border-gold/30 shadow-2xl backdrop-blur-md">
+                   <Trophy className="w-20 h-20 mb-6 text-gold drop-shadow-[0_0_20px_rgba(255,215,0,0.5)] animate-pulse-slow" />
+                   <h3 className="text-4xl font-serif font-bold mb-4 text-gold">Level Objectives Met</h3>
+                   <p className="text-lg text-content/80 mb-8">You have successfully Explored, Discovered, Learned, Solved, and Built your civilization.</p>
+                   <button 
+                     onClick={() => {
+                        playSound('success');
+                        setLevelState(prev => ({ ...prev, stage: 7 }));
+                        updateResources({ knowledge: 200, culture: 150, legacy: 100 });
+                     }}
+                     className="px-8 py-4 bg-gold text-black font-extrabold text-xl rounded-xl hover:scale-105 transition-transform"
+                   >
+                     Claim Level Rewards
+                   </button>
+                </div>
+             </div>
+          ) : stage === 7 ? (
+
               <div className="relative h-full p-6 md:p-8 flex flex-col items-center justify-center z-10 animate-fade-in text-center overflow-y-auto w-full">
                 {config.id === 14 ? (
                   <FinalSequence config={config} onComplete={() => {
