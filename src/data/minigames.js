@@ -874,36 +874,98 @@ export const minigamesData = {
       }
     ]
   },
-  "mg-l11-vijay": {
-    id: "mg-l11-vijay", levelId: 11,
+
+  "mg-l11-planning": {
+    id: "mg-l11-planning", levelId: 11,
     variations: [
       {
-        variationId: "v1", type: "historicalDecision", title: "City of Victory",
-        rewards: [
-          { type: 'resource', id: 'vijayanagara_coin', amount: 4, label: 'Varaha Gold Coins', destination: 'Inventory', usage: 'Used in Hampi Bazaars' },
-          { type: 'artifact', id: 'temple_carving', amount: 1, label: 'Ruins Temple Carving', destination: 'Artifact Collection', usage: 'View in Library' }
-        ],
-        description: "Make strategic choices to manage the grand capital of Vijayanagara.",
+        variationId: "v1", type: "historicalDecision", title: "Urban Planning",
+        description: "Develop the urban zones of Vijayanagara to balance royal, sacred, and civic needs.",
         difficulty: "hard", maxScore: 100,
         scenarios: [
-          { text: "The rocky landscape of Hampi has little water. How do you supply the city?", options: [{ label: "Build aqueducts and stone tanks (Pushkaranis)", score: 10, response: "The city thrived with excellent water engineering." }, { label: "Rely on rainfall only", score: -10, response: "The city suffered severe droughts." }] },
-          { text: "Portuguese traders arrive on the western coast. What do you trade with them?", options: [{ label: "Buy Arabian horses for the cavalry", score: 10, response: "The Vijayanagara cavalry became the strongest in the south!" }, { label: "Ignore them completely", score: -10, response: "You lost military superiority." }] }
+          {
+            id: "sc1",
+            prompt: "The city population is booming. Where do you establish the new residential wards (puras)?",
+            options: [
+              { response: "Around major temple complexes", score: 50, explanation: "Correct. Vijayanagara's 'puras' were centered around major temples, which acted as economic and social hubs." },
+              { response: "Inside the Royal Enclosure", score: -20, explanation: "The Royal Enclosure was strictly for the monarch and elite administration, not general populace." },
+              { response: "Outside the outermost defensive walls", score: 0, explanation: "Leaves the population vulnerable to Deccan Sultanate raids." }
+            ]
+          },
+          {
+            id: "sc2",
+            prompt: "You need a monumental platform for the King to observe the grand Mahanavami festival and military parades.",
+            options: [
+              { response: "Build the Mahanavami Dibba in the Royal Center", score: 50, explanation: "The Mahanavami Dibba was a massive stone platform used exactly for this purpose, projecting royal power." },
+              { response: "Build it in the Sacred Center", score: -20, explanation: "The Sacred Center was for temples and priests, not military parades." },
+              { response: "Build a wooden stage in the bazaar", score: 0, explanation: "Wooden structures would not support the royal court or project imperial permanence." }
+            ]
+          }
         ]
-      },
+      }
+    ]
+  },
+  "mg-l11-water": {
+    id: "mg-l11-water", levelId: 11,
+    variations: [
       {
-        variationId: "v2", type: "artifactMatch", title: "Markets of Hampi",
-        rewards: [
-          { type: 'resource', id: 'vijayanagara_coin', amount: 4, label: 'Varaha Gold Coins', destination: 'Inventory', usage: 'Used in Hampi Bazaars' },
-          { type: 'artifact', id: 'temple_carving', amount: 1, label: 'Ruins Temple Carving', destination: 'Artifact Collection', usage: 'View in Library' }
-        ],
-        description: "Match the commodities traded in the bustling bazaars of Vijayanagara.",
-        difficulty: "hard", maxScore: 100,
-        pairs: [
-          { id: '1', left: 'Diamonds & Rubies', right: 'Sold openly in heaps on the streets', icon: '💎' },
-          { id: '2', left: 'Arabian Horses', right: 'Imported for the Royal Cavalry', icon: '🐎' },
-          { id: '3', left: 'Spices & Pepper', right: 'Exported heavily to Europe', icon: '🌶️' },
-          { id: '4', left: 'Cotton Textiles', right: 'Woven locally for domestic use and trade', icon: '🧵' }
+        variationId: "v1", type: "historicalDecision", title: "Water Architecture",
+        description: "Manage the complex hydraulic engineering of Hampi's arid landscape.",
+        difficulty: "medium", maxScore: 100,
+        scenarios: [
+          {
+            id: "sc1",
+            prompt: "The Tungabhadra river is lower in elevation than the Royal Center. How do you supply water to the palace baths?",
+            options: [
+              { response: "Build a network of stone aqueducts (Rayakaluve)", score: 50, explanation: "Vijayanagara engineers built miles of elevated stone channels (Rayakaluve) to gravity-feed water into the city." },
+              { response: "Have elephants carry water daily", score: -20, explanation: "Extremely inefficient for a city of half a million people." },
+              { response: "Dig deeper wells", score: 0, explanation: "The solid granite bedrock makes digging deep wells nearly impossible." }
+            ]
+          },
+          {
+            id: "sc2",
+            prompt: "Monsoon rains are heavy but brief. How do you store the runoff from the granite hills?",
+            options: [
+              { response: "Construct massive stepped tanks (Pushkarini)", score: 50, explanation: "Stepped tanks elegantly captured runoff and provided ritual and civic water year-round." },
+              { response: "Let it flow into the river", score: -20, explanation: "The city will suffer severe drought in the summer." },
+              { response: "Store it in clay pots", score: 0, explanation: "Insufficient scale for an imperial capital." }
+            ]
+          }
         ]
+      }
+    ]
+  },
+  "mg-l11-trade": {
+    id: "mg-l11-trade", levelId: 11,
+    variations: [
+      {
+        variationId: "v1", type: "artifactMatch", title: "The Grand Bazaar",
+        description: "Match the international trade goods found in Vijayanagara's markets to their origins.",
+        difficulty: "medium", maxScore: 100,
+        pairs: [
+          { id: '1', left: 'War Horses', right: 'Arabia & Persia', icon: '🐎' },
+          { id: '2', left: 'Spices & Pepper', right: 'Malabar Coast', icon: '🌿' },
+          { id: '3', left: 'Precious Gems (Diamonds)', right: 'Golconda Mines', icon: '💎' },
+          { id: '4', left: 'Ming Porcelain', right: 'China', icon: '🏺' }
+        ]
+      }
+    ]
+  },
+  "mg-l11-architecture": {
+    id: "mg-l11-architecture", levelId: 11,
+    variations: [
+      {
+        variationId: "v1", type: "buildFromMemory", title: "Vitthala Temple Assembly",
+        description: "Memorize and reconstruct the iconic elements of the Vitthala Temple complex.",
+        difficulty: "medium", maxScore: 100, memorizeTime: 6,
+        components: [
+          { id: 'c1', label: 'Stone Chariot (Garuda Shrine)', icon: '🛕', required: true },
+          { id: 'c2', label: 'Musical Pillars (Maha Mandapa)', icon: '🏛️', required: true },
+          { id: 'c3', label: 'Gopuram (Monumental Gate)', icon: '⛩️', required: true },
+          { id: 'c4', label: 'Kalyana Mandapa (Marriage Hall)', icon: '💍', required: true },
+          { id: 'c5', label: 'Pushkarini (Temple Tank)', icon: '🌊', required: true }
+        ],
+        deco: ['🐘', '☀️']
       }
     ]
   },
