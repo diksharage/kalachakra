@@ -1,11 +1,11 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Bot, Send, Sparkles } from 'lucide-react';
+import { Bot, Send, Sparkles, BookOpen, Compass, Lightbulb } from 'lucide-react';
 import { askHeritageGuide } from '../services/aiService';
 
 const AIGuidePage = () => {
   const [messages, setMessages] = useState([
-    { role: 'ai', content: "Namaste, Explorer! I'm Kala, your AI Heritage Guide. Ask me anything about the civilizations, artifacts, or history you discover." }
+    { role: 'ai', content: "Namaste, Explorer! I am KALA (Knowledge & AI Learning Assistant). I am your persistent companion throughout your journey. Ask me anything about the civilizations, artifacts, or history you discover." }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -21,7 +21,6 @@ const AIGuidePage = () => {
   }, [messages, isTyping]);
 
   useEffect(() => {
-    // Check if we came here from an artifact discovery link
     const params = new URLSearchParams(location.search);
     const query = params.get('q');
     if (query) {
@@ -29,106 +28,124 @@ const AIGuidePage = () => {
     }
   }, []);
 
-  const handleSend = async (text = input) => {
-    if (!text.trim()) return;
+  const handleSend = async (customText) => {
+    const textToSend = typeof customText === 'string' ? customText : input;
+    if (!textToSend.trim()) return;
 
-    const userMsg = { role: 'user', content: text };
-    setMessages(prev => [...prev, userMsg]);
+    setMessages(prev => [...prev, { role: 'user', content: textToSend }]);
     setInput('');
     setIsTyping(true);
 
     try {
-      const response = await askHeritageGuide(text);
+      const response = await askHeritageGuide(textToSend);
       setMessages(prev => [...prev, { role: 'ai', content: response }]);
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'ai', content: "I'm having trouble accessing my historical archives right now. Please try again later." }]);
+      setMessages(prev => [...prev, { role: 'ai', content: "My connection to the archives was interrupted. Please ask again." }]);
     } finally {
       setIsTyping(false);
     }
   };
 
+  const suggestions = [
+    "What did early humans use for tools?",
+    "Tell me about the Indus Valley civilization.",
+    "Why was trade important for ancient empires?"
+  ];
+
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)]">
-      <div className="mb-6 flex items-center gap-4">
-        <div className="w-12 h-12 rounded-full bg-surface border-2 border-gold flex items-center justify-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-tr from-gold/20 to-transparent"></div>
-          <Bot className="w-6 h-6 text-gold z-10" />
+    <div className="h-[calc(100vh-80px)] flex flex-col md:h-full max-w-5xl mx-auto w-full animate-fade-in relative z-10 p-4 md:p-6">
+      
+      {/* Header Profile */}
+      <div className="bg-surface/80 backdrop-blur-md border border-gold/30 rounded-t-3xl p-6 flex items-center gap-6 shadow-sm">
+        <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-gold to-terracotta flex items-center justify-center shadow-[0_0_20px_rgba(255,215,0,0.4)] border-2 border-gold/50 relative overflow-hidden shrink-0">
+           <Bot size={40} className="text-black relative z-10" />
+           <div className="absolute inset-0 bg-gold opacity-20 animate-pulse"></div>
         </div>
         <div>
-          <h1 className="text-2xl font-serif font-bold gold-gradient-text">KALA</h1>
-          <p className="text-content/50 text-sm">AI Heritage Guide</p>
+          <h1 className="text-2xl md:text-3xl font-serif font-bold text-gold tracking-widest flex items-center gap-3">KALA <Sparkles size={24} className="text-gold/80" /></h1>
+          <p className="text-content/80 text-sm md:text-base mt-1">Your Persistent AI Heritage Companion</p>
         </div>
       </div>
 
-      <div className="flex-1 glass-panel rounded-2xl border border-gold/30 overflow-hidden flex flex-col relative">
-        <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-          <Sparkles className="w-64 h-64" />
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar z-10">
-          {messages.map((msg, idx) => (
-            <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div 
-                className={`max-w-[80%] rounded-2xl p-4 ${
-                  msg.role === 'user' 
-                    ? 'bg-gold text-[#171B3A] rounded-tr-none shadow-md' 
-                    : 'bg-surface/80 border border-gold/20 text-content rounded-tl-none shadow-md'
-                }`}
-              >
-                <p className="leading-relaxed text-sm md:text-base">{msg.content}</p>
+      {/* Chat Area */}
+      <div className="flex-1 bg-surface-light border-l border-r border-content/10 p-4 md:p-6 overflow-y-auto flex flex-col gap-6">
+        {messages.map((msg, idx) => (
+          <div key={idx} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+            
+            {msg.role === 'ai' ? (
+              <div className="w-10 h-10 rounded-xl bg-gold text-black flex items-center justify-center shrink-0 shadow-md">
+                <Bot size={20} />
               </div>
-            </div>
-          ))}
-          {isTyping && (
-            <div className="flex justify-start">
-              <div className="bg-surface/80 border border-gold/20 rounded-2xl rounded-tl-none p-4 flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-gold animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                <div className="w-2 h-2 rounded-full bg-gold animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                <div className="w-2 h-2 rounded-full bg-gold animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                <span className="text-xs text-gold ml-2">Kala is studying ancient records...</span>
+            ) : (
+              <div className="w-10 h-10 rounded-xl bg-content/10 text-content flex items-center justify-center shrink-0 border border-content/20">
+                <span className="font-bold">You</span>
               </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
+            )}
 
-        <div className="p-4 bg-main/80 border-t border-gold/20 z-10">
-          <div className="flex gap-2">
-            <input 
-              type="text" 
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              placeholder="Ask about artifacts, history, or civilizations..."
-              className="flex-1 bg-surface border border-content/10 rounded-xl px-4 py-3 text-content placeholder:text-content/30 focus:outline-none focus:border-gold transition-colors"
-            />
-            <button 
-              onClick={() => handleSend()}
-              disabled={isTyping || !input.trim()}
-              className="bg-gold text-[#171B3A] p-3 rounded-xl hover:bg-terracotta disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              <Send className="w-6 h-6" />
-            </button>
+            <div className={`p-4 md:p-5 rounded-2xl max-w-[85%] md:max-w-[75%] shadow-sm ${
+              msg.role === 'user' 
+                ? 'bg-content/5 border border-content/10 text-content rounded-tr-sm' 
+                : 'bg-surface border border-gold/30 text-content leading-relaxed rounded-tl-sm'
+            }`}>
+              {msg.content}
+            </div>
           </div>
-          
-          <div className="mt-4 flex gap-2 overflow-x-auto custom-scrollbar pb-2">
-            {["What was the Great Bath used for?", "Tell me about Nalanda.", "Why is Ashoka important?"].map((q) => (
-              <button 
-                key={q}
-                onClick={() => handleSend(q)}
-                className="whitespace-nowrap text-xs bg-surface border border-gold/30 text-gold px-3 py-1.5 rounded-full hover:bg-gold/10 transition-colors"
-              >
-                {q}
-              </button>
-            ))}
+        ))}
+        {isTyping && (
+          <div className="flex gap-4">
+             <div className="w-10 h-10 rounded-xl bg-gold text-black flex items-center justify-center shrink-0 shadow-md">
+                <Bot size={20} />
+             </div>
+             <div className="p-5 rounded-2xl bg-surface border border-gold/30 rounded-tl-sm flex items-center gap-2">
+               <div className="w-2 h-2 rounded-full bg-gold/50 animate-bounce"></div>
+               <div className="w-2 h-2 rounded-full bg-gold/50 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+               <div className="w-2 h-2 rounded-full bg-gold/50 animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+             </div>
           </div>
-        </div>
+        )}
+        <div ref={messagesEndRef} />
       </div>
+
+      {/* Input Area */}
+      <div className="bg-surface/80 backdrop-blur-md border border-content/20 rounded-b-3xl p-4 shadow-[0_-10px_30px_rgba(0,0,0,0.1)]">
+        
+        {messages.length === 1 && (
+           <div className="flex flex-wrap gap-2 mb-4 justify-center md:justify-start">
+             {suggestions.map((s, i) => (
+               <button key={i} onClick={() => handleSend(s)} className="text-xs md:text-sm bg-surface-light border border-content/10 hover:border-gold/50 hover:text-gold text-content/70 px-4 py-2 rounded-full transition-colors flex items-center gap-2">
+                 <Lightbulb size={14} /> {s}
+               </button>
+             ))}
+           </div>
+        )}
+
+        <form 
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSend();
+          }} 
+          className="flex gap-3"
+        >
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask KALA a question..."
+            className="flex-1 bg-surface-light border border-content/20 rounded-2xl px-5 py-4 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-colors text-content"
+          />
+          <button
+            type="submit"
+            disabled={!input.trim() || isTyping}
+            className="px-6 py-4 bg-gold text-black rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-gold-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+          >
+            <Send size={20} className="hidden md:block" />
+            <span>Send</span>
+          </button>
+        </form>
+      </div>
+
     </div>
   );
 };
 
 export default AIGuidePage;
-
-
-
