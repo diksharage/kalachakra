@@ -485,6 +485,124 @@ const TradeRoute = ({ config, onComplete, theme, ageGroup, setProgress }) => {
   );
 };
 
+
+const StrategyBoardGame = ({ config, onComplete, theme, ageGroup, setProgress }) => {
+  const { t } = useLanguage();
+  const { playSound } = useAudio();
+  
+  const [pos, setPos] = useState(config.playerPiece);
+  const [targets, setTargets] = useState(config.targets || []);
+  const [movesLeft, setMovesLeft] = useState(config.maxMoves);
+  const [log, setLog] = useState([]);
+  
+  useEffect(() => {
+    setProgress(`Moves Left: ${movesLeft} | Targets: ${targets.length}`);
+  }, [movesLeft, targets, setProgress]);
+
+  const getValidMoves = (r, c) => {
+    const moves = [];
+    if (config.playerPiece.type === 'ashva') {
+      const offsets = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+      offsets.forEach(([dr, dc]) => {
+        const nr = r + dr; const nc = c + dc;
+        if (nr >= 0 && nr < config.boardSize && nc >= 0 && nc < config.boardSize) {
+          const isObstacle = (config.obstacles || []).some(o => o.r === nr && o.c === nc);
+          if (!isObstacle) moves.push(`${nr},${nc}`);
+        }
+      });
+    }
+    return moves;
+  };
+
+  const validMoves = getValidMoves(pos.r, pos.c);
+
+  const handleCellClick = (r, c) => {
+    if (!validMoves.includes(`${r},${c}`)) {
+      playSound('error');
+      return;
+    }
+    playSound('ui');
+    
+    let newTargets = [...targets];
+    const targetIdx = newTargets.findIndex(t => t.r === r && t.c === c);
+    let captured = false;
+    if (targetIdx !== -1) {
+      newTargets.splice(targetIdx, 1);
+      captured = true;
+      playSound('quest');
+    }
+    
+    setPos({ r, c });
+    setTargets(newTargets);
+    setMovesLeft(prev => prev - 1);
+    setLog(prev => [`Moved to ${r},${c}${captured ? ' (Captured Target!)' : ''}`, ...prev]);
+    
+    if (newTargets.length === 0) {
+      playSound('success');
+      setTimeout(() => onComplete(true, 100, 3), 1500);
+    } else if (movesLeft - 1 <= 0) {
+      playSound('error');
+      setTimeout(() => onComplete(false, 0, 0), 1500);
+    }
+  };
+
+  const cells = [];
+  for (let r = 0; r < config.boardSize; r++) {
+    for (let c = 0; c < config.boardSize; c++) {
+      const isPlayer = pos.r === r && pos.c === c;
+      const target = targets.find(t => t.r === r && t.c === c);
+      const obstacle = (config.obstacles || []).find(o => o.r === r && o.c === c);
+      const isValid = validMoves.includes(`${r},${c}`);
+      
+      let content = '';
+      if (isPlayer) content = config.playerPiece.icon || '♞';
+      else if (target) content = target.icon || '♟️';
+      else if (obstacle) content = obstacle.icon || '🏯';
+      
+      const isDark = (r + c) % 2 === 1;
+      let bgClass = isDark ? 'bg-surface/40' : 'bg-surface/10';
+      if (isValid) bgClass = 'bg-green-500/30 cursor-pointer hover:bg-green-500/50';
+      if (isPlayer) bgClass = 'bg-blue-500/40 ring-2 ring-blue-400';
+      
+      cells.push(
+        <div 
+          key={`${r}-${c}`}
+          onClick={() => handleCellClick(r, c)}
+          className={`w-12 h-12 md:w-16 md:h-16 flex items-center justify-center text-2xl md:text-3xl rounded transition-colors ${bgClass}`}
+        >
+          {content}
+        </div>
+      );
+    }
+  }
+
+  return (
+    <div className="flex flex-col md:flex-row gap-6 w-full h-full items-center justify-center">
+      <div className="flex flex-col items-center">
+        <div className="mb-4 text-center">
+          <h4 className="font-bold text-lg">{config.rules}</h4>
+          <p className="text-sm opacity-80">Plan your moves carefully!</p>
+        </div>
+        <div 
+          className="grid gap-1 p-2 bg-surface/20 rounded-xl border border-content/10 shadow-xl"
+          style={{ gridTemplateColumns: `repeat(${config.boardSize}, minmax(0, 1fr))` }}
+        >
+          {cells}
+        </div>
+      </div>
+      <div className="w-full md:w-64 flex flex-col gap-2 h-48 md:h-full bg-surface/10 p-4 rounded-xl overflow-y-auto text-sm border border-content/5">
+        <h5 className="font-bold opacity-70 mb-2 uppercase text-xs tracking-wider">Move History</h5>
+        {log.length === 0 && <span className="opacity-50">No moves yet.</span>}
+        {log.map((l, i) => (
+          <div key={i} className={`p-2 rounded ${l.includes('Captured') ? 'bg-green-500/20 text-green-300' : 'bg-surface/30'}`}>
+            {l}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const MiniGameManager = ({ gameConfig, challengeData, theme, ageGroup, onComplete, onClose }) => {
   const { t } = useLanguage();
   const [gameStateStage, setGameStateStage] = useState('intro');
@@ -690,6 +808,7 @@ const MiniGameManager = ({ gameConfig, challengeData, theme, ageGroup, onComplet
       {activeConfig.type === 'buildFromMemory' && <BuildFromMemory config={activeConfig} onComplete={handleSubGameComplete} theme={theme} ageGroup={ageGroup} setProgress={setProgressText} />}
       {activeConfig.type === 'historicalDecision' && <HistoricalDecision config={activeConfig} onComplete={handleSubGameComplete} theme={theme} ageGroup={ageGroup} setProgress={setProgressText} />}
       {activeConfig.type === 'tradeRoute' && <TradeRoute config={activeConfig} onComplete={handleSubGameComplete} theme={theme} ageGroup={ageGroup} setProgress={setProgressText} />}
+      {activeConfig.type === 'strategyBoard' && <StrategyBoardGame config={activeConfig} onComplete={handleSubGameComplete} theme={theme} ageGroup={ageGroup} setProgress={setProgressText} />}
     </MiniGameShell>
   );
 };

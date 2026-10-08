@@ -1051,36 +1051,77 @@ export const minigamesData = {
       }
     ]
   },
-  "mg-l13-games": {
-    id: "mg-l13-games", levelId: 13,
+
+  "mg-l13-chaturanga": {
+    id: "mg-l13-chaturanga", levelId: 13,
     variations: [
       {
-        variationId: "v1", type: "historicalDecision", title: "Chaturanga Strategy",
-        rewards: [
-          { type: 'resource', id: 'game_piece', amount: 5, label: 'Carved Game Pieces', destination: 'Inventory', usage: 'Playing Board Games' },
-          { type: 'artifact', id: 'pachisi_board', amount: 1, label: 'Royal Pachisi Board', destination: 'Artifact Collection', usage: 'View in Library' }
+        variationId: "v1", type: "strategyBoard", title: "Chaturanga: Ashva's Path",
+        description: "The ancient ancestor of chess! Use the Ashva (Knight) to capture the Raja (King) before you run out of moves.",
+        difficulty: "hard", maxScore: 150,
+        boardSize: 5,
+        maxMoves: 4,
+        rules: "Move the Ashva (Knight) in an L-shape to capture all targets within 4 moves.",
+        playerPiece: { type: "ashva", r: 4, c: 2, icon: "♞" },
+        targets: [
+          { id: "t1", r: 1, c: 3, icon: "♟️" },
+          { id: "t2", r: 0, c: 1, icon: "♚" }
         ],
-        description: "Make strategic moves in the ancient ancestor of Chess.",
+        obstacles: [
+          { id: "o1", r: 2, c: 2, icon: "🏯" }
+        ]
+      }
+    ]
+  },
+  "mg-l13-pachisi": {
+    id: "mg-l13-pachisi", levelId: 13,
+    variations: [
+      {
+        variationId: "v1", type: "historicalDecision", title: "Pachisi Strategy",
+        description: "Make strategic choices in the Royal Game of India (ancestor to Ludo).",
         difficulty: "medium", maxScore: 100,
         scenarios: [
-          { text: "Your King (Raja) is threatened by an enemy Chariot (Ratha). What do you move?", options: [{ label: "Move the Elephant (Gaja) to block the path", score: 10, response: "A solid defensive maneuver!" }, { label: "Move a Foot Soldier (Padati) forward aggressively", score: -10, response: "Your King was captured!" }] },
-          { text: "You have a clear path to the enemy King. Which piece do you send?", options: [{ label: "The Cavalry (Ashva) moving in an L-shape", score: 10, response: "The Knight's unpredictable movement secured the win!" }, { label: "The Minister (Mantri) moving strictly one square diagonally", score: -10, response: "The Minister is too slow in Chaturanga!" }] }
+          {
+            id: "sc1",
+            prompt: "You throw the cowrie shells and score a 25. You have a piece near the center, and a piece on the starting track. What is the best strategy?",
+            options: [
+              { response: "Move a piece to land on a Castle (Charkoni) to be safe from capture", score: 50, explanation: "Safe spaces (castles) are critical in Pachisi to prevent opponents from knocking your pieces back to the start." },
+              { response: "Charge aggressively into the open board", score: -20, explanation: "Your piece gets instantly captured by an opponent and sent back." },
+              { response: "Do not move", score: 0, explanation: "You waste a perfect throw." }
+            ]
+          }
         ]
-      },
+      }
+    ]
+  },
+  "mg-l13-evolution": {
+    id: "mg-l13-evolution", levelId: 13,
+    variations: [
       {
-        variationId: "v2", type: "timeline", title: "Evolution of Play",
-        rewards: [
-          { type: 'resource', id: 'game_piece', amount: 5, label: 'Carved Game Pieces', destination: 'Inventory', usage: 'Playing Board Games' },
-          { type: 'artifact', id: 'pachisi_board', amount: 1, label: 'Royal Pachisi Board', destination: 'Artifact Collection', usage: 'View in Library' }
-        ],
+        variationId: "v1", type: "timeline", title: "Evolution of Play",
         description: "Sequence the history of Indian traditional games.",
         difficulty: "medium", maxScore: 100,
         events: [
-          { id: 't1', label: 'Harappan cubical dice made of terracotta', order: 1 },
-          { id: 't2', label: 'Mentions of dice games in the Rig Veda', order: 2 },
-          { id: 't3', label: 'Creation of Pachisi (Ludo ancestor) on cloth', order: 3 },
-          { id: 't4', label: 'Invention of Chaturanga (Chess ancestor) in Gupta period', order: 4 },
-          { id: 't5', label: 'Creation of Moksha Patam (Snakes and Ladders)', order: 5 }
+          { id: 't1', label: 'Harappan cubical dice made of terracotta (Indus Valley)', order: 1 },
+          { id: 't2', label: 'Mentions of ritual dice games in the Vedic texts', order: 2 },
+          { id: 't3', label: 'Invention of Chaturanga (Ancestor of Chess) in the Gupta period', order: 3 },
+          { id: 't4', label: 'Development of Moksha Patam (Snakes and Ladders) to teach morality', order: 4 }
+        ]
+      }
+    ]
+  },
+  "mg-l13-moksha": {
+    id: "mg-l13-moksha", levelId: 13,
+    variations: [
+      {
+        variationId: "v1", type: "artifactMatch", title: "Moksha Patam",
+        description: "Match the original moral concepts of Snakes and Ladders to their gameplay mechanics.",
+        difficulty: "medium", maxScore: 100,
+        pairs: [
+          { id: '1', left: 'Ladder: Vidya (Knowledge)', right: 'Ascends towards enlightenment (Moksha)', icon: '🪜' },
+          { id: '2', left: 'Snake: Krodh (Anger)', right: 'Drags the soul down to lower planes', icon: '🐍' },
+          { id: '3', left: 'Ladder: Daya (Compassion)', right: 'A virtue that lifts the player higher', icon: '🪜' },
+          { id: '4', left: 'Snake: Lobh (Greed)', right: 'A vice that resets progress', icon: '🐍' }
         ]
       }
     ]
