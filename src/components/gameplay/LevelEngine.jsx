@@ -232,7 +232,7 @@ const ObjectiveTracker = ({ stage, levelState, locations, targetExplore, targetD
   let items = [];
   
   if (stage === 1) {
-    items = locations.map(loc => ({
+    items = processedLocations.filter(l => !l.isLockedNode).map(loc => ({
        id: loc.id,
        label: `Explore ${loc.label}`,
        isDone: levelState.exploration.includes(loc.id),
@@ -240,7 +240,7 @@ const ObjectiveTracker = ({ stage, levelState, locations, targetExplore, targetD
        isLocked: false
     })).slice(0, targetExplore);
   } else if (stage === 2) {
-    items = locations.map(loc => {
+    items = processedLocations.filter(l => !l.isLockedNode).map(loc => {
        const isExplored = levelState.exploration.includes(loc.id);
        return {
          id: loc.id,
@@ -253,7 +253,7 @@ const ObjectiveTracker = ({ stage, levelState, locations, targetExplore, targetD
        };
     }).filter(i => i.isDone || !i.isLocked).slice(0, targetDiscover);
   } else if (stage === 3) {
-    items = locations.map(loc => {
+    items = processedLocations.filter(l => !l.isLockedNode).map(loc => {
        const isDiscovered = levelState.discovery.includes(loc.id);
        return {
          id: loc.id,
@@ -1563,16 +1563,18 @@ const LevelEngine = ({ config }) => {
                 />
             ) : (
             <div className="relative h-full p-8 flex flex-wrap gap-6 items-center justify-center content-center z-10 overflow-y-auto">
-              {locations.map(loc => {
+              {processedLocations.map(loc => {
                 const isExplored = exploration.includes(loc.id);
                 const isDiscovered = discovery.includes(loc.id);
                 const isLearned = learning.includes(loc.id);
                 
                 let isClickable = false;
-                  if (loc.isNpc) isClickable = true;
+                  if (loc.isLockedNode) { isClickable = false; } else {
+                    if (loc.isNpc) isClickable = true;
                 if ((stage === 1 || stage > 1) && !isExplored) isClickable = true;
                 if ((stage === 2 || stage > 2) && isExplored && !isDiscovered) isClickable = true;
                 if ((stage === 3 || stage > 3) && isDiscovered && !isLearned) isClickable = true;
+                  }
 
                 return (
                   <button
@@ -1586,11 +1588,11 @@ const LevelEngine = ({ config }) => {
                     }
                   >
                     <span className={"text-4xl md:text-5xl mb-1 md:mb-2 transition-transform " + (!isDiscovered ? 'opacity-50 grayscale' : '')}>
-                      {loc.icon}
-                    </span>
+                        {loc.isLockedNode ? '🔒' : loc.icon}
+                      </span>
                     <span className={"text-sm font-bold text-center px-2 " + (isDiscovered ? theme.primary : 'text-content/60')}>
-                      {!isExplored ? '???' : loc.label}
-                    </span>
+                        {loc.isLockedNode ? 'Locked' : (!isExplored ? '???' : loc.label)}
+                      </span>
                     {isLearned && (
                       <div className={"absolute -top-2 -right-2 rounded-full p-1 border-2 border-transparent text-[#171B3A] " + theme.primaryBg}>
                         <CheckCircle className="w-4 h-4" />

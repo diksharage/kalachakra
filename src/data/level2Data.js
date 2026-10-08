@@ -5,7 +5,16 @@ export const level2Locations = [
     icon: '🌾',
     description: 'Flat, fertile ground near water.',
     discoverMessage: 'Fertile land was carefully selected by early communities for planting seeds, marking the slow beginning of agriculture.',
-    yields: { wild_seeds: 5, fertile_soil: 5 }
+    yields: { wild_seeds: 5, fertile_soil: 5 },
+    stateOverrides: [
+      {
+        condition: (state) => state.builtItems && state.builtItems.includes('l2_crops'),
+        label: 'Cultivated Farm',
+        icon: '🚜',
+        description: 'A thriving farm producing harvested grain.',
+        discoverMessage: 'Your community has successfully transformed the wild land into a reliable food source.'
+      }
+    ]
   },
   {
     id: 'water_source',
@@ -37,7 +46,15 @@ export const level2Locations = [
     icon: '🛖',
     description: 'A gathering of early permanent shelters.',
     discoverMessage: 'Farming required people to stay in one place to tend crops, leading to the first permanent villages and settled community life.',
-    yields: { wood: 5, stone: 5 }
+    yields: { wood: 5, stone: 5 },
+    stateOverrides: [
+      {
+        condition: (state) => state.builtItems && state.builtItems.includes('l2_settlement'),
+        label: 'Mudbrick Village',
+        icon: '🏘️',
+        description: 'A bustling settlement of permanent mudbrick homes.'
+      }
+    ]
   },
   {
     id: 'npc_elder_anaya',
@@ -67,5 +84,15 @@ export const level2Locations = [
         }
       ]
     }
+  }
+,
+  {
+    id: 'granary_site',
+    label: 'Trade Route',
+    icon: '🐪',
+    description: 'A path connecting early settlements.',
+    discoverMessage: 'With surplus food safely stored, the community could begin trading with distant groups.',
+    yields: { legacy: 50, knowledge: 10 },
+    unlockCondition: (state) => state.builtItems && state.builtItems.includes('l2_storage')
   }
 ];

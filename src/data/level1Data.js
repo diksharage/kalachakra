@@ -47,4 +47,14 @@ export const level1Locations = [
     discoverMessage: 'Dry grass was useful as kindling for fires and bedding for comfort.',
     yields: { plants: 1, flint: 1 }
   }
+,
+  {
+    id: 'deep_cave',
+    label: 'Deep Cave',
+    icon: '🦇',
+    description: 'A pitch-black cave network.',
+    discoverMessage: 'With the invention of fire, early humans could explore deep caves and create the first art.',
+    yields: { stone: 5, flint: 2, legacy: 50 },
+    unlockCondition: (state) => state.completedChallenges && state.completedChallenges.includes('fire_discovery')
+  }
 ];
