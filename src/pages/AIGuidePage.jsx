@@ -37,8 +37,9 @@ const AIGuidePage = () => {
     setIsTyping(true);
 
     try {
-      const response = await askHeritageGuide(textToSend);
-      setMessages(prev => [...prev, { role: 'ai', content: response }]);
+      const response = await askHeritageGuide(textToSend, {}, messages);
+      const { text, actions } = response;
+      setMessages(prev => [...prev, { role: 'ai', content: text, actions }]);
     } catch (error) {
       setMessages(prev => [...prev, { role: 'ai', content: "My connection to the archives was interrupted. Please ask again." }]);
     } finally {
@@ -65,6 +66,9 @@ const AIGuidePage = () => {
           <h1 className="text-2xl md:text-3xl font-serif font-bold text-gold tracking-widest flex items-center gap-3">KALA <Sparkles size={24} className="text-gold/80" /></h1>
           <p className="text-content/80 text-sm md:text-base mt-1">Your Persistent AI Heritage Companion</p>
         </div>
+        <button onClick={() => setMessages([{ role: 'ai', content: "Namaste! History cleared. How can I assist you?" }])} className="ml-auto text-xs text-content/50 hover:text-gold border border-content/20 hover:border-gold/50 px-3 py-1.5 rounded-lg transition-colors">
+           Clear Chat
+        </button>
       </div>
 
       {/* Chat Area */}
@@ -82,12 +86,24 @@ const AIGuidePage = () => {
               </div>
             )}
 
-            <div className={`p-4 md:p-5 rounded-2xl max-w-[85%] md:max-w-[75%] shadow-sm ${
+            {/* Add action buttons inside AI messages if they exist */}
+            <div className="flex flex-col gap-2 max-w-[85%] md:max-w-[75%]">
+            <div className={`p-4 md:p-5 rounded-2xl shadow-sm ${
               msg.role === 'user' 
                 ? 'bg-content/5 border border-content/10 text-content rounded-tr-sm' 
                 : 'bg-surface border border-gold/30 text-content leading-relaxed rounded-tl-sm'
             }`}>
               {msg.content}
+            </div>
+            {msg.actions && msg.actions.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-1 pl-2">
+                 {msg.actions.map((act, i) => (
+                    <button key={i} className="text-xs bg-gold/10 text-gold border border-gold/30 px-3 py-1.5 rounded-full hover:bg-gold/20 transition-colors">
+                       {act.label}
+                    </button>
+                 ))}
+              </div>
+            )}
             </div>
           </div>
         ))}

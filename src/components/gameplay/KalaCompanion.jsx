@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Bot, X, HelpCircle, Lightbulb, Sparkles, Send } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { adaptTextForAge } from '../../utils/ageAdapter';
+import { askHeritageGuide } from '../../services/aiService';
 
 const KalaCompanion = ({ stage, levelId, inventory, activeChallenge, ageGroup }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,22 +54,30 @@ const KalaCompanion = ({ stage, levelId, inventory, activeChallenge, ageGroup })
     }
   }, [stage, activeChallenge]);
 
-  const handleSend = (e) => {
+  
+  const [isTyping, setIsTyping] = useState(false);
+
+  const handleSend = async (e) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || isTyping) return;
     const userMsg = input.trim();
     setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setInput('');
+    setIsTyping(true);
     
-    // Simulate AI response
-    setTimeout(() => {
-      let reply = "That's a fascinating part of history! Every artifact tells a story. Keep exploring to learn more.";
-      if (userMsg.toLowerCase().includes('hint') || userMsg.toLowerCase().includes('help')) {
-         reply = "Hint: Think about what resources are most critical for survival right now.";
-      }
-      setMessages(prev => [...prev, { role: 'kala', type: 'chat', content: reply }]);
-    }, 1000);
+    try {
+      const isMissingResources = !!document.querySelector('.bg-red-900\\/20');
+      const context = { stage, levelId, inventory, activeChallenge, missingResources: isMissingResources, ageGroup };
+      const response = await askHeritageGuide(userMsg, context, messages);
+      const { text, actions } = response;
+      setMessages(prev => [...prev, { role: 'kala', type: 'chat', content: text, actions }]);
+    } catch (err) {
+      setMessages(prev => [...prev, { role: 'kala', type: 'chat', content: "My connection seems to be interrupted." }]);
+    } finally {
+      setIsTyping(false);
+    }
   };
+
 
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end pointer-events-none">
@@ -95,13 +104,33 @@ const KalaCompanion = ({ stage, levelId, inventory, activeChallenge, ageGroup })
          </div>
          
          <div className="flex-1 p-4 overflow-y-auto flex flex-col gap-3 text-sm">
+            
             {messages.map((m, i) => (
                <div key={i} className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
                   <div className={`p-3 rounded-2xl max-w-[90%] ${m.role === 'user' ? 'bg-gold text-black rounded-tr-sm' : m.type === 'hint' ? 'bg-blue-900/40 border border-blue-400/30 text-blue-100 rounded-tl-sm' : 'bg-surface-light border border-content/10 text-content rounded-tl-sm'}`}>
                      {m.content}
+                     {m.actions && m.actions.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                           {m.actions.map((act, idx) => (
+                              <button key={idx} className="text-xs bg-gold/10 text-gold border border-gold/30 px-3 py-1 rounded hover:bg-gold/20 transition-colors" onClick={() => setIsOpen(false)}>
+                                {act.label}
+                              </button>
+                           ))}
+                        </div>
+                     )}
                   </div>
                </div>
             ))}
+            {isTyping && (
+               <div className="flex flex-col items-start">
+                  <div className="p-3 rounded-2xl bg-surface-light border border-content/10 text-content rounded-tl-sm flex gap-1">
+                     <div className="w-1.5 h-1.5 rounded-full bg-gold/50 animate-bounce"></div>
+                     <div className="w-1.5 h-1.5 rounded-full bg-gold/50 animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                     <div className="w-1.5 h-1.5 rounded-full bg-gold/50 animate-bounce" style={{animationDelay: '0.4s'}}></div>
+                  </div>
+               </div>
+            )}
+
             <div ref={messagesEndRef} />
             {activeChallenge && (
               <button 
@@ -126,7 +155,7 @@ const KalaCompanion = ({ stage, levelId, inventory, activeChallenge, ageGroup })
               placeholder="Ask KALA..." 
               className="flex-1 bg-surface-light border border-content/20 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold transition-colors"
             />
-            <button type="submit" disabled={!input.trim()} className="p-2 bg-gold text-black rounded-xl disabled:opacity-50 hover:bg-gold-light transition-colors">
+            <button type="submit" disabled={!input.trim() || isTyping} className="p-2 bg-gold text-black rounded-xl disabled:opacity-50 hover:bg-gold-light transition-colors">
                <Send size={16} />
             </button>
          </form>
