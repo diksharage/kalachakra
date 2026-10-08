@@ -18,7 +18,7 @@ export default defineConfig({
         theme_color: '#121212',
         background_color: '#121212',
         display: 'standalone',
-        start_url: '/',
+        start_url: process.env.NODE_ENV === 'production' ? '/kalachakra/' : '/',
         icons: [
           {
             src: 'favicon.svg',
