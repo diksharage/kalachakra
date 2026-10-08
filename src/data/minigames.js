@@ -506,37 +506,93 @@ export const minigamesData = {
       }
     ]
   },
-  "mg-l7-timeline": {
-    id: "mg-l7-timeline", levelId: 7,
+
+  "mg-l7-math": {
+    id: "mg-l7-math", levelId: 7,
     variations: [
       {
-        variationId: "v1", type: "timeline", title: "Gupta Golden Age",
-        rewards: [
-          { type: 'knowledge', id: 'gupta_manuscript', amount: 1, label: 'Scientific Manuscript', destination: 'Knowledge Library', usage: 'Universities' },
-          { type: 'artifact', id: 'astronomy_tool', amount: 1, label: 'Ancient Observatory Tool', destination: 'Artifact Collection', usage: 'View in Library' }
-        ],
-        description: "Sequence the scientific and mathematical breakthroughs of the Gupta period.",
+        variationId: "v1", type: "timeline", title: "Aryabhata's Sequence",
+        description: "Arrange the mathematical concepts in the logical order they were developed to solve complex problems.",
         difficulty: "hard", maxScore: 100,
         events: [
-          { id: 't1', label: 'Understanding that the Earth rotates on its axis', order: 1 },
-          { id: 't2', label: 'Calculation of Pi (π) to four decimal places', order: 2 },
-          { id: 't3', label: 'Explanation of solar and lunar eclipses', order: 3 },
-          { id: 't4', label: 'Development of the decimal system', order: 4 }
+          { id: 't1', label: 'Invention of Zero (0) as a placeholder', order: 1 },
+          { id: 't2', label: 'Base-10 Decimal System', order: 2 },
+          { id: 't3', label: 'Calculation of Pi (3.1416)', order: 3 },
+          { id: 't4', label: 'Trigonometric Sine (Jya)', order: 4 }
         ]
-      },
+      }
+    ]
+  },
+  "mg-l7-astro": {
+    id: "mg-l7-astro", levelId: 7,
+    variations: [
       {
-        variationId: "v2", type: "artifactMatch", title: "Scholars of the Golden Age",
-        rewards: [
-          { type: 'knowledge', id: 'gupta_manuscript', amount: 1, label: 'Scientific Manuscript', destination: 'Knowledge Library', usage: 'Universities' },
-          { type: 'artifact', id: 'astronomy_tool', amount: 1, label: 'Ancient Observatory Tool', destination: 'Artifact Collection', usage: 'View in Library' }
-        ],
-        description: "Match the great scholar to their primary field of study.",
+        variationId: "v1", type: "historicalDecision", title: "Astronomy Observations",
+        description: "Apply ancient Indian astronomical theories to observe the cosmos.",
         difficulty: "hard", maxScore: 100,
+        scenarios: [
+          {
+            id: "sc1",
+            prompt: "You observe a solar eclipse. The traditional belief states that the demon Rahu is swallowing the sun. As a student of Aryabhata, what do you conclude?",
+            options: [
+              { response: "It is caused by the Moon casting a shadow on the Earth", score: 50, explanation: "Correct! Aryabhata correctly deduced that eclipses were caused by shadows of planets and moons, rejecting mythological explanations." },
+              { response: "The gods are angry", score: -20, explanation: "Gupta-era astronomers favored mathematical calculation over superstition." },
+              { response: "The sun is temporarily burning out", score: 0, explanation: "Incorrect astronomical theory." }
+            ]
+          },
+          {
+            id: "sc2",
+            prompt: "Looking at the night sky, you notice the stars appear to move across the horizon. Why?",
+            options: [
+              { response: "The Earth rotates on its own axis", score: 50, explanation: "Brilliant! Aryabhata proposed that the apparent movement of stars is due to Earth's rotation on its axis." },
+              { response: "The sky is a giant dome spinning around us", score: -20, explanation: "This is the geocentric model, which Aryabhata challenged regarding daily rotation." },
+              { response: "The stars are falling", score: 0, explanation: "Incorrect observation." }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "mg-l7-patterns": {
+    id: "mg-l7-patterns", levelId: 7,
+    variations: [
+      {
+        variationId: "v1", type: "artifactMatch", title: "Pattern Recognition",
+        description: "Match the Gupta-era knowledge artifacts to their fields of study.",
+        difficulty: "medium", maxScore: 100,
         pairs: [
-          { id: '1', left: 'Aryabhata', right: 'Mathematics and Astronomy', icon: '🔭' },
-          { id: '2', left: 'Sushruta', right: 'Surgery and Medicine', icon: '⚕️' },
-          { id: '3', left: 'Kalidasa', right: 'Sanskrit Poetry and Plays', icon: '📜' },
-          { id: '4', left: 'Varahamihira', right: 'Encyclopedic Science', icon: '📖' }
+          { id: '1', left: 'Sushruta Samhita', right: 'Surgery and Medicine', icon: '🌿' },
+          { id: '2', left: 'Surya Siddhanta', right: 'Astronomy and Time', icon: '✨' },
+          { id: '3', left: 'Iron Pillar of Delhi', right: 'Advanced Metallurgy', icon: '🗿' },
+          { id: '4', left: 'Kamasutra', right: 'Human Behavior & Sociology', icon: '📜' }
+        ]
+      }
+    ]
+  },
+  "mg-l7-manuscript": {
+    id: "mg-l7-manuscript", levelId: 7,
+    variations: [
+      {
+        variationId: "v1", type: "tradeRoute", title: "The Scholar's Journey",
+        description: "Travel to Nalanda Mahavihara to secure a rare manuscript.",
+        difficulty: "medium", maxScore: 150,
+        route: [
+          {
+            id: 'leg1',
+            prompt: "You arrive at the gates of Nalanda. The Dvarapala (gatekeeper) tests your knowledge before entry. What is the fundamental shape of the Earth?",
+            options: [
+              { text: "Spherical", isSafe: true, msg: "The gatekeeper nods. You are granted entry to the university." },
+              { text: "Flat and infinite", isSafe: false, msg: "The gatekeeper turns you away. Gupta scholars knew the Earth was spherical." }
+            ]
+          },
+          {
+            id: 'leg2',
+            prompt: "Inside the grand library, Dharmaganja, you find a decaying birch-bark manuscript. How do you preserve it?",
+            options: [
+              { text: "Copy it onto palm leaves", isSafe: true, msg: "Palm leaves were the standard, durable medium for texts. The knowledge is saved." },
+              { text: "Leave it in the sun to dry", isSafe: false, msg: "The brittle bark crumbles into dust. The knowledge is lost forever." }
+            ]
+          }
         ]
       }
     ]
