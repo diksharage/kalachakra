@@ -37,7 +37,7 @@ import LevelPlayPage from './pages/LevelPlayPage';
 
 const AppContent = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <GameBackground />
       <Routes>
         <Route path="/" element={<Navigate to="/auth" replace />} />
