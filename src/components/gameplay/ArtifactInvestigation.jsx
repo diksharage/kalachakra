@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Search, CheckCircle, X, ChevronRight, HelpCircle } from 'lucide-react';
+import { useAudio } from '../../context/AudioContext';
 
 const ArtifactInvestigation = ({ data, theme, onComplete, onClose, completedChallenges }) => {
+  const { playSound } = useAudio();
   const [step, setStep] = useState(0); 
   const [log, setLog] = useState(null);
   
@@ -36,13 +38,11 @@ const ArtifactInvestigation = ({ data, theme, onComplete, onClose, completedChal
 
   const handleOptionSelect = (option) => {
     if (option.isCorrect) {
-      setLog({ text: option.explanation || "Correct! You inferred the true historical purpose.", type: 'success' });
-      setTimeout(() => {
-        onComplete(data.id, artifact.reward);
-      }, 4000);
+      playSound('achievement');
+      setLog({ text: option.explanation || "Correct! You inferred the true historical purpose.", type: 'success', option });
     } else {
+      playSound('error');
       setLog({ text: "That doesn't match the clues we found. Think about the specific observations.", type: 'error' });
-      setTimeout(() => setLog(null), 3000);
     }
   };
 
@@ -128,15 +128,28 @@ const ArtifactInvestigation = ({ data, theme, onComplete, onClose, completedChal
         )}
 
         {log && (
-           <div className={`p-6 rounded-2xl border flex flex-col items-center justify-center text-center animate-fade-in ${
-             log.type === 'success' ? 'bg-green-900/20 border-green-500/30' : 'bg-red-900/20 border-red-500/30'
-           }`}>
-             {log.type === 'success' ? <CheckCircle className="w-12 h-12 text-green-400 mb-4" /> : <X className="w-12 h-12 text-red-400 mb-4" />}
-             <h4 className={`text-xl font-bold mb-2 ${log.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
-               {log.type === 'success' ? 'Discovery Confirmed' : 'Incorrect Theory'}
+          <div className={`p-6 rounded-2xl animate-pop-in ${log.type === 'success' ? 'bg-green-500/10 border border-green-500/30' : 'bg-red-500/10 border border-red-500/30'}`}>
+             <h4 className={`font-bold mb-2 flex items-center gap-2 ${log.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+                {log.type === 'success' ? <CheckCircle className="w-5 h-5"/> : <X className="w-5 h-5"/>} 
+                {log.type === 'success' ? 'Brilliant Deduction' : 'Needs Re-evaluation'}
              </h4>
-             <p className="text-content/80">{log.text}</p>
-           </div>
+             <p className="text-content/90 leading-relaxed mb-6">{log.text}</p>
+             {log.type === 'success' ? (
+                <button 
+                  onClick={() => onComplete(data.id, artifact.reward)}
+                  className="w-full py-4 bg-green-500 text-black font-extrabold rounded-xl hover:scale-[1.02] transition-transform shadow-[0_0_15px_rgba(34,197,94,0.3)]"
+                >
+                  Collect Artifact & Rewards
+                </button>
+             ) : (
+                <button 
+                  onClick={() => setLog(null)}
+                  className="w-full py-3 bg-surface border border-content/20 rounded-xl hover:bg-surface-light transition-colors font-bold"
+                >
+                  Review Clues & Try Again
+                </button>
+             )}
+          </div>
         )}
 
       </div>

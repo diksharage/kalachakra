@@ -3,6 +3,7 @@ import { Star, CheckCircle, XCircle, X, Clock, MapPin, Navigation, ArrowRight, R
 import { useGame } from '../../context/GameContext';
 import { adaptTextForAge } from '../../utils/ageAdapter';
 import { useLanguage } from '../../context/LanguageContext';
+import { useAudio } from '../../context/AudioContext';
 
 const getBand = (ageGroup) => {
   if (ageGroup === '6-8' || ageGroup === '9-11') return 'younger';
@@ -62,6 +63,7 @@ const ArtifactMatch = ({ config, onComplete, theme, ageGroup, setProgress }) => 
   }, [matches, activePairs, setProgress]);
 
   const handleLeftClick = (id) => {
+      if (feedback?.type === 'incorrect') setFeedback(null);
     if (!matches[id]) { setSelectedLeft(id); setFeedback(null); }
   };
 
@@ -74,9 +76,9 @@ const ArtifactMatch = ({ config, onComplete, theme, ageGroup, setProgress }) => 
       setSelectedLeft(null);
     } else {
       setErrors(e => e + 1);
-      setFeedback({ id: rightId, type: 'incorrect' });
-      setSelectedLeft(null);
-      setTimeout(() => setFeedback(null), 1500);
+      playSound('error');
+        setFeedback({ id: rightId, type: 'incorrect' });
+        setSelectedLeft(null);
     }
   };
 
@@ -425,11 +427,8 @@ const TradeRoute = ({ config, onComplete, theme, ageGroup, setProgress }) => {
     } else {
       setFailures(f => f + 1);
       if (band === 'older') {
-         setFailedMsg(t('minigame.route_reset', 'Incorrect route! A storm destroyed your cargo. The journey restarts.'));
-         setTimeout(() => {
-           setCurrentLeg(0);
-           setFailedMsg('');
-         }, 3000);
+         playSound('error');
+           setFailedMsg(t('minigame.route_reset', 'Incorrect route! A storm destroyed your cargo. The journey restarts.'));
       } else {
          setFailedMsg(t('minigame.route_delay', 'Incorrect route! The caravan lost time. Try again.'));
       }

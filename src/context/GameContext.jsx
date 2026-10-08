@@ -171,6 +171,7 @@ export const GameProvider = ({ children }) => {
       else if (type === 'EVENT') audio.playSound('event');
       else if (type === 'INVESTIGATION') audio.playSound('investigation');
       else if (type === 'SYSTEM') audio.playSound('ui');
+        else if (type === 'SUCCESS') audio.playSound('quest');
     }
 
     setGameState(prev => {
