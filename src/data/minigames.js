@@ -399,38 +399,110 @@ export const minigamesData = {
       }
     ]
   },
-  "mg-l6-build": {
-    id: "mg-l6-build", levelId: 6,
+
+  "mg-l6-admin": {
+    id: "mg-l6-admin", levelId: 6,
     variations: [
       {
-        variationId: "v1", type: "buildFromMemory", title: "Ashoka's Pillar",
-        rewards: [
-          { type: 'knowledge', id: 'ashokan_edict', amount: 1, label: 'Ashokan Edict', destination: 'Knowledge Library', usage: 'Spreading Dhamma' },
-          { type: 'knowledge', id: 'royal_decree', amount: 1, label: 'Mauryan Royal Decree', destination: 'Knowledge Library', usage: 'Imperial Administration' }
-        ],
-        description: "Memorize the components of the famous Lion Capital of Ashoka.",
-        difficulty: "hard", maxScore: 100, memorizeTime: 5,
-        components: [
-          { id: 'cb1', label: 'Four Asiatic Lions', icon: '🦁', required: true },
-          { id: 'cb2', label: 'Dharma Chakra (Wheel)', icon: '☸️', required: true },
-          { id: 'cb3', label: 'Inverted Lotus Bell', icon: '🪷', required: true },
-          { id: 'cb4', label: 'Animal Abacus (Bull, Horse, Elephant, Lion)', icon: '🐘', required: true },
-          { id: 'cb5', label: 'Gold Plating', icon: '✨', required: false },
-          { id: 'cb6', label: 'Marble Base', icon: '🏛️', required: false }
-        ]
-      },
-      {
-        variationId: "v2", type: "historicalDecision", title: "Ashoka's Dhamma",
-        rewards: [
-          { type: 'knowledge', id: 'ashokan_edict', amount: 1, label: 'Ashokan Edict', destination: 'Knowledge Library', usage: 'Spreading Dhamma' },
-          { type: 'knowledge', id: 'royal_decree', amount: 1, label: 'Mauryan Royal Decree', destination: 'Knowledge Library', usage: 'Imperial Administration' }
-        ],
-        description: "After the Kalinga War, make decisions on how to rule your empire peacefully.",
+        variationId: "v1", type: "historicalDecision", title: "Imperial Administration",
+        description: "Manage the vast Mauryan Empire by deploying officials and allocating resources.",
         difficulty: "hard", maxScore: 100,
         scenarios: [
-          { text: "You want to spread the message of peace to common people. How do you do it?", options: [{ label: "Carve edicts on rocks in the local Prakrit language", score: 10, response: "People could understand the message easily!" }, { label: "Write them only in Sanskrit for scholars", score: -10, response: "The common people could not read it." }] },
-          { text: "Your empire is vast. How do you ensure the welfare of travellers?", options: [{ label: "Plant banyan trees and dig wells along the roads", score: 10, response: "Travelers rested under the shade." }, { label: "Tax travelers heavily", score: -10, response: "Trade and travel declined." }] }
+          {
+            id: "sc1",
+            prompt: "A distant province is experiencing a minor rebellion due to harsh local taxation. How does the central administration respond?",
+            options: [
+              { response: "Send Dhamma Mahamatras to mediate and ensure fair treatment", score: 50, explanation: "Ashoka appointed special officers (Dhamma Mahamatras) to ensure justice, welfare, and smooth administration." },
+              { response: "Send the entire imperial army to crush them", score: -20, explanation: "An overreaction that strains state resources and violates Ashokan principles." },
+              { response: "Ignore them, the empire is too big", score: 0, explanation: "The rebellion grows and disrupts local tax revenue." }
+            ]
+          },
+          {
+            id: "sc2",
+            prompt: "The Arthashastra recommends strict surveillance for state security. How do you gather information from border towns?",
+            options: [
+              { response: "Deploy a network of spies disguised as merchants", score: 50, explanation: "The Mauryan state relied heavily on an extensive espionage network for political stability." },
+              { response: "Build massive watchtowers everywhere", score: -20, explanation: "Too expensive and logistically impossible across the entire subcontinent." },
+              { response: "Trust the local governors blindly", score: 0, explanation: "Governors might become corrupt or overly ambitious." }
+            ]
+          }
         ]
+      }
+    ]
+  },
+  "mg-l6-infra": {
+    id: "mg-l6-infra", levelId: 6,
+    variations: [
+      {
+        variationId: "v1", type: "tradeRoute", title: "The Royal Highway",
+        description: "Maintain the great Uttarapatha (Northern High Road) connecting the empire.",
+        difficulty: "medium", maxScore: 150,
+        route: [
+          {
+            id: 'leg1',
+            prompt: "You are planning a trade caravan from Pataliputra to Taxila. The monsoon rains have washed out a section of the road. Do you wait or force the crossing?",
+            options: [
+              { text: "Wait at a state-built rest house (dharmashala)", isSafe: true, msg: "The state maintained rest houses for this exact purpose. The cargo is safe." },
+              { text: "Force the crossing", isSafe: false, msg: "Carts are lost in the mud. Goods are destroyed." }
+            ]
+          },
+          {
+            id: 'leg2',
+            prompt: "Nearing Taxila, border officials demand to inspect your goods and collect tolls. Do you comply?",
+            options: [
+              { text: "Pay the state tolls", isSafe: true, msg: "Mauryan trade was highly regulated. Paying tolls ensures state protection." },
+              { text: "Bribe the guards to avoid tolls", isSafe: false, msg: "Spies report your bribery. Your caravan is confiscated by the state." }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "mg-l6-agri": {
+    id: "mg-l6-agri", levelId: 6,
+    variations: [
+      {
+        variationId: "v1", type: "historicalDecision", title: "State Resources",
+        description: "Manage agriculture and state monopolies.",
+        difficulty: "medium", maxScore: 100,
+        scenarios: [
+          {
+            id: "sc1",
+            prompt: "New, uncultivated forest land has been conquered. How do you maximize its agricultural output?",
+            options: [
+              { response: "Establish state farms and resettle surplus population", score: 50, explanation: "The Mauryan state actively cleared forests and established state-run agricultural settlements to boost revenue." },
+              { response: "Leave it as a hunting reserve for the King", score: -20, explanation: "A waste of potential revenue needed to sustain the massive army and bureaucracy." },
+              { response: "Let private merchants buy it", score: 0, explanation: "The state loses direct control over a major revenue source." }
+            ]
+          },
+          {
+            id: "sc2",
+            prompt: "There is a severe drought in the Deccan region. The state granaries in Pataliputra are full.",
+            options: [
+              { response: "Distribute grain from state granaries", score: 50, explanation: "The Sohgaura copper plate inscription mentions state granaries meant for relief during famines." },
+              { response: "Sell the grain at a premium", score: -20, explanation: "Causes mass starvation and revolt against the emperor." },
+              { response: "Keep the grain for the capital", score: 0, explanation: "The provinces suffer, reducing future tax revenues." }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "mg-l6-edicts": {
+    id: "mg-l6-edicts", levelId: 6,
+    variations: [
+      {
+        variationId: "v1", type: "buildFromMemory", title: "Ashokan Edicts",
+        description: "Construct a classic Ashokan Pillar to spread imperial communication.",
+        difficulty: "medium", maxScore: 100, memorizeTime: 5,
+        components: [
+          { id: 'c1', label: 'Monolithic Stone Shaft', icon: '🏛️', required: true },
+          { id: 'c2', label: 'Inverted Lotus Bell', icon: '🪷', required: true },
+          { id: 'c3', label: 'Abacus (Platform)', icon: '🧱', required: true },
+          { id: 'c4', label: 'Animal Capital (e.g., Lions)', icon: '🦁', required: true },
+          { id: 'c5', label: 'Brahmi Inscriptions', icon: '📜', required: true }
+        ],
+        deco: ['🌲', '☀️']
       }
     ]
   },
