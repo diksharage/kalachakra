@@ -1,5 +1,30 @@
 export const level3CityLocations = [
   {
+    id: 'l3_event_merchant',
+    label: 'Mesopotamian Merchant',
+    icon: 'dYO.',
+    description: 'A trader from distant lands has arrived.',
+    isEvent: true,
+    discoverMessage: 'The Indus Valley traded extensively with Mesopotamia, exchanging raw materials for finished goods.',
+    eventDef: {
+      scenario: 'A wealthy merchant from the city of Ur has docked at the port. They are seeking high-quality Indus craft goods and are willing to pay well.',
+      options: [
+        {
+          label: 'Trade away precious Carnelian Beads',
+          costs: { craftMaterials: 1 },
+          rewards: { legacy: 40, community: 1 },
+          resultText: 'The merchant was delighted with the beads and gave you foreign metals in exchange! Our trade network expands.'
+        },
+        {
+          label: 'Decline the trade to keep resources local',
+          costs: {},
+          rewards: { legacy: 5 },
+          resultText: 'You kept your goods. The city remains self-reliant, but misses out on foreign exchange.'
+        }
+      ]
+    }
+  },
+  {
     id: 'indus_house',
     label: 'Courtyard House',
     icon: '🏠',

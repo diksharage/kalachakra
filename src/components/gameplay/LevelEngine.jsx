@@ -8,6 +8,7 @@ import { minigamesData } from '../../data/minigames';
 import MiniGameManager from '../minigames/MiniGameManager';
 import FinalSequence from './FinalSequence';
 import ArtifactInvestigation from './ArtifactInvestigation';
+import WorldEvent from './WorldEvent';
 import NPCInteraction from './NPCInteraction';
 import { useAchievements } from '../../context/AchievementContext';
 import { Star, CheckCircle, ArrowRight, Bot, Target, Lock, Play, Hammer, Trophy, Search } from 'lucide-react';
@@ -779,6 +780,7 @@ const LevelEngine = ({ config }) => {
     discovery: [],
     learning: [],
     completedChallenges: [],
+    completedEvents: [],
     activeChallengeIds: [],
     builtItems: [],
     resources: { ...config.defaultResources },
@@ -796,6 +798,7 @@ const LevelEngine = ({ config }) => {
         discovery: saved.discovery || [],
         learning: saved.learning || [],
         completedChallenges: saved.completedChallenges || [],
+          completedEvents: saved.completedEvents || [],
         activeChallengeIds: saved.activeChallengeIds || [],
         builtItems: saved.builtItems || [],
       };
@@ -1052,7 +1055,29 @@ const LevelEngine = ({ config }) => {
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
         <div className={"glass-panel p-0 md:p-0 rounded-2xl w-full max-h-full overflow-y-auto border shadow-2xl text-center flex flex-col " + theme.border + (type === 'challenge' && data.format === 'minigame' ? " max-w-4xl" : " max-w-lg p-5 md:p-8")}>
 
-          {type === 'artifact' && (
+          {type === 'event' && (
+              <WorldEvent 
+                data={data} 
+                theme={theme} 
+                levelState={levelState}
+                onComplete={(eventId, cost, reward) => {
+                  setLevelState(prev => {
+                     const newRes = { ...prev.resources };
+                     Object.entries(cost || {}).forEach(([k,v]) => { newRes[k] = (newRes[k] || 0) - v; });
+                     Object.entries(reward || {}).forEach(([k,v]) => { newRes[k] = (newRes[k] || 0) + v; });
+                     return { 
+                       ...prev, 
+                       resources: newRes,
+                       completedEvents: [...prev.completedEvents, eventId],
+                       activePopup: null 
+                     };
+                  });
+                }}
+                onClose={() => setLevelState(prev => ({ ...prev, activePopup: null }))}
+              />
+            )}
+            
+            {type === 'artifact' && (
               <ArtifactInvestigation 
                 data={data} 
                 theme={theme} 
@@ -1587,7 +1612,7 @@ const LevelEngine = ({ config }) => {
                 
                 let isClickable = false;
                   if (loc.isLockedNode) { isClickable = false; } else {
-                    if (loc.isNpc || loc.isArtifact) isClickable = true;
+                    if (loc.isNpc || loc.isArtifact || loc.isEvent) isClickable = true;
                 if ((stage === 1 || stage > 1) && !isExplored) isClickable = true;
                 if ((stage === 2 || stage > 2) && isExplored && !isDiscovered) isClickable = true;
                 if ((stage === 3 || stage > 3) && isDiscovered && !isLearned) isClickable = true;

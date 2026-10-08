@@ -1,5 +1,30 @@
 export const level1Locations = [
   {
+    id: 'l1_event_storm',
+    label: 'Gathering Storm',
+    icon: '⚠️',
+    description: 'Dark clouds gather on the horizon.',
+    isEvent: true,
+    discoverMessage: 'Surviving extreme weather required quick adaptation.',
+    eventDef: {
+      scenario: 'A massive thunderstorm is rolling in fast. The temperature is dropping and the wind is howling. How do you prepare?',
+      options: [
+        {
+          label: 'Seek immediate shelter in the caves',
+          costs: {},
+          rewards: { legacy: 10 },
+          resultText: 'You huddled in the caves. The storm passed, and the community was safe.'
+        },
+        {
+          label: 'Build a hasty lean-to out of branches',
+          costs: { wood: 2 },
+          rewards: { community: 2, legacy: 20 },
+          resultText: 'The lean-to held up! Building structural shelter in a crisis boosted morale.'
+        }
+      ]
+    }
+  },
+  {
     id: 'forest',
     label: 'Forest',
     icon: '🌳',

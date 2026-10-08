@@ -1,5 +1,30 @@
 export const level2Locations = [
   {
+    id: 'l2_event_blight',
+    label: 'Wilted Crops',
+    icon: '⚠️',
+    description: 'Some of the grain appears yellow and wilted.',
+    isEvent: true,
+    discoverMessage: 'Agricultural communities faced constant threats from crop disease and pests.',
+    eventDef: {
+      scenario: 'A strange blight has appeared on the edge of the wheat fields. If it spreads, it could ruin the harvest.',
+      options: [
+        {
+          label: 'Burn the infected crops immediately',
+          costs: { harvested_grain: 1 },
+          rewards: { legacy: 25 },
+          resultText: 'You lost some grain, but the fire stopped the blight from spreading. The harvest is saved!'
+        },
+        {
+          label: 'Dig trenches to separate the fields',
+          costs: { wild_seeds: 2 },
+          rewards: { legacy: 15, community: 1 },
+          resultText: 'The trenches slowed the spread, though a bit of the crop was lost. Good structural thinking.'
+        }
+      ]
+    }
+  },
+  {
     id: 'open_land',
     label: 'Open Land',
     icon: '🌾',
