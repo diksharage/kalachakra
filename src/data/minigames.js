@@ -304,35 +304,97 @@ export const minigamesData = {
       }
     ]
   },
-  "mg-l5-kingdoms": {
-    id: "mg-l5-kingdoms", levelId: 5,
+
+  "mg-l5-agri": {
+    id: "mg-l5-agri", levelId: 5,
     variations: [
       {
-        variationId: "v1", type: "historicalDecision", title: "Rise of Magadha",
-        rewards: [
-          { type: 'resource', id: 'iron_tool', amount: 2, label: 'Iron Tools', destination: 'Inventory', usage: 'Used for Agriculture and War' },
-          { type: 'artifact', id: 'punch_marked_coin', amount: 1, label: 'Punch-Marked Coin', destination: 'Artifact Collection', usage: 'View in Library' }
-        ],
-        description: "Make strategic choices to help the kingdom of Magadha expand its power.",
+        variationId: "v1", type: "historicalDecision", title: "Iron Age Agriculture",
+        description: "Manage your food supply and implement new agricultural technologies.",
         difficulty: "medium", maxScore: 100,
         scenarios: [
-          { text: "Your capital, Rajagriha, is surrounded by hills. How do you defend it?", options: [{ label: "Build massive cyclopean stone walls", score: 10, response: "The stone walls made Rajagriha impregnable!" }, { label: "Move the capital immediately", score: -10, response: "You lost the strategic advantage of the hills." }] },
-          { text: "Your army needs to cross rivers to conquer Anga. What resource do you utilize?", options: [{ label: "Forest elephants for clearing paths and war", score: 10, response: "Elephants became the tanks of ancient Indian warfare!" }, { label: "Chariots only", score: -10, response: "Chariots get stuck in the dense eastern forests." }] }
+          {
+            id: "sc1",
+            prompt: "Your population is growing rapidly, but crop yields in the Ganges valley are struggling due to hard, clay-heavy soils. How do you increase food supply?",
+            options: [
+              { response: "Invest in Iron Plowshares", score: 50, explanation: "Excellent! The introduction of iron plowshares revolutionized agriculture in the dense soils of the Ganges valley." },
+              { response: "Pray to the rain gods", score: -10, explanation: "Faith is important, but practical tools are needed to till the heavy soil." },
+              { response: "Import food from the south", score: 0, explanation: "This drains your treasury and is not a long-term solution." }
+            ]
+          },
+          {
+            id: "sc2",
+            prompt: "You now have surplus crops. A neighboring kingdom is facing a famine and asks for aid.",
+            options: [
+              { response: "Send grain to forge a diplomatic alliance", score: 50, explanation: "A wise strategic move. Soft power and diplomacy were crucial among the 16 Mahajanapadas." },
+              { response: "Hoard the grain in your granary", score: -20, explanation: "The grain eventually rots, and your neighbors resent you." },
+              { response: "Sell the grain at extortionate prices", score: 0, explanation: "You gain short-term wealth but make a long-term enemy." }
+            ]
+          }
         ]
-      },
+      }
+    ]
+  },
+  "mg-l5-diplomacy": {
+    id: "mg-l5-diplomacy", levelId: 5,
+    variations: [
       {
-        variationId: "v2", type: "timeline", title: "Evolution of Governance",
-        rewards: [
-          { type: 'resource', id: 'iron_tool', amount: 2, label: 'Iron Tools', destination: 'Inventory', usage: 'Used for Agriculture and War' },
-          { type: 'artifact', id: 'punch_marked_coin', amount: 1, label: 'Punch-Marked Coin', destination: 'Artifact Collection', usage: 'View in Library' }
+        variationId: "v1", type: "historicalDecision", title: "Diplomacy & Alliances",
+        description: "Navigate the complex relationships between the 16 Great Kingdoms.",
+        difficulty: "hard", maxScore: 100,
+        scenarios: [
+          {
+            id: "sc1",
+            prompt: "The powerful kingdom of Magadha wants to marry their princess to your ruling family. This would mean a strong alliance, but potentially subordinating your kingdom.",
+            options: [
+              { response: "Accept the matrimonial alliance", score: 50, explanation: "Matrimonial alliances were heavily used by Magadhan kings like Bimbisara to peacefully expand influence." },
+              { response: "Refuse and declare war", score: -20, explanation: "Magadha's elephant corps crushes your army." },
+              { response: "Demand tribute instead", score: 0, explanation: "Magadha is insulted and cuts off trade routes." }
+            ]
+          },
+          {
+            id: "sc2",
+            prompt: "A group of republics (Gana-Sanghas) form a confederacy against expanding kingdoms. Do you support them or the centralized kingdoms?",
+            options: [
+              { response: "Support the Republics' independence", score: 50, explanation: "Supporting the Vajji confederacy creates a buffer zone against aggressive empires." },
+              { response: "Invade the Republics", score: -20, explanation: "The united Gana-Sanghas repel your forces with guerrilla tactics." },
+              { response: "Ignore the conflict", score: 0, explanation: "You lose influence in the region as the political map shifts." }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "mg-l5-defense": {
+    id: "mg-l5-defense", levelId: 5,
+    variations: [
+      {
+        variationId: "v1", type: "buildFromMemory", title: "Fortify Rajagriha",
+        description: "Memorize the strategic defenses of the Magadhan capital, Rajagriha.",
+        difficulty: "medium", maxScore: 100, memorizeTime: 6,
+        components: [
+          { id: 'c1', label: 'Five Hills (Natural Defense)', icon: '⛰️', required: true },
+          { id: 'c2', label: 'Cyclopean Stone Walls', icon: '🧱', required: true },
+          { id: 'c3', label: 'Garrison Barracks', icon: '⛺', required: true },
+          { id: 'c4', label: 'Iron Armories', icon: '⚔️', required: true },
+          { id: 'c5', label: 'Elephant Stables', icon: '🐘', required: true }
         ],
-        description: "Place the stages of ancient Indian political evolution in order.",
+        deco: ['🌲', '🔥', '🛡️']
+      }
+    ]
+  },
+  "mg-l5-trade": {
+    id: "mg-l5-trade", levelId: 5,
+    variations: [
+      {
+        variationId: "v1", type: "artifactMatch", title: "Early Coinage",
+        description: "Match the economic developments of the Mahajanapada period.",
         difficulty: "medium", maxScore: 100,
-        events: [
-          { id: 't1', label: 'Jana (Early Vedic Tribes)', order: 1 },
-          { id: 't2', label: 'Janapadas (Settled Territories)', order: 2 },
-          { id: 't3', label: 'Mahajanapadas (16 Great Kingdoms)', order: 3 },
-          { id: 't4', label: 'Rise of the Magadha Empire', order: 4 }
+        pairs: [
+          { id: '1', left: 'Punch-Marked Coins', right: 'First standardized currency', icon: '🪙' },
+          { id: '2', left: 'Srenis (Guilds)', right: 'Organized merchant groups', icon: '🤝' },
+          { id: '3', left: 'Iron Plowshare', right: 'Agricultural surplus generator', icon: '⛏️' },
+          { id: '4', left: 'Northern Black Polished Ware', right: 'Luxury pottery for trade', icon: '🏺' }
         ]
       }
     ]
