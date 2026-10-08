@@ -11,7 +11,7 @@ const Sidebar = ({ isOpen, onClose }) => {
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Journey', path: '/journey', icon: Map },
-    { name: 'Explore', path: '/explore', icon: Compass },
+    { name: 'Heritage Map', path: '/explore', icon: Compass },
     { name: 'Investigations', path: '/investigations', icon: Search },
     { name: 'Quests', path: '/quests', icon: Target },
     { name: 'Build', path: '/builder', icon: Hammer },

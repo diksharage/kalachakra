@@ -93,17 +93,7 @@ const InventoryPage = () => {
           <p className="text-content/70 text-sm max-w-xl">{t('inventory.subtitle', 'Your collected resources, trade goods, and discovered heritage items across all civilizations.')}</p>
         </div>
         
-        <div className={`glass-panel px-6 py-4 rounded-xl border flex gap-6 ${theme === 'light' ? 'bg-surface border-gold/30' : 'bg-surface/50 border-content/10'}`}>
-          <div>
-            <div className="text-[10px] font-bold text-gold uppercase tracking-wider mb-1">{t('common.legacy', 'Legacy')}</div>
-            <div className="text-2xl font-bold text-content">{legacy || 0}</div>
-          </div>
-          <div className="w-px bg-content/10"></div>
-          <div>
-            <div className="text-[10px] font-bold text-gold uppercase tracking-wider mb-1">{t('inventory.collected', 'Collected Types')}</div>
-            <div className="text-2xl font-bold text-content">{totalCollected}</div>
-          </div>
-        </div>
+        
       
         </div>
       </header>

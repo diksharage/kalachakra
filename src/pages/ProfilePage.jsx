@@ -85,15 +85,7 @@ const ProfilePage = () => {
               </div>
             </div>
 
-            {!isComplete && (
-               <button 
-                 onClick={() => navigate(gameState.activeLevelId === currentLevel && gameState.activeLevelState ? `/journey/level/${currentLevel}/play` : `/journey/level/${currentLevel}`)}
-                 className="px-6 py-3 bg-gradient-to-r from-gold to-terracotta text-[#171B3A] font-bold rounded-xl shadow-lg hover:scale-105 transition-transform flex items-center gap-2"
-               >
-                 <PlayCircle size={20} />
-                 {gameState.activeLevelId === currentLevel && gameState.activeLevelState ? "RESUME JOURNEY" : "CONTINUE JOURNEY"}
-               </button>
-            )}
+            
           </div>
         </div>
       </div>
@@ -119,19 +111,7 @@ const ProfilePage = () => {
               </div>
             </div>
 
-            {gameState.activeLevelState && gameState.activeLevelId === currentLevel && (
-               <div className="bg-surface/50 p-4 rounded-xl border border-gold/20 flex flex-col md:flex-row justify-between items-center gap-4">
-                 <div className="text-center md:text-left">
-                   <p className="text-xs uppercase text-content/60 font-bold tracking-wider mb-1">Current Objective</p>
-                   <p className="font-bold text-lg text-content">Level {currentLevel}: {getStageLabel(gameState.activeLevelState.stage)}</p>
-                 </div>
-                 <button 
-                   onClick={() => { playSound('ui'); navigate(`/journey/level/${currentLevel}/play`); }}
-                   className="px-4 py-2 bg-gold/10 text-gold border border-gold/30 rounded-lg text-sm font-bold hover:bg-gold/20 transition-colors"
-                 >
-                   Jump In <ArrowRight size={16} /></button>
-               </div>
-            )}
+            
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
