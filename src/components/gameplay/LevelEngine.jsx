@@ -1538,112 +1538,178 @@ const LevelEngine = ({ config }) => {
                 </div>
              </div>
           ) : stage === 7 ? (
-
-              <div className="relative h-full p-6 md:p-8 flex flex-col items-center justify-center z-10 animate-fade-in text-center overflow-y-auto w-full">
-                {config.id === 14 ? (
-                  <FinalSequence config={config} onComplete={() => {
-                     if (!isReplay) {
-                        triggerEventAchievement('preserver_of_the_legacy');
-                        completeLevel(14);
-                     }
-                     updateActiveLevelState(null, null);
-                     navigate('/profile');
-                  }} />
-                ) : (
-                  <div className="w-full max-w-4xl mx-auto flex flex-col items-center py-10">
-                    <Star className={"w-16 h-16 mb-4 animate-pulse-slow " + theme.primary} />
-                    <h3 className={"flex items-center gap-4 text-3xl md:text-5xl font-serif font-bold mb-2 " + theme.primary}><CheckCircle className="w-10 h-10" /> LEVEL COMPLETE</h3>
-                    <p className="text-xl font-bold text-content mb-2">Level {config.id} — {t(`levels.${config.id}.title`, config.title)}</p>
-                    <p className="text-content/70 text-sm md:text-base italic mb-8">You have successfully mastered the historical challenges of this era.</p>
-                    
-                    <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 text-left">
+                <div className="relative h-full p-4 md:p-8 flex flex-col items-center justify-start z-10 animate-fade-in text-center overflow-y-auto w-full hide-scrollbar">
+                  {config.id === 14 ? (
+                    <FinalSequence config={config} onComplete={() => {
+                       if (!isReplay) {
+                          triggerEventAchievement('preserver_of_the_legacy');
+                          completeLevel(14);
+                       }
+                       updateActiveLevelState(null, null);
+                       navigate('/profile');
+                    }} />
+                  ) : (
+                    <div className="w-full max-w-5xl mx-auto flex flex-col items-center py-6">
                       
-                      {/* Compact Stage Summary */}
-                      <div className={"p-5 rounded-2xl border bg-surface/50 flex flex-col " + theme.border}>
-                         <p className={"font-bold mb-3 uppercase tracking-widest text-xs opacity-80 " + theme.primary}>Stages Cleared</p>
-                         <ul className="text-sm space-y-2 font-medium text-content/90 flex-1">
-                            <li className="flex items-center justify-between"><span>Explore</span> <span className="text-green-400">{levelState.exploration.length}/{targetExplore}</span></li>
-                            <li className="flex items-center justify-between"><span>Discover</span> <span className="text-green-400">{levelState.discovery.length}/{targetDiscover}</span></li>
-                            <li className="flex items-center justify-between"><span>Learn</span> <span className="text-green-400">{levelState.learning.length}/{targetLearn}</span></li>
-                            <li className="flex items-center justify-between"><span>Solve</span> <span className="text-green-400">{levelState.completedChallenges.length}/{targetChallenges}</span></li>
-                            <li className="flex items-center justify-between"><span>Build</span> <span className="text-green-400">{levelState.builtItems.length}/{targetBuilds}</span></li>
-                         </ul>
+                      {/* Header Summary */}
+                      <div className="mb-8 w-full">
+                         <div className="inline-flex items-center justify-center gap-2 px-6 py-2 rounded-full bg-gold/10 border border-gold/30 text-gold text-sm font-bold tracking-widest uppercase mb-4">
+                            <CheckCircle className="w-5 h-5" /> Civilization Mastered
+                         </div>
+                         <h2 className={"text-4xl md:text-5xl font-serif font-extrabold mb-2 text-white drop-shadow-md"}>
+                           {t(`levels.${config.id}.title`, config.title)}
+                         </h2>
+                         <p className="text-xl text-content/70 italic font-serif">Level {config.id} Completion Summary</p>
                       </div>
 
-                      {/* Important Discoveries & Buildings */}
-                      <div className={"p-5 rounded-2xl border bg-surface/50 flex flex-col lg:col-span-2 " + theme.border}>
-                         <p className={"font-bold mb-3 uppercase tracking-widest text-xs opacity-80 " + theme.primary}>Heritage Discovered & Built</p>
-                         <div className="flex flex-wrap gap-2 overflow-y-auto max-h-[200px] hide-scrollbar">
-                           {levelState.discovery.map(id => {
-                              const loc = locations.find(l => l.id === id);
-                              if (!loc) return null;
-                              return (
-                                <div key={'d'+id} className="flex items-center gap-2 bg-surface p-2 rounded-lg border border-content/10">
-                                  <span className="text-xl">{loc.icon}</span>
-                                  <span className="text-xs font-bold whitespace-nowrap">{loc.label}</span>
+                      {/* Main Grid */}
+                      <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 text-left">
+                        
+                        {/* Column 1: Star Rating & Progression */}
+                        <div className="flex flex-col gap-6">
+                           <div className={"p-6 rounded-3xl border bg-surface/80 flex flex-col items-center text-center shadow-xl backdrop-blur-sm " + theme.border}>
+                              <h4 className={"font-bold mb-4 uppercase tracking-widest text-xs opacity-80 " + theme.primary}>Performance Rating</h4>
+                              {(() => {
+                                 const { stars, hasGoodMinigames, hasAllExplored } = calculateLevelStars();
+                                 return (
+                                   <>
+                                     <div className="flex gap-2 mb-6">
+                                        {[1, 2, 3].map(s => (
+                                           <Star key={s} className={`w-10 h-10 transition-all duration-1000 ${s <= stars ? 'text-gold fill-gold drop-shadow-[0_0_15px_rgba(255,215,0,0.8)] scale-110' : 'text-content/20'}`} />
+                                        ))}
+                                     </div>
+                                     <div className="w-full space-y-3 text-sm">
+                                        <div className="flex justify-between items-center bg-black/30 p-3 rounded-xl">
+                                          <span>Basic Completion</span>
+                                          <CheckCircle className="text-green-500 w-4 h-4"/>
+                                        </div>
+                                        <div className={`flex justify-between items-center bg-black/30 p-3 rounded-xl ${hasGoodMinigames ? '' : 'opacity-50'}`}>
+                                          <span>Objective Accuracy</span>
+                                          {hasGoodMinigames ? <CheckCircle className="text-green-500 w-4 h-4"/> : <span className="text-content/50 text-xs uppercase font-bold">Missed</span>}
+                                        </div>
+                                        <div className={`flex justify-between items-center bg-black/30 p-3 rounded-xl ${hasAllExplored ? '' : 'opacity-50'}`}>
+                                          <span>Full Exploration</span>
+                                          {hasAllExplored ? <CheckCircle className="text-green-500 w-4 h-4"/> : <span className="text-content/50 text-xs uppercase font-bold">Missed</span>}
+                                        </div>
+                                     </div>
+                                   </>
+                                 );
+                              })()}
+                           </div>
+
+                           {/* XP & Rewards */}
+                           <div className={"p-6 rounded-3xl border bg-gradient-to-br from-surface to-black/50 shadow-xl backdrop-blur-sm " + theme.border}>
+                              <h4 className={"font-bold mb-4 uppercase tracking-widest text-xs opacity-80 " + theme.primary}>Rewards Earned</h4>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-black/40 p-4 rounded-xl text-center border border-content/10">
+                                  <div className="text-2xl mb-1">🏺</div>
+                                  <div className="text-2xl font-bold text-emerald-400">100</div>
+                                  <div className="text-[10px] uppercase tracking-widest text-content/60">Legacy XP</div>
                                 </div>
-                              );
-                           })}
-                           {levelState.builtItems.map(id => {
-                              const bItem = buildActions.find(b => b.id === id);
-                              if (!bItem) return null;
-                              return (
-                                <div key={'b'+id} className="flex items-center gap-2 bg-blue-500/10 text-content p-2 rounded-lg border border-blue-500/30">
-                                  <span className="text-xl">{bItem.icon || 'Hammer'}</span>
-                                  <span className="text-xs font-bold whitespace-nowrap">{t(bItem.nameKey) || bItem.nameKey}</span>
+                                <div className="bg-black/40 p-4 rounded-xl text-center border border-content/10">
+                                  <div className="text-2xl mb-1">📜</div>
+                                  <div className="text-2xl font-bold text-blue-400">Unlock</div>
+                                  <div className="text-[10px] uppercase tracking-widest text-content/60">Next Era</div>
                                 </div>
-                              );
-                           })}
-                         </div>
+                              </div>
+                           </div>
+                        </div>
+
+                        {/* Column 2 & 3: Assets & Achievements */}
+                        <div className="lg:col-span-2 flex flex-col gap-6">
+                           
+                           {/* World Built */}
+                           <div className={"p-6 rounded-3xl border bg-surface/80 shadow-xl backdrop-blur-sm " + theme.border}>
+                              <div className="flex justify-between items-center mb-4">
+                                <h4 className={"font-bold uppercase tracking-widest text-xs opacity-80 " + theme.primary}>Civilization Built</h4>
+                                <span className="text-xs bg-black/30 px-3 py-1 rounded-full text-content/60">{levelState.builtItems.length} Structures</span>
+                              </div>
+                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                {levelState.builtItems.length === 0 ? (
+                                  <div className="col-span-full p-4 text-center text-content/40 italic text-sm bg-black/20 rounded-xl">No permanent structures built.</div>
+                                ) : (
+                                  levelState.builtItems.map(id => {
+                                    const bItem = buildActions.find(b => b.id === id);
+                                    if (!bItem) return null;
+                                    return (
+                                      <div key={'b'+id} className="flex flex-col items-center justify-center gap-2 bg-black/40 p-4 rounded-xl border border-content/10 hover:border-gold/30 transition-colors">
+                                        <span className="text-3xl drop-shadow-md">{bItem.icon || '🏗️'}</span>
+                                        <span className="text-xs font-bold text-center leading-tight text-content/90">{bItem.label || t(bItem.nameKey)}</span>
+                                      </div>
+                                    );
+                                  })
+                                )}
+                              </div>
+                           </div>
+
+                           {/* Resources Generated */}
+                           <div className={"p-6 rounded-3xl border bg-surface/80 shadow-xl backdrop-blur-sm " + theme.border}>
+                              <h4 className={"font-bold mb-4 uppercase tracking-widest text-xs opacity-80 " + theme.primary}>Final Treasury</h4>
+                              <div className="flex flex-wrap gap-3">
+                                {Object.entries(levelState.resources || {}).filter(([_,v])=>v>0).map(([k,v]) => (
+                                  <div key={k} className="flex items-center gap-2 bg-black/40 px-4 py-2 rounded-lg border border-content/10">
+                                    <span className="text-gold font-bold">{v}</span>
+                                    <span className="text-sm capitalize text-content/80">{k.replace('_', ' ')}</span>
+                                  </div>
+                                ))}
+                                {Object.values(levelState.resources || {}).every(v=>v<=0) && (
+                                  <span className="text-content/40 italic text-sm">Treasury empty.</span>
+                                )}
+                              </div>
+                           </div>
+
+                           {/* Artifacts & Events */}
+                           <div className={"p-6 rounded-3xl border bg-surface/80 shadow-xl backdrop-blur-sm " + theme.border}>
+                              <div className="flex justify-between items-center mb-4">
+                                <h4 className={"font-bold uppercase tracking-widest text-xs opacity-80 " + theme.primary}>Discoveries & Events</h4>
+                                <span className="text-xs bg-black/30 px-3 py-1 rounded-full text-content/60">{levelState.discovery.length} Found</span>
+                              </div>
+                              <div className="flex flex-wrap gap-2 max-h-[160px] overflow-y-auto hide-scrollbar pr-2">
+                                {levelState.discovery.map(id => {
+                                   const loc = locations.find(l => l.id === id);
+                                   if (!loc) return null;
+                                   const isSpecial = loc.isArtifact || loc.isEvent;
+                                   return (
+                                     <div key={'d'+id} className={`flex items-center gap-2 px-3 py-2 rounded-xl border ${isSpecial ? 'bg-gold/10 border-gold/30 text-gold' : 'bg-black/40 border-content/10 text-content/80'}`}>
+                                       <span className="text-xl">{loc.icon}</span>
+                                       <span className="text-xs font-bold whitespace-nowrap">{loc.label}</span>
+                                     </div>
+                                   );
+                                })}
+                              </div>
+                           </div>
+
+                        </div>
                       </div>
 
-                      {/* Actual Rewards Earned */}
-                      <div className={"p-5 rounded-2xl border bg-surface/50 md:col-span-2 lg:col-span-3 " + theme.border}>
-                         <p className={"font-bold mb-3 uppercase tracking-widest text-xs opacity-80 " + theme.primary}>{isReplay ? 'Replay Rewards' : 'Rewards & Achievements'}</p>
-                         <div className="flex flex-wrap gap-3">
-                            {isReplay ? (
-                               <span className="px-3 py-2 bg-blue-900/20 text-blue-300 rounded-lg border border-blue-400/20 uppercase tracking-widest text-xs font-bold">Level Already Completed (Global inventory preserved)</span>
-                            ) : (
-                               <>
-                                  <span className="px-3 py-2 bg-gold/10 text-gold rounded-lg border border-gold/20 font-bold text-sm flex items-center gap-2"><Star className="w-4 h-4" /> +100 Legacy Points</span>
-                                  <span className="px-3 py-2 bg-green-900/20 text-green-400 rounded-lg border border-green-500/20 font-bold text-sm flex items-center gap-2"><CheckCircle className="w-4 h-4" /> Era Mastered</span>
-                                  {config.id === 1 && <span className="px-3 py-2 bg-purple-900/20 text-purple-400 rounded-lg border border-purple-500/20 font-bold text-sm flex items-center gap-2"><Trophy className="w-4 h-4" /> Achievement: Start Journey</span>}
-                                  {config.id === 14 && <span className="px-3 py-2 bg-purple-900/20 text-purple-400 rounded-lg border border-purple-500/20 font-bold text-sm flex items-center gap-2"><Trophy className="w-4 h-4" /> Achievement: Preserver of the Legacy</span>}
-                               </>
-                            )}
-                         </div>
+                      {/* Actions */}
+                      <div className="flex flex-col sm:flex-row gap-4 w-full max-w-2xl justify-center mt-4 pb-12">
+                         <button 
+                           onClick={() => {
+                             playSound('ui');
+                             handleCompleteLevel();
+                             navigate('/journey');
+                           }}
+                           className="flex-1 max-w-[280px] px-8 py-5 bg-gradient-to-r from-gold to-emerald-600 text-[#111] font-extrabold text-lg rounded-2xl hover:shadow-[0_0_30px_rgba(212,166,74,0.6)] hover:scale-105 transition-all"
+                         >
+                           Continue Journey
+                         </button>
+                         <button 
+                           onClick={() => {
+                             playSound('ui');
+                             handleCompleteLevel();
+                             window.location.reload();
+                           }}
+                           className="flex-1 max-w-[280px] px-8 py-5 bg-surface border border-content/20 text-content font-bold text-lg rounded-2xl hover:bg-surface-light hover:border-content/50 transition-all"
+                         >
+                           Replay Level
+                         </button>
                       </div>
 
                     </div>
-  
-                    <p className="text-content/80 text-sm mb-6 font-bold uppercase tracking-widest text-green-400 animate-pulse-slow">
-                      {isReplay ? 'Replay Concluded' : `Next Unlocked: Level ${config.id + 1}`}
-                    </p>
-                    
-                    <div className="flex flex-col md:flex-row items-center gap-4 w-full justify-center">
-                      <button 
-                        onClick={() => {
-                          handleCompleteLevel(); 
-                          navigate('/journey');
-                        }}
-                        className="px-6 py-3 rounded-xl font-bold bg-surface border border-content/20 text-content hover:bg-surface/80 transition-colors w-full md:w-auto focus:outline-none focus:ring-2 focus:ring-content"
-                      >
-                        Return to Journey Map
-                      </button>
-                      <button 
-                        onClick={() => {
-                          handleCompleteLevel(); 
-                          navigate(`/journey/level/${config.id + 1}`);
-                        }}
-                        className={"px-8 py-3 rounded-xl font-bold transition-transform hover:scale-105 w-full md:w-auto shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface focus:ring-gold " + theme.button}
-                      >
-                        Continue to Next Level <ArrowRight className="w-5 h-5 inline ml-2" />
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : activePopup?.type === 'explore' ? (
+                  )}
+                </div>
+              ) : activePopup?.type === 'explore' ? (
                 <ExplorePanel 
                    data={activePopup.data} 
                    theme={theme} 
