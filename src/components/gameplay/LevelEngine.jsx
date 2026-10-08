@@ -1112,15 +1112,30 @@ const LevelEngine = ({ config }) => {
                      {Object.keys(reqs).length === 0 ? <span className="text-sm opacity-60">None</span> : (
                        <div className="flex flex-col gap-2">
                          {Object.entries(reqs).map(([k, v]) => {
-                           const has = resources[k] || 0;
-                           const isMet = has >= v;
-                           return (
-                             <div key={k} className="flex justify-between items-center text-sm">
-                               <span className="font-bold">{k}</span>
-                               <span className={isMet ? "text-green-400" : "text-red-400 font-bold"}>{has} / {v}</span>
-                             </div>
-                           )
-                         })}
+                             const has = resources[k] || 0;
+                             const isMet = has >= v;
+                             return (
+                               <div key={k} className="flex flex-col gap-1 text-sm border-b border-content/10 pb-2 mb-2 last:border-0 last:mb-0">
+                                 <div className="flex justify-between items-center">
+                                   <span className="font-bold capitalize">{k.replace(/_/g, ' ')}</span>
+                                   <span className={isMet ? "text-green-400 font-bold" : "text-red-400 font-bold"}>
+                                     {has} / {v} {isMet && <CheckCircle className="inline w-4 h-4 ml-1" />}
+                                   </span>
+                                 </div>
+                                 {!isMet && (
+                                   <div className="flex justify-between items-center mt-1 bg-red-900/10 p-2 rounded border border-red-500/20">
+                                      <div className="flex items-center gap-2 text-xs text-content/70">
+                                        <Search className="w-3 h-3 text-gold" />
+                                        <span>{getResourceHint(k)}</span>
+                                      </div>
+                                      <button onClick={() => setLevelState(prev => ({...prev, activePopup: null}))} className="text-xs px-2 py-1 bg-gold/20 text-gold font-bold rounded hover:bg-gold hover:text-[#171B3A] transition-colors uppercase tracking-wider">
+                                        Gather
+                                      </button>
+                                   </div>
+                                 )}
+                               </div>
+                             )
+                           })}
                        </div>
                      )}
                   </div>
