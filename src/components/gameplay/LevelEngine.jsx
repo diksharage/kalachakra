@@ -7,7 +7,6 @@ import { useAudio } from '../../context/AudioContext';
 import { minigamesData } from '../../data/minigames';
 import MiniGameManager from '../minigames/MiniGameManager';
 import FinalSequence from './FinalSequence';
-import Level1Runner from './Level1Runner';
 import { useAchievements } from '../../context/AchievementContext';
 import { Star, CheckCircle, ArrowRight, Bot, Target, Lock, Play, Hammer, Trophy, Search } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
@@ -1381,27 +1380,6 @@ const LevelEngine = ({ config }) => {
                   </div>
                 )}
               </div>
-            ) : (config.id === 1 && stage === 1 && !isReplay) ? (
-                <Level1Runner 
-                  ageGroup={ageGroup}
-                  onComplete={(gatheredResources, runnerScore) => {
-                     playSound('level_unlock');
-                     if (!isReplay) {
-                       updateResources({ 
-                         ...gatheredResources, 
-                         knowledge: runnerScore || 150, 
-                         culture: 50, 
-                         legacy: 20 
-                       });
-                     }
-                     setLevelState(prev => {
-                       const next = { ...prev, exploration: locations.map(l => l.id), activePopup: null };
-                       next.stage = 2; // Jump to Discover
-                       return next;
-                     });
-                     notify('SUCCESS', 'Exploration Complete', `Gathered resources and earned XP!`, { icon: '🏃' });
-                  }}
-                />
             ) : activePopup?.type === 'explore' ? (
                 <ExplorePanel 
                    data={activePopup.data} 
