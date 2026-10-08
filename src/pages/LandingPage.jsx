@@ -44,7 +44,7 @@ const LandingPage = () => {
       {/* 2. & 3. PUBLIC LANDING PAGE & HERO VISUAL */}
       <div className="relative flex flex-col items-center justify-center text-center px-4 py-24 md:py-32 overflow-hidden">
         {/* Background decorations - Symbolic Heritage Pattern */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-surface/20 rounded-full blur-[100px] -z-10 pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-surface/30 rounded-full blur-[100px] -z-10 pointer-events-none" />
         <div className="absolute top-10 left-10 text-9xl opacity-5">ðŸ›ï¸</div>
         <div className="absolute bottom-10 right-10 text-9xl opacity-5">ðŸº</div>
         <div className="absolute top-40 right-20 text-7xl opacity-5">ðŸ“œ</div>
@@ -83,7 +83,7 @@ const LandingPage = () => {
       </section>
 
       {/* 5. GAMEPLAY LOOP */}
-      <section id="how-it-works" className="py-24 bg-surface/20 px-4">
+      <section id="how-it-works" className="py-24 bg-surface/30 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <h2 className="text-3xl font-serif font-bold gold-gradient-text mb-12">HOW YOU PLAY</h2>
           
@@ -141,7 +141,7 @@ const LandingPage = () => {
       </section>
 
       {/* 8. PERSONALIZED EXPERIENCE */}
-      <section className="py-24 px-4 bg-surface/10 border-y border-gold/10">
+      <section className="py-24 px-4 bg-surface/30 border-y border-gold/10">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-serif font-bold gold-gradient-text text-center mb-6">YOUR JOURNEY, YOUR WAY</h2>
           <p className="text-center text-content/70 max-w-2xl mx-auto mb-16 text-lg">Your player type changes how KALACHAKRA guides your journey â€” not what you are allowed to explore.</p>
@@ -197,7 +197,7 @@ const LandingPage = () => {
       </section>
 
       {/* 11. CULTURAL DIVERSITY */}
-      <section className="py-24 px-4 bg-surface/20 border-y border-gold/10">
+      <section className="py-24 px-4 bg-surface/30 border-y border-gold/10">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-3xl font-serif font-bold gold-gradient-text mb-6">ONE JOURNEY. MANY TRADITIONS.</h2>
           <p className="text-lg text-content/80 leading-relaxed mb-12 max-w-3xl mx-auto">

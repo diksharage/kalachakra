@@ -48,7 +48,7 @@ export const JourneyProgressCard = ({ stats }) => {
               <div className="flex justify-between items-start mb-2">
                 <span className="font-bold text-lg">{level}</span>
                 {isCompleted && <CheckCircle size={20} className="text-emerald-500" />}
-                {isLocked && <Lock size={20} className="text-content/30" />}
+                {isLocked && <Lock size={20} className="text-content/50" />}
                 {isCurrent && <MapPin size={20} className="animate-pulse text-gold" />}
               </div>
               <div className={`text-xs font-bold leading-tight ${isCurrent ? lTheme.text : 'text-content/70'}`}>

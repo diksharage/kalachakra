@@ -15,22 +15,22 @@ const StageGuide = () => (
         <Map className="text-blue-400 mb-2" size={24} />
         <span className="text-[10px] font-bold uppercase tracking-wider">Explore</span>
       </div>
-      <ArrowRight className="text-content/20" size={16} />
+      <ArrowRight className="text-content/50" size={16} />
       <div className="flex flex-col items-center flex-1 text-center opacity-80">
         <Search className="text-purple-400 mb-2" size={24} />
         <span className="text-[10px] font-bold uppercase tracking-wider">Discover</span>
       </div>
-      <ArrowRight className="text-content/20" size={16} />
+      <ArrowRight className="text-content/50" size={16} />
       <div className="flex flex-col items-center flex-1 text-center opacity-80">
         <BookOpen className="text-green-400 mb-2" size={24} />
         <span className="text-[10px] font-bold uppercase tracking-wider">Learn</span>
       </div>
-      <ArrowRight className="text-content/20" size={16} />
+      <ArrowRight className="text-content/50" size={16} />
       <div className="flex flex-col items-center flex-1 text-center opacity-80">
         <Target className="text-red-400 mb-2" size={24} />
         <span className="text-[10px] font-bold uppercase tracking-wider">Play + Solve</span>
       </div>
-      <ArrowRight className="text-content/20" size={16} />
+      <ArrowRight className="text-content/50" size={16} />
       <div className="flex flex-col items-center flex-1 text-center opacity-80">
         <Hammer className="text-gold mb-2" size={24} />
         <span className="text-[10px] font-bold uppercase tracking-wider">Build</span>

@@ -150,7 +150,7 @@ const InteractiveLearnNode = ({ data, onComplete, theme, isYoung, playSound, age
            <p className="text-sm opacity-70 mb-2 uppercase tracking-widest text-blue-400">Step 2: Assemble the Fact</p>
            <p className="text-xs opacity-60 mb-4">Tap the sentences in the correct historical order (Fact → Significance).</p>
            
-           <div className="flex flex-col gap-2 min-h-[6rem] p-4 border border-dashed rounded-lg bg-surface/20 mb-4">
+           <div className="flex flex-col gap-2 min-h-[6rem] p-4 border border-dashed rounded-lg bg-surface/30 mb-4">
               {orderState.length === 0 && <span className="text-content/40 text-sm m-auto">Select the first fact...</span>}
               {orderState.map((txt, i) => (
                 <div key={i} className={"p-3 bg-surface border rounded-lg text-left shadow-sm " + theme.border}>
@@ -329,7 +329,7 @@ const ObjectiveTracker = ({ stage, levelState, locations, targetExplore, targetD
                disabled={item.isDone || (item.isLocked && stage !== 5)}
                className={"flex items-center justify-between text-left p-2 rounded-lg transition-all " + 
                  (item.isDone ? 'opacity-60' : 
-                  item.isLocked ? (stage === 5 ? 'opacity-80 bg-surface/40 hover:bg-surface/80 border border-red-500/30 cursor-pointer' : 'opacity-40 cursor-not-allowed bg-surface/20') : 
+                  item.isLocked ? (stage === 5 ? 'opacity-80 bg-surface/40 hover:bg-surface/80 border border-red-500/30 cursor-pointer' : 'opacity-40 cursor-not-allowed bg-surface/30') : 
                   'bg-surface/40 hover:bg-surface/80 border border-transparent hover:border-content/10')}
              >
                 <div className="flex items-center gap-3">
@@ -561,7 +561,7 @@ const ExplorePanel = ({ data, theme, ageGroup, isYoung, isReplay, playSound, upd
                 </div>
                 {isFound
                   ? <CheckCircle size={24} className="text-gold shrink-0 mt-1 animate-in zoom-in" />
-                  : <span className="text-xs font-bold text-content/30 shrink-0 mt-2">Tap to find</span>
+                  : <span className="text-xs font-bold text-content/50 shrink-0 mt-2">Tap to find</span>
                 }
               </button>
             );
@@ -658,7 +658,7 @@ const MatchingGame = ({ data, onComplete, theme, isYoung, playSound }) => {
                 key={item.id} 
                 onClick={() => handleRightClick(item)}
                 disabled={!selectedLeft || isMatched || failed}
-                className={"p-3 rounded-lg border text-left transition-all " + (isMatched ? 'bg-green-900/40 border-green-500 opacity-50' : selectedLeft && !isMatched ? 'bg-surface hover:bg-surface/80 ring-1 ring-gold/50 cursor-pointer animate-pulse-slow' : 'bg-surface/20 opacity-70 cursor-not-allowed')}
+                className={"p-3 rounded-lg border text-left transition-all " + (isMatched ? 'bg-green-900/40 border-green-500 opacity-50' : selectedLeft && !isMatched ? 'bg-surface hover:bg-surface/80 ring-1 ring-gold/50 cursor-pointer animate-pulse-slow' : 'bg-surface/30 opacity-70 cursor-not-allowed')}
               >
                 {item.label}
               </button>
@@ -691,7 +691,7 @@ const OrderingGame = ({ data, onComplete, theme, isYoung, playSound }) => {
     <div className="flex flex-col w-full gap-2">
       {isYoung && <div className="text-left w-full text-xs font-bold text-blue-400 mb-2 uppercase tracking-wider animate-pulse-slow">💡 Hint: Think about what you must do FIRST before you can do the next step!</div>}
       <div className="flex flex-col gap-4 w-full">
-        <div className="flex flex-col gap-2 min-h-[6rem] p-4 border border-dashed rounded-lg bg-surface/20">
+        <div className="flex flex-col gap-2 min-h-[6rem] p-4 border border-dashed rounded-lg bg-surface/30">
           {selected.length === 0 && <span className="text-content/40 text-sm m-auto">Select items in correct sequence...</span>}
           {selected.map((id, idx) => {
             const item = data.items.find(i => i.id === id);
@@ -1285,7 +1285,7 @@ const LevelEngine = ({ config }) => {
                        }
                        notify('BUILD', 'Building Constructed!', effectStrings.length > 0 ? `Produced: ${effectStrings.join(', ')}` : `Consumed required resources.`, { icon: 'dY""' });
                     }} 
-                    className={"px-6 py-3 font-bold rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-surface transition-all " + (canAfford ? theme.button : "opacity-50 cursor-not-allowed bg-surface/30 border-transparent text-content/50")}
+                    className={"px-6 py-3 font-bold rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-surface transition-all " + (canAfford ? theme.button : "opacity-60 cursor-not-allowed bg-surface/30 border-transparent text-content/80")}
                   >
                     Confirm Build
                   </button>
@@ -1502,7 +1502,7 @@ const LevelEngine = ({ config }) => {
                           <div className="flex flex-col items-center mb-8 w-full max-w-sm">
                             <div className="flex gap-4 mb-4">
                                {[1, 2, 3].map(s => (
-                                  <Star key={s} className={`w-12 h-12 transition-all duration-1000 ${s <= stars ? 'text-gold fill-gold drop-shadow-[0_0_15px_rgba(255,215,0,0.8)] scale-110' : 'text-content/20'}`} />
+                                  <Star key={s} className={`w-12 h-12 transition-all duration-1000 ${s <= stars ? 'text-gold fill-gold drop-shadow-[0_0_15px_rgba(255,215,0,0.8)] scale-110' : 'text-content/50'}`} />
                                ))}
                             </div>
                             <div className="text-left bg-black/40 border border-content/10 p-4 rounded-xl w-full text-sm space-y-2">
@@ -1575,7 +1575,7 @@ const LevelEngine = ({ config }) => {
                                    <>
                                      <div className="flex gap-2 mb-6">
                                         {[1, 2, 3].map(s => (
-                                           <Star key={s} className={`w-10 h-10 transition-all duration-1000 ${s <= stars ? 'text-gold fill-gold drop-shadow-[0_0_15px_rgba(255,215,0,0.8)] scale-110' : 'text-content/20'}`} />
+                                           <Star key={s} className={`w-10 h-10 transition-all duration-1000 ${s <= stars ? 'text-gold fill-gold drop-shadow-[0_0_15px_rgba(255,215,0,0.8)] scale-110' : 'text-content/50'}`} />
                                         ))}
                                      </div>
                                      <div className="w-full space-y-3 text-sm">

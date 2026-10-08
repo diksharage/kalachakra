@@ -27,7 +27,7 @@ const AchievementCard = ({ achievement, isUnlocked, progress }) => {
   return (
     <div className={`rounded-2xl p-4 flex gap-4 transition-all ${isUnlocked ? 'bg-surface border border-gold/40 shadow-lg shadow-gold/10' : 'bg-surface/50 border border-content/10 opacity-70'}`}>
       <div className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl shrink-0 ${isUnlocked ? 'bg-gradient-to-br from-gold to-terracotta' : 'bg-main border border-content/20'}`}>
-        {isUnlocked ? achievement.icon : <Lock size={24} className="text-content/30" />}
+        {isUnlocked ? achievement.icon : <Lock size={24} className="text-content/50" />}
       </div>
       <div className="flex-1 flex flex-col justify-center">
         <div className="flex justify-between items-start mb-1">

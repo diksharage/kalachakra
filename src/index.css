@@ -4,15 +4,15 @@
 
 @layer base {
   :root, :root.dark {
-    /* DARK THEME: ancient ruins at dusk */
-    --bg-main: #121714; /* Deep Temple Shadow */
-    --bg-surface: #18352B; /* Deep Forest */
-    --text-main: #E8D9B8; /* Warm Cream */
-    --text-muted: rgba(232, 217, 184, 0.7);
-    --color-gold: #C49A45; /* Antique Gold */
-    --color-terracotta: #A84F32; /* Terracotta */
-    --color-bronze: #A97932;
-    --color-accent: #3C7C78; /* Water Accent / Teal */
+    /* DARK THEME: ancient/adventure professional */
+    --bg-main: #0B0D0F;
+    --bg-surface: #1E2226; /* Slightly lighter for card contrast */
+    --text-main: #F5F1E8;
+    --text-muted: #A7A29A;
+    --color-gold: #D6A84F;
+    --color-terracotta: #D96B62;
+    --color-bronze: #9A7135;
+    --color-accent: #72B879;
   }
 
   :root.light-mode {

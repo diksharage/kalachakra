@@ -104,7 +104,7 @@ const QuestsPage = () => {
         <p className="text-content/70 text-sm mb-4">{completionResult.quest?.id?.replace(/_/g,' ')}</p>
         <div className="flex justify-center gap-2 mb-4">
           {[1,2,3].map(s => (
-            <Star key={s} size={28} className={s <= completionResult.mastery ? 'text-gold fill-gold' : 'text-content/20'} />
+            <Star key={s} size={28} className={s <= completionResult.mastery ? 'text-gold fill-gold' : 'text-content/50'} />
           ))}
         </div>
         <div className="text-gold font-bold text-xl mb-1">+{completionResult.earnedLegacy} Legacy</div>
@@ -158,7 +158,7 @@ const QuestsPage = () => {
             return (
               <div key={q.id} className="rounded-2xl p-6 flex gap-4 items-center opacity-50 grayscale border border-content/10 bg-surface">
                 <div className="w-12 h-12 rounded-xl bg-main border border-content/20 flex items-center justify-center shrink-0">
-                  <Lock className="text-content/30" />
+                  <Lock className="text-content/50" />
                 </div>
                 <div>
                   <h3 className="font-bold text-content">{t('quest.locked', 'Unknown Quest')}</h3>
@@ -180,7 +180,7 @@ const QuestsPage = () => {
                 {status === 'completed' && (
                   <div className="flex items-center gap-1">
                     {state?.stars && [1,2,3].map(s => (
-                      <Star key={s} size={12} className={s <= state.stars ? 'text-gold fill-gold' : 'text-content/20'} />
+                      <Star key={s} size={12} className={s <= state.stars ? 'text-gold fill-gold' : 'text-content/50'} />
                     ))}
                     <CheckCircle2 className="text-emerald-500 ml-1" size={18} />
                   </div>

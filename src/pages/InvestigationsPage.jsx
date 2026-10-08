@@ -50,7 +50,7 @@ const InvestigationsPage = () => {
             return (
               <div key={inv.id} className={`rounded-2xl p-6 flex gap-6 items-center opacity-50 grayscale border border-content/10 ${theme === 'light' ? 'bg-surface' : 'bg-surface/50'}`}>
                 <div className="w-16 h-16 rounded-2xl bg-main border border-content/20 flex items-center justify-center shrink-0">
-                  <Lock className="text-content/30" size={24} />
+                  <Lock className="text-content/50" size={24} />
                 </div>
                 <div>
                   <h3 className="font-bold text-content text-lg mb-1">{t('investigation.locked', 'Unknown Investigation')}</h3>

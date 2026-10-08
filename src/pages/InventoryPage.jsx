@@ -16,7 +16,7 @@ const InventoryCard = ({ item, quantity, levelThemeData }) => {
     return (
       <div className={`rounded-xl p-4 flex gap-4 transition-all opacity-50 grayscale border border-content/10 ${theme === 'light' ? 'bg-surface' : 'bg-surface/50'}`}>
         <div className="w-14 h-14 rounded-lg bg-main border border-content/20 flex items-center justify-center shrink-0">
-          <Lock className="text-content/30" />
+          <Lock className="text-content/50" />
         </div>
         <div className="flex-1 flex flex-col justify-center">
           <h4 className="font-bold text-content">{t('inventory.unknown', 'Unknown Item')}</h4>

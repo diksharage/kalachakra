@@ -123,7 +123,7 @@ const GlobalSearch = ({ isOpen, onClose }) => {
             value={query}
             onChange={(e) => { setQuery(e.target.value); setSelectedIndex(0); }}
             placeholder={t('search.placeholder', 'Search places, artifacts, stories...')}
-            className="flex-1 bg-transparent border-none outline-none text-lg text-content placeholder:text-content/30"
+            className="flex-1 bg-transparent border-none outline-none text-lg text-content placeholder:text-content/50"
           />
           <button 
             onClick={onClose}

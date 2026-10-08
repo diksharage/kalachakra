@@ -15,7 +15,7 @@ const MiniGameShell = ({ levelId, title, instructions, progressText, onClose, ch
   const { t } = useLanguage();
   return (
     <div className="w-full flex flex-col min-h-[50vh] md:min-h-[60vh] max-h-[85vh] text-left relative">
-      <div className={`w-full flex flex-col md:flex-row items-start md:items-center justify-between p-4 border-b border-content/10 ${theme?.bg || 'bg-surface/20'}`}>
+      <div className={`w-full flex flex-col md:flex-row items-start md:items-center justify-between p-4 border-b border-content/10 ${theme?.bg || 'bg-surface/30'}`}>
          <div className="flex flex-col flex-1 pr-4">
             <span className={`text-[10px] uppercase font-bold tracking-widest ${theme?.primary || 'text-gold'} opacity-80`}>Level ${levelId}</span>
             <h3 className="text-xl md:text-2xl font-serif font-bold text-content leading-tight">{title}</h3>
@@ -440,7 +440,7 @@ const TradeRoute = ({ config, onComplete, theme, ageGroup, setProgress }) => {
       <div className="flex items-center justify-between mb-8 overflow-x-auto pb-6 px-2 shrink-0 hide-scrollbar">
         {config.legs.map((l, i) => (
           <React.Fragment key={i}>
-            <div className={`flex flex-col items-center gap-2 ${i <= currentLeg ? 'text-gold' : 'text-content/30'}`}>
+            <div className={`flex flex-col items-center gap-2 ${i <= currentLeg ? 'text-gold' : 'text-content/50'}`}>
               <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 shrink-0 transition-colors
                 ${i < currentLeg ? 'bg-gold text-main border-gold shadow-[0_0_15px_rgba(212,166,74,0.4)]' : i === currentLeg ? 'border-gold motion-safe:animate-pulse bg-gold/10' : 'border-content/20 bg-surface'}`}>
                 {i < currentLeg ? <CheckCircle size={24} /> : <MapPin size={24} />}
@@ -450,7 +450,7 @@ const TradeRoute = ({ config, onComplete, theme, ageGroup, setProgress }) => {
             <div className={`flex-1 h-1.5 mx-2 rounded-full shrink-0 transition-colors ${i < currentLeg ? 'bg-gold shadow-[0_0_10px_rgba(212,166,74,0.4)]' : 'bg-content/10'}`}></div>
           </React.Fragment>
         ))}
-        <div className="flex flex-col items-center gap-2 text-content/30">
+        <div className="flex flex-col items-center gap-2 text-content/50">
           <div className="w-12 h-12 rounded-full flex items-center justify-center border-2 border-content/20 shrink-0 bg-surface">
             <Star size={24} />
           </div>
@@ -560,7 +560,7 @@ const StrategyBoardGame = ({ config, onComplete, theme, ageGroup, setProgress })
       else if (obstacle) content = obstacle.icon || '🏯';
       
       const isDark = (r + c) % 2 === 1;
-      let bgClass = isDark ? 'bg-surface/40' : 'bg-surface/10';
+      let bgClass = isDark ? 'bg-surface/40' : 'bg-surface/30';
       if (isValid) bgClass = 'bg-green-500/30 cursor-pointer hover:bg-green-500/50';
       if (isPlayer) bgClass = 'bg-blue-500/40 ring-2 ring-blue-400';
       
@@ -584,13 +584,13 @@ const StrategyBoardGame = ({ config, onComplete, theme, ageGroup, setProgress })
           <p className="text-sm opacity-80">Plan your moves carefully!</p>
         </div>
         <div 
-          className="grid gap-1 p-2 bg-surface/20 rounded-xl border border-content/10 shadow-xl"
+          className="grid gap-1 p-2 bg-surface/30 rounded-xl border border-content/10 shadow-xl"
           style={{ gridTemplateColumns: `repeat(${config.boardSize}, minmax(0, 1fr))` }}
         >
           {cells}
         </div>
       </div>
-      <div className="w-full md:w-64 flex flex-col gap-2 h-48 md:h-full bg-surface/10 p-4 rounded-xl overflow-y-auto text-sm border border-content/5">
+      <div className="w-full md:w-64 flex flex-col gap-2 h-48 md:h-full bg-surface/30 p-4 rounded-xl overflow-y-auto text-sm border border-content/5">
         <h5 className="font-bold opacity-70 mb-2 uppercase text-xs tracking-wider">Move History</h5>
         {log.length === 0 && <span className="opacity-50">No moves yet.</span>}
         {log.map((l, i) => (
@@ -696,7 +696,7 @@ const MiniGameManager = ({ gameConfig, challengeData, theme, ageGroup, onComplet
                 <span className="font-bold text-gold flex items-center gap-1.5 text-sm md:text-base">
                   {previousBest.score} 
                   <span className="flex text-xs ml-0.5">
-                    {[1,2,3].map(s => <Star key={s} size={12} className={s <= previousBest.stars ? "fill-gold text-gold" : "text-content/30"} />)}
+                    {[1,2,3].map(s => <Star key={s} size={12} className={s <= previousBest.stars ? "fill-gold text-gold" : "text-content/50"} />)}
                   </span>
                 </span>
               </div>
@@ -730,7 +730,7 @@ const MiniGameManager = ({ gameConfig, challengeData, theme, ageGroup, onComplet
               <Star 
                 key={s} 
                 size={56} 
-                className={`transition-all duration-700 delay-${s * 150} ${s <= result.stars ? 'fill-gold text-gold scale-110 drop-shadow-[0_0_25px_rgba(212,166,74,0.6)]' : 'text-content/10 scale-90'}`} 
+                className={`transition-all duration-700 delay-${s * 150} ${s <= result.stars ? 'fill-gold text-gold scale-110 drop-shadow-[0_0_25px_rgba(212,166,74,0.6)]' : 'text-content/50 scale-90'}`} 
               />
             ))}
           </div>

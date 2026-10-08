@@ -43,7 +43,7 @@ const ArtifactsPage = () => {
                 {isUnlocked ? (
                   <div className="text-6xl drop-shadow-[0_0_15px_rgba(212,166,74,0.5)]">ðŸº</div>
                 ) : (
-                  <Lock className="w-12 h-12 text-content/20" />
+                  <Lock className="w-12 h-12 text-content/50" />
                 )}
               </div>
               
@@ -65,7 +65,7 @@ const ArtifactsPage = () => {
                     <p className="text-sm text-content/80 line-clamp-3">{artifact.story}</p>
                   </>
                 ) : (
-                  <p className="text-sm text-content/30 italic">Explore ancient settlements on the map to discover this artifact.</p>
+                  <p className="text-sm text-content/50 italic">Explore ancient settlements on the map to discover this artifact.</p>
                 )}
               </div>
             </div>

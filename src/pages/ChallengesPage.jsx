@@ -105,7 +105,7 @@ const ChallengesPage = () => {
           <p className="text-content/70">{subtitleText}</p>
         </div>
         <div className="bg-surface px-4 py-2 rounded-xl border border-gold/30 flex items-center gap-3">
-          <Flame className={`w-5 h-5 ${streak > 0 ? 'text-[#C56A3D] animate-pulse' : 'text-content/30'}`} />
+          <Flame className={`w-5 h-5 ${streak > 0 ? 'text-[#C56A3D] animate-pulse' : 'text-content/50'}`} />
           <span className="font-bold">{streak} Streak</span>
         </div>
       </div>
@@ -152,7 +152,7 @@ const ChallengesPage = () => {
               } else if (idx === selectedAnswer && !isCorrect) {
                 btnClass += "bg-red-900/40 border-red-500 text-red-300"; // Wrong selected
               } else {
-                btnClass += "bg-main/40 border-content/10 text-content/30"; // Others
+                btnClass += "bg-main/40 border-content/10 text-content/50"; // Others
               }
             }
 

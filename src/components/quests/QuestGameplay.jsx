@@ -128,7 +128,7 @@ const QuestGameplay = ({ quest, onComplete, onClose }) => {
         {/* Stars */}
         <div className="flex gap-2">
           {[1, 2, 3].map(s => (
-            <Star key={s} size={32} className={s <= stars ? 'text-gold fill-gold' : 'text-content/20'} />
+            <Star key={s} size={32} className={s <= stars ? 'text-gold fill-gold' : 'text-content/50'} />
           ))}
         </div>
 
