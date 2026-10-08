@@ -665,6 +665,7 @@ const LevelEngine = ({ config }) => {
 
   useEffect(() => {
     startAmbience(config.id);
+    playSound('event');
     return () => stopAmbience();
   }, [config.id, startAmbience, stopAmbience]);
 
@@ -898,6 +899,9 @@ const LevelEngine = ({ config }) => {
   };
 
   const handleChallengeAnswer = (challenge, isCorrect, isBuild, score = 0) => {
+    playSound('ui');
+    if (isCorrect) playSound('quest');
+    if (!isCorrect) playSound('error');
     if (isCorrect) {
       setLevelState(prev => {
         const next = { ...prev, activePopup: null, resources: { ...prev.resources } };

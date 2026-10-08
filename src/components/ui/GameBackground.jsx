@@ -10,18 +10,28 @@ const GameBackground = () => {
   const { theme } = useTheme();
   const isLight = theme === 'light';
 
+  
   const getBackgroundImage = () => {
+    const base = import.meta.env.BASE_URL || '/';
+    const path = (file) => `url('${base}assets/backgrounds/${file}')`;
     switch (bgType) {
-      case 'level1': case 'level2': case 'forest':
-        return "url('/assets/backgrounds/forest.jpg')";
-      case 'level3': case 'level4': case 'level5': case 'level6': case 'city':
-        return "url('/assets/backgrounds/city.jpg')";
-      case 'level7': case 'level8': case 'level9': case 'level10': case 'level11': case 'temple':
-        return "url('/assets/backgrounds/temple.jpg')";
+      case 'level1': case 'forest':
+        return path('forest.jpg');
+      case 'level2':
+        return path('indus.jpg');
+      case 'level3': case 'level4': case 'level5': case 'mauryan':
+        return path('mauryan.jpg');
+      case 'level6': case 'level7': case 'temple':
+        return path('temple.jpg');
+      case 'level8': case 'maritime':
+        return path('maritime.jpg');
+      case 'level9': case 'level10': case 'level11': case 'city':
+        return path('city.jpg');
       case 'dashboard': case 'map': case 'level12': case 'level13': case 'level14': case 'quests': case 'legacy': default:
-        return "url('/assets/backgrounds/dashboard.jpg')";
+        return path('dashboard.jpg');
     }
   };
+
 
   // Mapping contexts to cinematic color palettes
   const getBackgroundStyle = () => {
