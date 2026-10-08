@@ -783,37 +783,93 @@ export const minigamesData = {
       }
     ]
   },
-  "mg-l10-chola": {
-    id: "mg-l10-chola", levelId: 10,
+
+  "mg-l10-maritime": {
+    id: "mg-l10-maritime", levelId: 10,
     variations: [
       {
-        variationId: "v1", type: "tradeRoute", title: "Chola Naval Expedition",
-        rewards: [
-          { type: 'resource', id: 'naval_supplies', amount: 3, label: 'Naval Supplies', destination: 'Inventory', usage: 'Equipping Maritime Expeditions' },
-          { type: 'artifact', id: 'chola_bronze', amount: 1, label: 'Processional Bronze Idol', destination: 'Artifact Collection', usage: 'View in Library' }
-        ],
-        description: "Chart the maritime expansion of the Chola Empire into Southeast Asia.",
-        difficulty: "hard", maxScore: 100,
-        legs: [
-          { start: "Nagapattinam", context: "The Imperial Chola Navy sets sail. Where do they head to secure the Malacca Strait?", options: [{ label: "Srivijaya (Sumatra)", isCorrect: true }, { label: "Madagascar", isCorrect: false }] },
-          { start: "Srivijaya", context: "Having secured the strait, where do the merchant guilds travel next to trade fine textiles?", options: [{ label: "Song Dynasty China", isCorrect: true }, { label: "Rome", isCorrect: false }] }
+        variationId: "v1", type: "tradeRoute", title: "Maritime Expedition",
+        description: "Navigate a Chola naval fleet across the Bay of Bengal to Southeast Asia.",
+        difficulty: "hard", maxScore: 150,
+        route: [
+          {
+            id: 'leg1',
+            prompt: "Departing from Nagapattinam. The monsoon winds are shifting. How do you chart the course to Srivijaya (Indonesia)?",
+            options: [
+              { text: "Use the northeast monsoon winds for a direct crossing", isSafe: true, msg: "The Cholas mastered the monsoon winds, allowing for rapid open-ocean navigation." },
+              { text: "Hug the coastline all the way around", isSafe: false, msg: "It takes too long. Supplies run out and pirates raid the fleet." }
+            ]
+          },
+          {
+            id: 'leg2',
+            prompt: "Arriving at the Strait of Malacca, local pirates demand a tribute to pass.",
+            options: [
+              { text: "Deploy the imperial navy to secure the strait", isSafe: true, msg: "Rajendra Chola I used naval power to secure these vital trade bottlenecks." },
+              { text: "Pay the pirates heavily", isSafe: false, msg: "The pirates keep extorting you. Your expedition goes bankrupt." }
+            ]
+          }
         ]
-      },
+      }
+    ]
+  },
+  "mg-l10-water": {
+    id: "mg-l10-water", levelId: 10,
+    variations: [
       {
-        variationId: "v2", type: "buildFromMemory", title: "Brihadisvara Temple",
-        rewards: [
-          { type: 'resource', id: 'naval_supplies', amount: 3, label: 'Naval Supplies', destination: 'Inventory', usage: 'Equipping Maritime Expeditions' },
-          { type: 'artifact', id: 'chola_bronze', amount: 1, label: 'Processional Bronze Idol', destination: 'Artifact Collection', usage: 'View in Library' }
-        ],
-        description: "Memorize the layout of Rajaraja Chola's great temple at Thanjavur.",
-        difficulty: "hard", maxScore: 100, memorizeTime: 5,
-        components: [
-          { id: 'cb1', label: 'Towering Vimana (66m)', icon: '🏛️', required: true },
-          { id: 'cb2', label: 'Monolithic Nandi (Bull)', icon: '🐂', required: true },
-          { id: 'cb3', label: 'Massive Lingam', icon: '🕉️', required: true },
-          { id: 'cb4', label: 'Frescoed Corridors', icon: '🎨', required: true },
-          { id: 'cb5', label: 'Iron Support Beams', icon: '⛓️', required: false },
-          { id: 'cb6', label: 'Drawbridge', icon: '🌉', required: false }
+        variationId: "v1", type: "historicalDecision", title: "Irrigation Management",
+        description: "Manage the agrarian backbone of the Chola empire.",
+        difficulty: "medium", maxScore: 100,
+        scenarios: [
+          {
+            id: "sc1",
+            prompt: "The Kaveri river floods annually. How do you harness this for agriculture?",
+            options: [
+              { response: "Build massive anicuts (dams) and branching canals", score: 50, explanation: "The Grand Anicut (Kallanai) and Chola canal systems turned the Kaveri delta into a rice bowl." },
+              { response: "Build higher walls around the river", score: -20, explanation: "This wastes the fertile silt and starves the fields of water." },
+              { response: "Let the floods happen naturally", score: 0, explanation: "The floods destroy crops and villages unpredictably." }
+            ]
+          },
+          {
+            id: "sc2",
+            prompt: "A village lake (Eri) is silting up, reducing its water capacity.",
+            options: [
+              { response: "Assign the village assembly (Sabha) to organize desilting", score: 50, explanation: "Local village assemblies in the Chola period had specialized 'Tank Committees' (Eri-variyam) to manage water." },
+              { response: "Wait for the Emperor to fix it", score: -20, explanation: "The central government is too far away. The crops die." },
+              { response: "Abandon the lake", score: 0, explanation: "You lose a massive source of agricultural revenue." }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "mg-l10-bronze": {
+    id: "mg-l10-bronze", levelId: 10,
+    variations: [
+      {
+        variationId: "v1", type: "timeline", title: "Lost-Wax Casting",
+        description: "Sequence the cire-perdue (lost-wax) method used to create famous Chola bronzes like the Nataraja.",
+        difficulty: "hard", maxScore: 100,
+        events: [
+          { id: 't1', label: 'Sculpt the exact figure in beeswax', order: 1 },
+          { id: 't2', label: 'Coat the wax in fine clay and let it dry', order: 2 },
+          { id: 't3', label: 'Heat the mold to melt and drain the wax', order: 3 },
+          { id: 't4', label: 'Pour molten bronze into the hollow clay mold', order: 4 }
+        ]
+      }
+    ]
+  },
+  "mg-l10-governance": {
+    id: "mg-l10-governance", levelId: 10,
+    variations: [
+      {
+        variationId: "v1", type: "artifactMatch", title: "Local Administration",
+        description: "Match the Chola administrative terms to their functions.",
+        difficulty: "medium", maxScore: 100,
+        pairs: [
+          { id: '1', left: 'Ur / Sabha', right: 'Village Assembly', icon: '🏛️' },
+          { id: '2', left: 'Nadu', right: 'District or Province', icon: '🗺️' },
+          { id: '3', left: 'Nagaram', right: 'Merchant Town', icon: '⚖️' },
+          { id: '4', left: 'Brahmadeya', right: 'Land granted to scholars', icon: '📜' }
         ]
       }
     ]
