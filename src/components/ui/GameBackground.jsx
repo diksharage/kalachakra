@@ -122,7 +122,7 @@ const GameBackground = () => {
   };
 
   return (
-    <div className={`fixed inset-0 z-[-1] overflow-hidden pointer-events-none transition-colors duration-1000 ${isLight ? 'bg-[#E8D9B8]' : 'bg-[#080808]'}`}>
+    <div className={`fixed inset-0 z-[-1] overflow-hidden pointer-events-none transition-colors duration-1000 ${'bg-[#070A0C]'}`}>
       
       {/* 0. Cinematic AI Image Base */}
       <div 
@@ -131,7 +131,7 @@ const GameBackground = () => {
       />
 
       {/* 1. Base Readability Overlay & Civilization Colors */}
-      <div className={`absolute inset-0 transition-colors duration-1000 ${isLight ? 'bg-[#E8D9B8]/75' : 'bg-[#0a0a0c]/85'}`} />
+      <div className={`absolute inset-0 transition-colors duration-1000 ${'bg-[#0a0a0c]/50'}`} />
       <div 
         className={`absolute inset-0 transition-all duration-1000 ease-in-out ${getOpacity()} mix-blend-color pointer-events-none`}
         style={{ background: getBackgroundStyle() }}
@@ -139,12 +139,12 @@ const GameBackground = () => {
       
       {/* 2. Dust/Texture Overlay (Cinematic Grain) */}
       <div 
-        className={`absolute inset-0 pointer-events-none ${isLight ? 'mix-blend-multiply opacity-20' : 'mix-blend-overlay opacity-30'}`}
+        className={`absolute inset-0 pointer-events-none ${'mix-blend-overlay opacity-30'}`}
         style={{ backgroundImage: textureOverlay }}
       />
       
       {/* 3. Sunlight/Atmosphere (Soft Glow from Top) */}
-      <div className={`absolute top-0 left-0 right-0 h-[70vh] bg-gradient-to-b from-amber-500/15 to-transparent pointer-events-none transition-opacity duration-1000 ${isLight ? 'mix-blend-overlay opacity-80' : 'mix-blend-screen opacity-50'}`} />
+      <div className={`absolute top-0 left-0 right-0 h-[70vh] bg-gradient-to-b from-amber-500/15 to-transparent pointer-events-none transition-opacity duration-1000 ${'mix-blend-screen opacity-40'}`} />
 
       {/* 4. Cinematic Vignette (Dark Edges for depth) */}
       <div className={`absolute inset-0 pointer-events-none transition-all duration-1000 ${isLight ? 'opacity-60' : 'opacity-100'}`} style={{
