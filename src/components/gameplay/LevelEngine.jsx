@@ -19,6 +19,7 @@ import { getBuilderDataForLevel } from '../../data/civilizationBuilder';
 import { artifactInvestigations } from '../../data/artifactInvestigations';
 import BackButton from '../common/BackButton';
 import KalaCompanion from './KalaCompanion';
+import VisualStoryLearnNode from './VisualStoryLearnNode';
 import { adaptTextForAge, adaptQuestionForAge } from '../../utils/ageAdapter';
 
 
@@ -1769,3 +1770,4 @@ const LevelEngine = ({ config }) => {
 };
 
 export default LevelEngine;
+

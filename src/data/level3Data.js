@@ -30,6 +30,24 @@ export const level3CityLocations = [
     icon: '🏠',
     description: 'A structure built with baked bricks.',
     discoverMessage: 'Many houses were built with standardized baked bricks, often centered around an open courtyard for light and air.',
+    visualStory: [
+      {
+        icon: '??',
+        title: 'Courtyard Architecture',
+        text: 'Indus houses were designed for privacy and cooling. They often featured thick walls made of standardized baked bricks (1:2:4 ratio) and were centered around an open courtyard.',
+        focusPoint: 'Notice the lack of windows on the ground floor facing the street.',
+        type: 'Reconstruction',
+        evidence: 'Foundations of multi-story houses found at Mohenjo-Daro.'
+      },
+      {
+        icon: '??',
+        title: 'Standardized Bricks',
+        text: 'The bricks used in construction were incredibly uniform. This level of standardization across hundreds of miles suggests a highly organized society with shared measurements.',
+        focusPoint: 'The 1:2:4 ratio is perfect for interlocking brickwork.',
+        type: 'Artifact Detail',
+        uncertainty: "We don't know if this standardization was enforced by a central king or agreed upon by merchant guilds."
+      }
+    ],
     yields: { materials: 1 }
   },
   {
@@ -38,6 +56,23 @@ export const level3CityLocations = [
     icon: '🛣️',
     description: 'A wide, straight road.',
     discoverMessage: 'Several major settlements show evidence of organized streets that were oriented along cardinal directions, though layouts varied between sites.',
+    visualStory: [
+      {
+        icon: '🗺️',
+        title: 'Grid-Like Planning',
+        text: 'Unlike many ancient cities that grew organically, Indus cities like Mohenjo-Daro were carefully planned. The main streets ran strictly north-south and east-west, intersecting at right angles.',
+        focusPoint: 'This layout allowed winds to naturally sweep down the avenues.',
+        type: 'Map / Layout',
+        evidence: 'Excavations reveal main streets up to 10 meters wide.'
+      },
+      {
+        icon: '🚶',
+        title: 'Neighborhoods and Life',
+        text: 'The city was divided into distinct blocks. People lived, worked, and traded in these structured neighborhoods. The planning suggests a deep understanding of urban management.',
+        type: 'Social Context',
+        uncertainty: 'Was there a central planning committee, or was this a widely accepted cultural norm?'
+      }
+    ],
     yields: {}
   },
   {
@@ -46,6 +81,23 @@ export const level3CityLocations = [
     icon: '🚿',
     description: 'A channel lined with bricks.',
     discoverMessage: 'Some Indus settlements feature sophisticated water-management and drainage networks, carrying wastewater away from houses.',
+    visualStory: [
+      {
+        icon: '🚿',
+        title: 'Advanced Drainage',
+        text: 'The Indus civilization had some of the most advanced sanitation in the ancient world. Almost every house had a bathing area and a drainage system that connected to street drains.',
+        focusPoint: 'Drains were covered with loose bricks so they could be opened for cleaning.',
+        type: 'Engineering',
+        evidence: 'Extensive brick-lined drains found running beneath the streets of Mohenjo-Daro and Harappa.'
+      },
+      {
+        icon: '🧹',
+        title: 'Public Health',
+        text: 'This system shows a remarkable emphasis on cleanliness and public health. Wastewater was directed out of the residential areas to soak pits or the river.',
+        type: 'Social Context',
+        evidence: 'Terracotta pipes and soak jars found in excavations.'
+      }
+    ],
     yields: {}
   },
   {
@@ -54,6 +106,16 @@ export const level3CityLocations = [
     icon: '💧',
     description: 'A deep circular structure for water.',
     discoverMessage: 'Access to clean water was vital. Mohenjo-daro alone is estimated to have had hundreds of wells.',
+    visualStory: [
+      {
+        icon: '💧',
+        title: 'The Great Wells',
+        text: 'Water was life. Mohenjo-Daro alone had over 700 public and private wells. These cylindrical structures were built with wedge-shaped bricks to prevent inward collapse.',
+        focusPoint: 'Wedge-shaped bricks are a brilliant engineering solution for circular structures.',
+        type: 'Architecture',
+        evidence: 'Well structures still standing today, rising like chimneys as surrounding earth was excavated.'
+      }
+    ],
     yields: { water: 2 }
   },
   {
@@ -62,6 +124,16 @@ export const level3CityLocations = [
     icon: '🛠️',
     description: 'An area filled with debris and tools.',
     discoverMessage: 'Artisans created standardized and highly crafted items here, working with stone, clay, shell, and metal.',
+    visualStory: [
+      {
+        icon: '🛠️',
+        title: 'Master Crafters',
+        text: 'Indus artisans were highly skilled. They worked with local materials like clay and shell, and imported materials like copper, tin, and lapis lazuli.',
+        focusPoint: 'Evidence of kilns and craft debris helps identify these areas.',
+        type: 'Economy & Trade',
+        evidence: 'Slag, unfinished beads, and broken tools found clustered in specific city zones.'
+      }
+    ],
     yields: { craftMaterials: 2 }
   },
   {
@@ -70,6 +142,15 @@ export const level3CityLocations = [
     icon: '📦',
     description: 'A massive brick foundation.',
     discoverMessage: 'Large non-residential structures are often interpreted as storage facilities or public buildings, though their exact functions remain debated.',
+    visualStory: [
+      {
+        icon: '📦',
+        title: 'The Great Granary?',
+        text: 'Massive brick foundations have been found. For a long time, historians called them "granaries", assuming they stored grain collected as taxes.',
+        type: 'Architecture',
+        uncertainty: 'Recent archaeology questions this. No grain has actually been found in these specific structures. They might have been great public halls or palaces instead.'
+      }
+    ],
     yields: { storage: 1 }
   }
 ];
@@ -81,6 +162,15 @@ export const level3SiteLocations = [
     icon: '🏺',
     description: 'Major urban site.',
     discoverMessage: 'Harappa is the site that gives the civilization its name. It shows extensive craft production, settlement planning, and trade networks.',
+    visualStory: [
+      {
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Harappa_3.jpg/800px-Harappa_3.jpg',
+        title: 'The City of Harappa',
+        text: 'Discovered in the 1920s, Harappa was the first Indus city excavated. It gave its name to the entire civilization (The Harappan Civilization).',
+        type: 'Site Profile',
+        evidence: 'Harappa had massive defensive walls, large gateways, and distinct neighborhoods.'
+      }
+    ],
     yields: {}
   },
   {
@@ -89,6 +179,23 @@ export const level3SiteLocations = [
     icon: '🧱',
     description: 'Famous planned settlement.',
     discoverMessage: 'Known for its highly planned streets and the "Great Bath", often interpreted as a large public or ritual water structure.',
+    visualStory: [
+      {
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Mohenjo-daro_Bath.jpg/800px-Mohenjo-daro_Bath.jpg',
+        title: 'The Great Bath',
+        text: 'One of the most famous structures of the ancient world. It was made watertight using carefully fitted bricks and a layer of natural tar (bitumen).',
+        focusPoint: 'Notice the two wide staircases leading down into the basin.',
+        type: 'Site Profile',
+        uncertainty: 'Was it for public hygiene, or a ritual purification center like later temple tanks in India?'
+      },
+      {
+        icon: '🏛️',
+        title: 'The Citadel',
+        text: 'Mohenjo-Daro, like many Indus cities, was divided into a higher "Citadel" (where the Great Bath is) and a "Lower Town" where most people lived.',
+        type: 'Site Layout',
+        evidence: 'The Citadel was built on a massive artificial mud-brick platform to protect it from floods.'
+      }
+    ],
     yields: {}
   },
   {
@@ -97,6 +204,22 @@ export const level3SiteLocations = [
     icon: '💧',
     description: 'Stone architecture and water management.',
     discoverMessage: 'A remarkable site with sophisticated reservoirs and water storage structures adapted to its arid environment.',
+    visualStory: [
+      {
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Dholavira_water_reservoir.JPG/800px-Dholavira_water_reservoir.JPG',
+        title: 'Desert Engineering at Dholavira',
+        text: 'Located in the arid Rann of Kutch, Dholavira survived by mastering water conservation. They built massive rock-cut reservoirs to capture monsoon rain.',
+        type: 'Site Profile',
+        evidence: 'Large stepped reservoirs and dams built across nearby seasonal streams.'
+      },
+      {
+        icon: '🪨',
+        title: 'The Signboard',
+        text: 'Archaeologists found 10 large Indus signs made of white gypsum laid on the floor here. It is thought to be the oldest known "signboard" in the world, once mounted over a gateway.',
+        type: 'Artifact Detail',
+        uncertainty: 'Since the script is undeciphered, we have no idea what the signboard says. Perhaps the name of the city or its ruler?'
+      }
+    ],
     yields: {}
   },
   {
@@ -105,6 +228,15 @@ export const level3SiteLocations = [
     icon: '🚚',
     description: 'Crafts and exchange.',
     discoverMessage: 'A settlement heavily associated with craft production and trade, featuring a large basin often interpreted as a dockyard.',
+    visualStory: [
+      {
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Lothal_Dockyard.jpg/800px-Lothal_Dockyard.jpg',
+        title: 'The Port of Lothal',
+        text: 'Lothal was a major manufacturing center for beads and metal. But its most debated feature is a massive brick basin with a channel connecting it to an ancient river.',
+        type: 'Site Profile',
+        uncertainty: "Was this the world's earliest known tidal dockyard for ships, or simply a massive irrigation tank?"
+      }
+    ],
     yields: {}
   }
 ];
@@ -183,3 +315,4 @@ export const level3ArtifactLocations = [
     }
   }
 ];
+
