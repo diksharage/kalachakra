@@ -4,7 +4,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   User, Edit2, Star, Trophy, Hexagon, Clock, 
-  ChevronRight, Lock, Map as MapIcon, ArrowRight, Settings, Box 
+  ChevronRight, Lock, Map as MapIcon, ArrowRight, Settings, Box, Activity
 } from 'lucide-react';
 
 const ProfilePage = () => {
@@ -14,12 +14,39 @@ const ProfilePage = () => {
   
   const currentLevel = Math.min(gameState.currentLevel || 1, 14);
   const xp = gameState.legacy || 0;
-  const nextLevelXp = currentLevel * 500; // Fake scaling for UI
+  
+  // Calculate XP threshold dynamically
+  const nextLevelXp = Math.max(currentLevel * 500, xp + 100); 
   const xpPercent = Math.min((xp / nextLevelXp) * 100, 100);
   
-  const masteryPercent = 12; // Example static value or calc from gameState
+  const masteryPercent = Math.round(((gameState.completedLevels?.length || 0) / 14) * 100) || 0;
   const achievementsCount = gameState.achievements?.length || 0;
   const artifactsCount = gameState.unlockedArtifacts?.length || 0;
+
+  const handleLevelClick = (level) => {
+    if (gameState.unlockedLevels?.includes(level)) {
+      navigate(`/journey/level/${level}`);
+    } else {
+      navigate('/journey');
+    }
+  };
+
+  const formatTimeAgo = (timestamp) => {
+    if (!timestamp) return 'Just now';
+    const date = new Date(timestamp);
+    const seconds = Math.floor((new Date() - date) / 1000);
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + " years ago";
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + " months ago";
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + " days ago";
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + " hours ago";
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + " mins ago";
+    return "Just now";
+  };
 
   return (
     <div className="w-full max-w-[1600px] mx-auto p-4 md:p-6 lg:p-8 space-y-6 min-h-screen text-content animate-fade-in">
@@ -128,8 +155,9 @@ const ProfilePage = () => {
               <div className="absolute top-6 left-8 right-8 h-0.5 bg-content/10 -z-10" />
               
               {[1, 2, 3, 4, 5, 14].map((level, index) => {
-                const isUnlocked = currentLevel >= level;
-                const isCurrent = currentLevel === level;
+                const isUnlocked = gameState.unlockedLevels?.includes(level) || currentLevel >= level;
+                const isCompleted = gameState.completedLevels?.includes(level);
+                const isCurrent = currentLevel === level && !isCompleted;
                 
                 let title = "";
                 if(level===1) title = "Early Human Communities";
@@ -140,18 +168,23 @@ const ProfilePage = () => {
                 else if(level===14) title = "Preserve the Legacy";
                 
                 return (
-                  <div key={level} className="flex flex-col items-center min-w-[100px] shrink-0 relative z-10 group">
+                  <div 
+                    key={level} 
+                    onClick={() => handleLevelClick(level)}
+                    className={`flex flex-col items-center min-w-[100px] shrink-0 relative z-10 group ${isUnlocked ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                  >
                     {/* The line fill if completed */}
                     {index > 0 && isUnlocked && (
                        <div className="absolute top-6 -left-[50%] w-full h-0.5 bg-gold/50 -z-10" />
                     )}
                     
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 shadow-xl \${
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 shadow-xl ${
                       isCurrent ? 'bg-main border-gold shadow-[0_0_15px_rgba(212,166,74,0.4)] scale-110' : 
+                      isCompleted ? 'bg-surface border-gold' :
                       isUnlocked ? 'bg-surface border-gold/50' : 
                       'bg-surface/50 border-content/10'
                     }`}>
-                      {isCurrent || isUnlocked ? (
+                      {isCurrent || isCompleted || isUnlocked ? (
                         <User size={20} className={isCurrent ? 'text-gold' : 'text-gold/70'} />
                       ) : (
                         <Lock size={16} className="text-content/30" />
@@ -236,15 +269,29 @@ const ProfilePage = () => {
             </div>
             
             <div className="space-y-4">
-              <div className="flex gap-4 p-4 rounded-xl hover:bg-surface/50 transition-colors border border-transparent hover:border-content/5">
-                <div className="w-10 h-10 rounded-full bg-surface border border-gold/30 flex items-center justify-center shrink-0 text-gold shadow-sm">
-                  <User size={18} />
+              {gameState.activityLog && gameState.activityLog.length > 0 ? (
+                gameState.activityLog.slice(0, 3).map((act, idx) => (
+                  <div key={idx} className="flex gap-4 p-4 rounded-xl hover:bg-surface/50 transition-colors border border-transparent hover:border-content/5">
+                    <div className="w-10 h-10 rounded-full bg-surface border border-gold/30 flex items-center justify-center shrink-0 text-gold shadow-sm">
+                      <Activity size={18} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-content/90 mb-1">{act.titleKey || act.type}</h3>
+                      <p className="text-xs text-content/50">{formatTimeAgo(act.timestamp)}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="flex gap-4 p-4 rounded-xl hover:bg-surface/50 transition-colors border border-transparent hover:border-content/5">
+                  <div className="w-10 h-10 rounded-full bg-surface border border-gold/30 flex items-center justify-center shrink-0 text-gold shadow-sm">
+                    <User size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-content/90 mb-1">Started Level {currentLevel}</h3>
+                    <p className="text-xs text-content/50">Just now</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-sm font-bold text-content/90 mb-1">Started Level {currentLevel}</h3>
-                  <p className="text-xs text-content/50">2 hours ago</p>
-                </div>
-              </div>
+              )}
             </div>
           </div>
           
@@ -265,22 +312,38 @@ const ProfilePage = () => {
               </Link>
             </div>
             
-            <div className="flex-1 flex flex-col items-center justify-center text-center p-4">
-              <div className="w-16 h-16 rounded-full bg-surface border border-content/10 flex items-center justify-center mb-4 relative">
-                <Trophy size={28} className="text-content/20" />
-                <div className="absolute -bottom-1 -right-1 bg-main rounded-full p-1 border border-content/10">
-                   <CheckCircle className="w-3 h-3 text-content/30" />
+            {achievementsCount > 0 ? (
+              <div className="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+                {gameState.achievements.slice(0, 4).map((ach, idx) => (
+                  <div key={idx} className="flex items-center gap-3 p-3 rounded-lg bg-surface/50 border border-content/5">
+                    <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center shrink-0 border border-gold/20">
+                      <CheckCircle className="w-5 h-5 text-gold" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-sm font-bold capitalize text-content/90">{ach.replace(/_/g, ' ')}</h4>
+                      <p className="text-xs text-content/50">Unlocked Badge</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center text-center p-4">
+                <div className="w-16 h-16 rounded-full bg-surface border border-content/10 flex items-center justify-center mb-4 relative">
+                  <Trophy size={28} className="text-content/20" />
+                  <div className="absolute -bottom-1 -right-1 bg-main rounded-full p-1 border border-content/10">
+                     <CheckCircle className="w-3 h-3 text-content/30" />
+                  </div>
+                </div>
+                <h3 className="text-sm font-bold text-content/80 mb-2">No achievements yet</h3>
+                <p className="text-xs text-content/40 leading-relaxed max-w-[200px]">Complete levels, explore and earn badges to unlock achievements!</p>
+                
+                <div className="flex items-center gap-1 mt-6">
+                  <div className="w-1.5 h-1.5 rotate-45 bg-gold" />
+                  <div className="w-16 h-px bg-gold/30" />
+                  <div className="w-1.5 h-1.5 rotate-45 bg-gold" />
                 </div>
               </div>
-              <h3 className="text-sm font-bold text-content/80 mb-2">No achievements yet</h3>
-              <p className="text-xs text-content/40 leading-relaxed max-w-[200px]">Complete levels, explore and earn badges to unlock achievements!</p>
-              
-              <div className="flex items-center gap-1 mt-6">
-                <div className="w-1.5 h-1.5 rotate-45 bg-gold" />
-                <div className="w-16 h-px bg-gold/30" />
-                <div className="w-1.5 h-1.5 rotate-45 bg-gold" />
-              </div>
-            </div>
+            )}
           </div>
 
           {/* COLLECTION CARD */}
@@ -296,11 +359,14 @@ const ProfilePage = () => {
             </div>
             
             <div className="flex justify-between gap-2 mb-6">
-               {[1,2,3,4,5].map(i => (
-                 <div key={i} className="flex-1 aspect-square rounded-lg bg-surface/50 border border-content/5 flex items-center justify-center shadow-inner relative overflow-hidden group hover:border-gold/30 transition-colors">
-                    <Box size={24} className="text-content/10 group-hover:text-gold/40 transition-colors" />
-                 </div>
-               ))}
+               {[0,1,2,3,4].map(idx => {
+                 const hasArtifact = idx < artifactsCount;
+                 return (
+                   <div key={idx} className={`flex-1 aspect-square rounded-lg flex items-center justify-center shadow-inner relative overflow-hidden group transition-colors ${hasArtifact ? 'bg-gold/10 border border-gold/30' : 'bg-surface/50 border border-content/5 hover:border-gold/30'}`}>
+                      <Box size={24} className={`${hasArtifact ? 'text-gold' : 'text-content/10 group-hover:text-gold/40'} transition-colors`} />
+                   </div>
+                 );
+               })}
             </div>
             
             <div className="mt-auto">
@@ -338,7 +404,6 @@ const ProfilePage = () => {
   );
 };
 
-// CheckCircle stub since it wasn't imported initially in my list
 const CheckCircle = ({ className, ...props }) => (
   <svg className={className} {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
 );
