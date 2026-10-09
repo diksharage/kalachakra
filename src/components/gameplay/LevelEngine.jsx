@@ -11,7 +11,7 @@ import ArtifactInvestigation from './ArtifactInvestigation';
 import WorldEvent from './WorldEvent';
 import NPCInteraction from './NPCInteraction';
 import { useAchievements } from '../../context/AchievementContext';
-import { Star, CheckCircle, ArrowRight, Bot, Target, Lock, Play, Hammer, Trophy, Search } from 'lucide-react';
+import { Star, CheckCircle, AlertTriangle, BookOpen, ImageIcon, ArrowRight, Bot, Target, Lock, Play, Hammer, Trophy, Search } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { levelThemes } from '../../data/levelThemes';
 import ResourceCard from './ResourceCard';
@@ -19,7 +19,6 @@ import { getBuilderDataForLevel } from '../../data/civilizationBuilder';
 import { artifactInvestigations } from '../../data/artifactInvestigations';
 import BackButton from '../common/BackButton';
 import KalaCompanion from './KalaCompanion';
-import VisualStoryLearnNode from './VisualStoryLearnNode';
 import { adaptTextForAge, adaptQuestionForAge } from '../../utils/ageAdapter';
 
 
@@ -87,7 +86,125 @@ const SurvivalInteractive = ({ data, theme, resources, onComplete }) => {
   );
 };
 
+
+const VisualStoryViewer = ({ story, theme, onComplete, playSound }) => {
+  const [currentIndex, React_useState] = useState(0);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  useEffect(() => {
+    setImageLoaded(false);
+  }, [currentIndex]);
+
+  const slide = story[currentIndex];
+  const isLast = currentIndex === story.length - 1;
+
+  const handleNext = () => {
+    if (playSound) playSound('ui');
+    if (isLast) {
+      onComplete();
+    } else {
+      React_useState(i => i + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (playSound) playSound('ui');
+    if (currentIndex > 0) React_useState(i => i - 1);
+  };
+
+  return (
+    <div className="w-full flex flex-col items-center justify-start h-full max-w-5xl mx-auto overflow-y-auto hide-scrollbar p-2">
+      <div className="w-full flex justify-between items-center mb-6">
+        <h4 className="text-sm font-bold uppercase tracking-widest text-gold">Visual Learning</h4>
+        <div className="flex gap-2">
+          {story.map((_, idx) => (
+            <div key={idx} className={"w-3 h-3 rounded-full transition-colors " + (idx === currentIndex ? 'bg-gold' : idx < currentIndex ? 'bg-gold/50' : 'bg-surface border border-content/20')} />
+          ))}
+        </div>
+      </div>
+
+      <div className={"w-full bg-surface border rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row transition-all duration-500 " + (theme?.border || 'border-content/10')}>
+        <div className="w-full md:w-1/2 relative bg-black/40 min-h-[300px] flex items-center justify-center p-4 border-b md:border-b-0 md:border-r border-content/10">
+          {slide.image ? (
+            <>
+              {!imageLoaded && <div className="absolute inset-0 flex items-center justify-center animate-pulse"><div className="w-12 h-12 border-4 border-gold border-t-transparent rounded-full animate-spin" /></div>}
+              <img 
+                src={slide.image} 
+                alt={slide.title}
+                onLoad={() => setImageLoaded(true)}
+                className={"w-full h-full object-contain max-h-[400px] transition-opacity duration-500 " + (imageLoaded ? 'opacity-100' : 'opacity-0')}
+              />
+              {slide.focusPoint && (
+                <div className="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md p-3 rounded-xl border border-gold/30 text-xs text-content/90 flex gap-2 items-start shadow-xl animate-fade-in delay-500">
+                  <div className="w-4 h-4 text-gold shrink-0 mt-0.5">🔍</div>
+                  <p>{slide.focusPoint}</p>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-8xl md:text-9xl animate-float opacity-80 filter drop-shadow-2xl">
+              {slide.icon || '🏛️'}
+            </div>
+          )}
+        </div>
+
+        <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-surface-light rounded-full text-xs font-bold uppercase tracking-wider text-content/70 mb-4 self-start">
+            <span className="w-3 h-3">📖</span> {slide.type || 'History'}
+          </div>
+          
+          <h3 className="text-2xl md:text-3xl font-serif font-bold mb-4 leading-tight text-content">{slide.title}</h3>
+          <p className="text-base md:text-lg text-content/90 leading-relaxed mb-6 flex-1">{slide.text}</p>
+          
+          <div className="space-y-3 mb-8">
+            {slide.evidence && (
+              <div className="flex gap-3 items-start bg-green-900/20 border border-green-500/30 p-3 rounded-xl text-sm">
+                <CheckCircle className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-bold text-green-300 block mb-0.5">Evidence:</span>
+                  <span className="text-green-100/80">{slide.evidence}</span>
+                </div>
+              </div>
+            )}
+            
+            {slide.uncertainty && (
+              <div className="flex gap-3 items-start bg-amber-900/20 border border-amber-500/30 p-3 rounded-xl text-sm">
+                <span className="w-5 h-5 text-amber-400 shrink-0 mt-0.5 font-bold text-lg leading-none">⚠</span>
+                <div>
+                  <span className="font-bold text-amber-300 block mb-0.5">Uncertainty:</span>
+                  <span className="text-amber-100/80">{slide.uncertainty}</span>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <div className="flex gap-3 mt-auto">
+            <button 
+              onClick={handlePrev}
+              disabled={currentIndex === 0}
+              className="p-4 rounded-xl border border-content/10 hover:bg-surface/50 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+            >
+              {'<'}
+            </button>
+            <button 
+              onClick={handleNext}
+              className={"flex-1 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all " + (isLast ? 'bg-green-600 text-white hover:bg-green-500' : 'bg-gold text-black hover:bg-gold-light')}
+            >
+              {isLast ? 'Complete Learning' : 'Next Insight'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
 const InteractiveLearnNode = ({ data, onComplete, theme, isYoung, playSound, ageGroup }) => {
+  if (data.visualStory && data.visualStory.length > 0) {
+    return <VisualStoryViewer story={data.visualStory} theme={theme} onComplete={onComplete} playSound={playSound} />;
+  }
+
   const timers = useRef([]);
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
   const safeSetTimeout = (cb, ms) => { const id = setTimeout(cb, ms); timers.current.push(id); return id; };
@@ -1770,4 +1887,3 @@ const LevelEngine = ({ config }) => {
 };
 
 export default LevelEngine;
-

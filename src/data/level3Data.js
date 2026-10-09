@@ -2,7 +2,7 @@ export const level3CityLocations = [
   {
     id: 'l3_event_merchant',
     label: 'Mesopotamian Merchant',
-    icon: 'dYO.',
+    icon: '🚢',
     description: 'A trader from distant lands has arrived.',
     isEvent: true,
     discoverMessage: 'The Indus Valley traded extensively with Mesopotamia, exchanging raw materials for finished goods.',
@@ -32,7 +32,7 @@ export const level3CityLocations = [
     discoverMessage: 'Many houses were built with standardized baked bricks, often centered around an open courtyard for light and air.',
     visualStory: [
       {
-        icon: '??',
+        icon: '📐',
         title: 'Courtyard Architecture',
         text: 'Indus houses were designed for privacy and cooling. They often featured thick walls made of standardized baked bricks (1:2:4 ratio) and were centered around an open courtyard.',
         focusPoint: 'Notice the lack of windows on the ground floor facing the street.',
@@ -247,22 +247,22 @@ export const level3ArtifactLocations = [
     label: 'Steatite Seal',
     icon: '🪨',
     description: 'A small, finely carved square stone.',
-    discoverMessage: 'What we know: Seals were used for trade and administration. What remains uncertain: The Indus script has not been conclusively deciphered.',
+    discoverMessage: 'Seals were used for trade and administration. The script on them remains one of history\'s greatest unsolved mysteries.',
     yields: {},
     isArtifact: true,
     investigation: {
       clues: [
-        { text: "Intricate Script", observation: "There are symbols at the top that look like writing, but they are unreadable." },
-        { text: "Unicorn Motif", observation: "A one-horned animal is carved with great precision." },
-        { text: "Boss on Back", observation: "The back has a pierced boss, meaning a string was passed through it." }
+        { text: "Intricate Script", observation: "There are 5-6 symbols at the top that look like writing, but they are completely unreadable to us today." },
+        { text: "Unicorn Motif", observation: "A one-horned animal (often called the Indus Unicorn) is carved with great precision." },
+        { text: "Boss on Back", observation: "The back has a protruding pierced 'boss', meaning a string or cord was passed through it to be worn or tied." }
       ],
-      question: "Based on the boss for a string and the deeply carved symbols, how was this primarily used?",
+      question: "Based on the string-hole and the deeply carved symbols, how was this primarily used in an ancient economy?",
       options: [
-        { label: "As currency to buy goods.", isCorrect: false },
-        { label: "Pressed into wet clay to mark ownership or seal trade goods.", isCorrect: true, explanation: "Seals were stamped onto clay tags attached to trade bundles, identifying the sender." },
+        { label: "As currency to buy everyday goods in the market.", isCorrect: false },
+        { label: "Pressed into wet clay to mark ownership or seal trade goods securely.", isCorrect: true, explanation: "Merchants stamped these seals onto wet clay tags attached to trade bundles. If the clay seal arrived unbroken, the buyer knew the goods hadn't been tampered with." },
         { label: "As a decorative pendant with no practical purpose.", isCorrect: false }
       ],
-      hint: "Think about why someone would need a carved 'stamp' when trading goods across long distances.",
+      hint: "Think about why a merchant would need a carved 'stamp' when sending goods hundreds of miles away.",
       reward: { xp: 50, knowledge: 2, legacy: 10 }
     }
   },
@@ -276,15 +276,15 @@ export const level3ArtifactLocations = [
     isArtifact: true,
     investigation: {
       clues: [
-        { text: "Perfect Cubes", observation: "They are shaped exactly the same, in multiple identical sizes." },
-        { text: "Binary Ratios", observation: "They follow a strict mathematical progression (1, 2, 4, 8, 16...)." },
-        { text: "Wide Distribution", observation: "The exact same weight system is found in cities hundreds of miles apart." }
+        { text: "Perfect Cubes", observation: "They are shaped exactly the same, carved from chert stone, in multiple identical sizes." },
+        { text: "Binary Ratios", observation: "They follow a strict mathematical progression (1, 2, 4, 8, 16, 32...). The precision is staggering." },
+        { text: "Wide Distribution", observation: "The exact same weight system is found in cities hundreds of miles apart, from the coast to the mountains." }
       ],
       question: "What does the extreme standardization of these weights across the entire civilization suggest?",
       options: [
-        { label: "They were toys for children.", isCorrect: false },
-        { label: "Each city had a different measuring system.", isCorrect: false },
-        { label: "A highly organized trade network and central authority enforcing standards.", isCorrect: true, explanation: "Standardized weights were crucial for fair trade, taxation, and administration across the vast Indus territory." }
+        { label: "They were standardized dice used for gambling in casinos.", isCorrect: false },
+        { label: "Each city randomly invented the exact same mathematical system independently.", isCorrect: false },
+        { label: "A highly organized trade network and central authority enforcing strict commercial standards.", isCorrect: true, explanation: "Standardized weights were crucial for fair trade, taxation, and administration. The fact that a merchant in Lothal used the exact same weights as one in Harappa shows incredible civic organization." }
       ],
       hint: "If a merchant travels 500 miles to another city, why is it important that a 'pound' weighs exactly the same there?",
       reward: { xp: 50, mastery: 1, legacy: 10 }
@@ -300,17 +300,17 @@ export const level3ArtifactLocations = [
     isArtifact: true,
     investigation: {
       clues: [
-        { text: "Micro-Drilling", observation: "The holes are incredibly thin and straight, requiring specialized bronze drills." },
-        { text: "Heat Treatment", observation: "The red color was achieved by carefully baking the stone in kilns." },
-        { text: "Found Abroad", observation: "Identical beads have been found in royal tombs in Mesopotamia." }
+        { text: "Micro-Drilling", observation: "The holes running through the center are incredibly thin and straight, requiring specialized bronze or stone drills and weeks of labor." },
+        { text: "Heat Treatment", observation: "The vibrant red color isn't natural; it was achieved by carefully baking the stone in kilns at precise temperatures." },
+        { text: "Found Abroad", observation: "Identical beads have been found buried with royalty in distant Mesopotamian tombs (modern-day Iraq)." }
       ],
-      question: "What does the presence of these beads in distant Mesopotamian tombs tell us?",
+      question: "What does the presence of these painstakingly crafted beads in distant Mesopotamian tombs tell us?",
       options: [
-        { label: "The Indus people conquered Mesopotamia.", isCorrect: false },
-        { label: "There was active, long-distance luxury trade between the Indus Valley and Mesopotamia.", isCorrect: true, explanation: "Mesopotamian records even mention importing goods from 'Meluhha', widely believed to be the Indus Valley." },
-        { label: "Carnelian beads naturally formed in both places.", isCorrect: false }
+        { label: "The Indus people conquered Mesopotamia and forced them to wear beads.", isCorrect: false },
+        { label: "There was active, long-distance luxury trade between the Indus Valley and Mesopotamia.", isCorrect: true, explanation: "The Indus Valley was a massive exporter of luxury goods. Mesopotamian clay tablets even mention importing goods from a land they called 'Meluhha', which scholars widely agree was the Indus Valley." },
+        { label: "Carnelian beads naturally formed in both places by coincidence.", isCorrect: false }
       ],
-      hint: "Consider how luxury goods move between completely different ancient civilizations.",
+      hint: "Consider how high-value luxury goods move between completely different ancient civilizations.",
       reward: { xp: 50, culture: 1, legacy: 10 }
     }
   }
