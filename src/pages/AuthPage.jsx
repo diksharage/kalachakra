@@ -75,7 +75,7 @@ const AuthPage = () => {
   return (
     <div 
       className="min-h-screen w-full flex items-center justify-center px-4 md:px-12 bg-cover bg-center bg-no-repeat relative overflow-hidden" 
-      style={{ backgroundImage: `url('${import.meta.env.BASE_URL}assets/backgrounds/temple.jpg')` }}
+      style={{ backgroundImage: `url('${import.meta.env.BASE_URL}assets/backgrounds/login_bg.jpg')` }}
     >
       {/* Subtle Overlay for text readability */}
       <div className="absolute inset-0 bg-black/50 pointer-events-none" />
