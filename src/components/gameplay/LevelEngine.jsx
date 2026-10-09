@@ -234,7 +234,7 @@ const ObjectiveTracker = ({ stage, levelState, locations, targetExplore, targetD
   let items = [];
   
   if (stage === 1) {
-    items = processedLocations.filter(l => !l.isLockedNode).map(loc => ({
+    items = locations.filter(l => !l.isLockedNode).map(loc => ({
        id: loc.id,
        label: `Explore ${loc.label}`,
        isDone: levelState.exploration.includes(loc.id),
@@ -242,7 +242,7 @@ const ObjectiveTracker = ({ stage, levelState, locations, targetExplore, targetD
        isLocked: false
     })).slice(0, targetExplore);
   } else if (stage === 2) {
-    items = processedLocations.filter(l => !l.isLockedNode).map(loc => {
+    items = locations.filter(l => !l.isLockedNode).map(loc => {
        const isExplored = levelState.exploration.includes(loc.id);
        return {
          id: loc.id,
@@ -255,7 +255,7 @@ const ObjectiveTracker = ({ stage, levelState, locations, targetExplore, targetD
        };
     }).filter(i => i.isDone || !i.isLocked).slice(0, targetDiscover);
   } else if (stage === 3) {
-    items = processedLocations.filter(l => !l.isLockedNode).map(loc => {
+    items = locations.filter(l => !l.isLockedNode).map(loc => {
        const isDiscovered = levelState.discovery.includes(loc.id);
        return {
          id: loc.id,
@@ -1721,7 +1721,7 @@ const LevelEngine = ({ config }) => {
                 />
             ) : (
             <div className="relative h-full p-8 flex flex-wrap gap-6 items-center justify-center content-center z-10 overflow-y-auto">
-              {processedLocations.map(loc => {
+              {locations.map(loc => {
                 const isExplored = exploration.includes(loc.id);
                 const isDiscovered = discovery.includes(loc.id);
                 const isLearned = learning.includes(loc.id);
