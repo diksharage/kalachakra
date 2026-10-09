@@ -90,10 +90,10 @@ const ProfilePage = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="flex flex-col gap-8">
         
         {/* LEFT COLUMN: OVERALL PROGRESS & STATS */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className="w-full space-y-8">
           
           <div className="glass-panel p-6 md:p-8 rounded-2xl border border-content/10">
             <h2 className="text-2xl font-serif font-bold gold-gradient-text mb-6">Journey Progress</h2>
@@ -160,96 +160,7 @@ const ProfilePage = () => {
 
         </div>
 
-        {/* RIGHT COLUMN: SETTINGS */}
-        <div className="lg:col-span-1 space-y-8">
-          
-          <div className="glass-panel p-6 rounded-2xl border border-content/10">
-            <h2 className="text-xl font-serif font-bold text-content mb-6 flex items-center gap-3"><Settings className="text-blue-400" /> App Settings</h2>
-            
-            {/* THEME TOGGLE */}
-            <div className="mb-8">
-              <div className="flex justify-between items-center mb-4">
-                <div>
-                  <h3 className="font-bold text-content">Visual Theme</h3>
-                  <p className="text-sm text-content/60">Switch between light and dark mode.</p>
-                </div>
               </div>
-              <button 
-                onClick={toggleTheme}
-                className="w-full flex items-center justify-between p-4 rounded-xl border border-content/20 bg-surface/50 hover:bg-surface transition-colors focus:outline-none focus:ring-2 focus:ring-gold"
-              >
-                <div className="flex items-center gap-3 font-bold text-content">
-                  {theme === 'light' ? <Sun className="text-orange-400" /> : <Moon className="text-blue-300" />}
-                  {theme === 'light' ? 'Light Mode' : 'Dark Mode'}
-                </div>
-                <div className={`w-12 h-6 rounded-full p-1 transition-colors ${theme === 'light' ? 'bg-gold' : 'bg-content/20'}`}>
-                  <div className={`w-4 h-4 rounded-full bg-main transition-transform ${theme === 'light' ? 'translate-x-6' : 'translate-x-0'}`} />
-                </div>
-              </button>
-            </div>
-
-            {/* AUDIO SETTINGS */}
-            <div className="border-t border-content/10 pt-6">
-              <div className="flex justify-between items-center mb-4">
-                <div>
-                  <h3 className="font-bold text-content">Audio Settings</h3>
-                  <p className="text-sm text-content/60">Game sounds & ambience.</p>
-                </div>
-                <button 
-                  onClick={toggleMute}
-                  className={`p-2 rounded-lg font-bold transition-all focus:outline-none focus:ring-2 focus:ring-gold ${audioSettings.muted ? 'bg-red-900/20 text-red-400 border border-red-500/30' : 'bg-surface border border-content/20 text-content'}`}
-                  title={audioSettings.muted ? 'Unmute' : 'Mute All'}
-                >
-                  {audioSettings.muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-                </button>
-              </div>
-
-              {!audioSettings.muted && (
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between mb-2">
-                      <label className="text-sm font-bold opacity-80">Sound Effects</label>
-                      <span className="text-xs opacity-60">{Math.round(audioSettings.sfxVolume * 100)}%</span>
-                    </div>
-                    <input 
-                      type="range" min="0" max="1" step="0.01" 
-                      value={audioSettings.sfxVolume}
-                      onChange={(e) => updateSetting('sfxVolume', parseFloat(e.target.value))}
-                      className="w-full h-2 rounded-full custom-slider"
-                      style={{ background: `linear-gradient(to right, #D4A64A ${audioSettings.sfxVolume * 100}%, rgba(255,255,255,0.2) ${audioSettings.sfxVolume * 100}%)` }}
-                    />
-                  </div>
-                  <div>
-                    <div className="flex justify-between mb-2">
-                      <label className="text-sm font-bold opacity-80">Ambience</label>
-                      <span className="text-xs opacity-60">{Math.round(audioSettings.ambienceVolume * 100)}%</span>
-                    </div>
-                    <input 
-                      type="range" min="0" max="1" step="0.01" 
-                      value={audioSettings.ambienceVolume}
-                      onChange={(e) => updateSetting('ambienceVolume', parseFloat(e.target.value))}
-                      className="w-full h-2 rounded-full custom-slider"
-                      style={{ background: `linear-gradient(to right, #D4A64A ${audioSettings.ambienceVolume * 100}%, rgba(255,255,255,0.2) ${audioSettings.ambienceVolume * 100}%)` }}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* LOGOUT SETTING */}
-            <div className="border-t border-content/10 pt-6 mt-6">
-              <button 
-                onClick={() => logoutUser()}
-                className="w-full flex items-center justify-center gap-3 p-4 rounded-xl border border-red-500/30 bg-red-900/10 text-red-400 hover:bg-red-900/30 hover:border-red-500/50 transition-colors font-bold"
-              >
-                <LogOut size={20} />
-                Log Out
-              </button>
-            </div>
-          </div>
-
-        </div>
-      </div>
     </div>
   );
 };

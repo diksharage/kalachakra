@@ -29,6 +29,7 @@ import BuilderPage from './pages/BuilderPage';
 import EventPage from './pages/EventPage';
 import InvestigationDetail from './pages/InvestigationDetail';
 import ProfilePage from './pages/ProfilePage';
+import SettingsPage from './pages/SettingsPage';
 import HeritageLibraryPage from './pages/HeritageLibraryPage';
 import BookPage from './pages/BookPage';
 import JourneyPage from './pages/JourneyPage';
@@ -66,6 +67,7 @@ const AppContent = () => {
             <Route path="/events/:id" element={<EventPage />} />
             <Route path="/investigations/:id" element={<InvestigationDetail />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
           </Route>
         </Route>
 

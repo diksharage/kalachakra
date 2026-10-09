@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { X, LayoutDashboard, Compass, Search, Target, Hammer, Bot, BookOpen, Trophy, User, Map, Package, Settings } from 'lucide-react';
+import { X, LayoutDashboard, Compass, Search, Target, Hammer, Bot, BookOpen, Trophy, User, Map, Package } from 'lucide-react';
 import { useGame } from '../../context/GameContext';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -56,20 +56,10 @@ const Sidebar = ({ isOpen, onClose }) => {
         </nav>
 
         <div className="mt-auto pt-4 border-t border-gold/20">
-          <NavLink 
-            to="/profile" 
-            onClick={onClose}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 w-full text-left transition-colors rounded-lg ${
-                isActive
-                  ? 'bg-surface text-gold border border-gold/30 shadow-[0_0_10px_rgba(212,166,74,0.1)]'
-                  : 'text-content/70 hover:bg-surface/50 hover:text-content'
-              }`
-            }
-          >
-            <Settings className="w-5 h-5" />
+          <NavLink to="/settings" onClick={onClose} className={({ isActive }) => "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-200 " + (isActive ? "bg-surface text-gold border border-gold/30 shadow-[0_0_10px_rgba(212,166,74,0.1)]" : "text-content/70 hover:bg-surface/50 hover:text-content")}>
             <span className="font-medium text-sm">Settings</span>
           </NavLink>
+          
         </div>
       </div>
     </>
