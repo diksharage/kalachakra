@@ -1882,6 +1882,7 @@ const LevelEngine = ({ config }) => {
         </div>
       </div>
       {renderPopup()}
+      <KalaCompanion stage={stage} levelId={config.id} levelState={levelState} inventory={levelState.resources} activeChallenge={levelState.activePopup?.type === 'challenge' ? levelState.activePopup.data : null} ageGroup={ageGroup} />
     </div>
   );
 };
