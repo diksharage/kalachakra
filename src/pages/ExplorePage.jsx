@@ -216,9 +216,12 @@ const ExplorePage = () => {
               
               if (!isUnlocked) {
                 return (
-                  <div key={loc.id} className="flex gap-4 items-center p-4 rounded-xl border border-content/5 bg-main/30 opacity-50 grayscale">
-                     <div className="w-10 h-10 rounded bg-surface border border-content/10 flex items-center justify-center shrink-0"><Lock size={16}/></div>
-                     <div><div className="text-sm font-bold text-content">{t('map.locked', 'Unknown Location')}</div></div>
+                  <div key={loc.id} className="flex gap-4 items-center p-4 rounded-xl border border-[#34302A] bg-[#101519]/70 opacity-75">
+                     <div className="w-10 h-10 rounded bg-[#151B20] border border-[#34302A] flex items-center justify-center shrink-0 text-[#C5C9CC]"><Lock size={16}/></div>
+                     <div className="flex-1">
+                       <div className="text-sm font-bold text-[#F5F1E8] capitalize">{t(`map.loc.${loc.id}`, loc.id.replace(/_/g, ' '))}</div>
+                       <div className="text-[11px] text-[#C5C9CC] mt-0.5">Unlocks in Level {loc.level} • {loc.region}</div>
+                     </div>
                   </div>
                 );
               }

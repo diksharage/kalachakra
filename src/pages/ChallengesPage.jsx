@@ -137,7 +137,7 @@ const ChallengesPage = () => {
 
         {showHint && (
           <div className="mb-6 p-4 bg-gold/10 border border-gold/30 rounded-xl">
-            <p className="text-sm text-gold font-bold">ðŸ’¡ Hint: {currentQuestion.explanation.substring(0, 40)}...</p>
+            <p className="text-sm text-gold font-bold">💡 Hint: {currentQuestion.explanation.substring(0, 40)}...</p>
           </div>
         )}
 

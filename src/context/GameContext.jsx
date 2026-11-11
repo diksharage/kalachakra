@@ -288,38 +288,58 @@ export const GameProvider = ({ children }) => {
       });
     };
     const placeBuilding = (levelId, gridIndex, buildingData) => {
-      logActivity('BUILD', 'Building Constructed', 'Expanded your settlement.');
-      notify('BUILD', 'Building Constructed', 'dash.rec.build_desc', { icon: '🏗️', route: '/builder' });
+      const bName = buildingData.name || 'Structure';
+      logActivity('BUILD', `Constructed ${bName}`, `Expanded settlement in Level ${levelId}.`, { icon: buildingData.icon || '🏗️' });
+      notify('BUILD', `Constructed ${bName}`, 'dash.rec.build_desc', { icon: buildingData.icon || '🏗️', route: '/builder' });
       setGameState(prev => {
-        // Check inventory requirements
         const reqs = buildingData.requirements || {};
-        const currentInv = prev.inventory || {};
+        const currentInv = { ...(prev.inventory || {}) };
+        const isCurrentActiveLevel = prev.activeLevelId === levelId && prev.activeLevelState?.resources;
+        const activeRes = isCurrentActiveLevel ? { ...prev.activeLevelState.resources } : {};
+
         for (const [res, cost] of Object.entries(reqs)) {
-          if ((currentInv[res] || 0) < cost) return prev; // Not enough resources
+          const available = (currentInv[res] || 0) + (isCurrentActiveLevel ? (activeRes[res] || 0) : 0);
+          if (available < cost) return prev;
         }
 
-        // Deduct resources
-        const newInv = { ...currentInv };
+        // Deduct resources from inventory first, then active level state if needed
         for (const [res, cost] of Object.entries(reqs)) {
-          newInv[res] -= cost;
+          const fromInv = Math.min(currentInv[res] || 0, cost);
+          currentInv[res] = Math.max(0, (currentInv[res] || 0) - fromInv);
+          const remainder = cost - fromInv;
+          if (remainder > 0 && isCurrentActiveLevel) {
+            activeRes[res] = Math.max(0, (activeRes[res] || 0) - remainder);
+          }
         }
 
         const currentEnv = prev.builtEnvironment || {};
         const levelEnv = currentEnv[levelId] || [];
-        
-        // Remove existing building at index if any
         const filteredEnv = levelEnv.filter(b => b.gridIndex !== gridIndex);
-        
+
+        const effects = buildingData.effects || {};
+        const gainedKnowledge = effects.knowledge || 0;
+        const gainedCulture = effects.culture || 0;
+
         const newState = {
           ...prev,
-          inventory: newInv,
+          inventory: currentInv,
+          ...(isCurrentActiveLevel
+            ? {
+                activeLevelState: {
+                  ...prev.activeLevelState,
+                  resources: activeRes
+                }
+              }
+            : {}),
           builtEnvironment: {
             ...currentEnv,
             [levelId]: [...filteredEnv, { gridIndex, buildingId: buildingData.id }]
           },
-          legacy: (prev.legacy || 0) + 5 // Small legacy reward for building
+          knowledge: (prev.knowledge || 0) + gainedKnowledge,
+          culture: (prev.culture || 0) + gainedCulture,
+          legacy: (prev.legacy || 0) + 10
         };
-        
+
         return newState;
       });
       checkQuestProgress('build', buildingData.id);
@@ -525,7 +545,7 @@ export const GameProvider = ({ children }) => {
         currentLevel: prev.currentLevel === levelId ? nextLevel : prev.currentLevel,
         legacy: prev.legacy + 100, // Reward legacy points for completing a level
         gameCompleted: isFinalLevel ? true : prev.gameCompleted,
-        achievements: isFinalLevel && !prev.achievements.includes('achievement_preserver') ? [...prev.achievements, 'achievement_preserver'] : prev.achievements
+        achievements: isFinalLevel && !prev.achievements.includes('preserver_of_the_legacy') ? [...prev.achievements, 'preserver_of_the_legacy'] : prev.achievements
       };
     });
   };

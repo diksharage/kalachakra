@@ -1,201 +1,361 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 import { useGame } from '../context/GameContext';
 import { useTheme } from '../context/ThemeContext';
-import { useNavigate, Link } from 'react-router-dom';
-import { 
-  User, Edit2, Star, Trophy, Hexagon, Clock, 
-  ChevronRight, Lock, Map as MapIcon, ArrowRight, Settings, Box, Activity
+import { useAudio } from '../context/AudioContext';
+import { getDashboardStats } from '../services/dashboardService';
+import { levelThemes } from '../data/levelThemes';
+import { civilizationLevels } from '../data/civilizationLevels';
+import { achievementsData } from '../data/achievements';
+import { heritageLibrary } from '../data/heritageLibrary';
+import { inventoryItems } from '../data/inventoryItems';
+import { useBackground } from '../context/BackgroundContext';
+import {
+  User,
+  Award,
+  Compass,
+  BookOpen,
+  Star,
+  Sparkles,
+  CheckCircle,
+  Volume2,
+  VolumeX,
+  Moon,
+  Sun,
+  ShieldAlert,
+  Play,
+  HelpCircle,
+  Edit2,
+  Check,
+  Heart,
+  Zap,
+  Landmark,
+  Lock,
+  ChevronRight,
+  BarChart2,
+  Clock,
+  Box,
+  Trophy,
+  Activity
 } from 'lucide-react';
 
 const ProfilePage = () => {
-  const { gameState } = useGame();
-  const { theme } = useTheme();
-  const navigate = useNavigate();
-  
-  const currentLevel = Math.min(gameState.currentLevel || 1, 14);
-  const xp = gameState.legacy || 0;
-  
-  // Calculate XP threshold dynamically
-  const nextLevelXp = Math.max(currentLevel * 500, xp + 100); 
-  const xpPercent = Math.min((xp / nextLevelXp) * 100, 100);
-  
-  const masteryPercent = Math.round(((gameState.completedLevels?.length || 0) / 14) * 100) || 0;
-  const achievementsCount = gameState.achievements?.length || 0;
-  const artifactsCount = gameState.unlockedArtifacts?.length || 0;
+  const { t, language, changeLanguage } = useLanguage();
+  const { setBgType } = useBackground();
 
-  const handleLevelClick = (level) => {
-    if (gameState.unlockedLevels?.includes(level)) {
-      navigate(`/journey/level/${level}`);
-    } else {
-      navigate('/journey');
+  React.useEffect(() => {
+    setBgType('profile');
+  }, [setBgType]);
+
+  const { gameState, loginUser, resetTutorial } = useGame();
+  const { theme: appTheme, toggleTheme } = useTheme();
+  const { settings: audioSettings, toggleMute } = useAudio();
+  const navigate = useNavigate();
+
+  const stats = useMemo(() => getDashboardStats(gameState), [gameState]);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState(gameState.name || gameState.playerName || 'Explorer');
+
+  const handleSaveName = () => {
+    if (nameInput.trim()) {
+      loginUser({ ...gameState, name: nameInput.trim(), playerName: nameInput.trim() });
     }
+    setIsEditingName(false);
   };
+
+  const pType = gameState.playerType || 'Explorer';
+  const currentLevel = Math.min(gameState.currentLevel || 1, 14);
+  const unlockedLevels = gameState.unlockedLevels || [1];
+  const completedLevels = gameState.completedLevels || [];
+
+  // Accurate XP & Milestone calculation
+  const xp = gameState.legacy || 0;
+  const nextLevelXp = stats.legacy?.nextMilestone || 500;
+  const xpPercent = Math.min(Math.round((xp / Math.max(1, nextLevelXp)) * 100), 100);
+
+  // Accurate counts matching configured data
+  const totalAchievementsCount = achievementsData.length;
+  const unlockedAchievementObjects = useMemo(() => {
+    const ids = gameState.achievements || [];
+    return achievementsData.filter(a => ids.includes(a.id));
+  }, [gameState.achievements]);
+
+  const unlockedArtifactsIds = gameState.unlockedArtifacts || [];
+  const totalCatalogArtifacts = heritageLibrary.length;
+
+  // Resolve collected items for preview
+  const collectedPreviewItems = useMemo(() => {
+    const list = [];
+    const seen = new Set();
+
+    unlockedArtifactsIds.forEach(id => {
+      if (seen.has(id)) return;
+      seen.add(id);
+      const fromInv = inventoryItems.find(i => i.id === id);
+      const fromLib = heritageLibrary.find(i => i.id === id);
+      list.push({
+        id,
+        icon: fromInv?.icon || fromLib?.icon || '🏺',
+        name:
+          fromInv?.name ||
+          t(`library.entry.${id}.title`, id.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()))
+      });
+    });
+
+    Object.entries(gameState.inventory || {}).forEach(([k, v]) => {
+      if ((Number(v) || 0) <= 0 || seen.has(k)) return;
+      if (['xp', 'knowledge', 'culture', 'legacy', 'energy', 'coins'].includes(k)) return;
+      seen.add(k);
+      const fromInv = inventoryItems.find(i => i.id === k);
+      list.push({
+        id: k,
+        icon: fromInv?.icon || '📦',
+        name: fromInv?.name || k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+      });
+    });
+
+    return list;
+  }, [unlockedArtifactsIds, gameState.inventory, t]);
+
+  // Accurate Mastery Percentage
+  const masteryPercentage = useMemo(() => {
+    const levelPart = (completedLevels.length / 14) * 50;
+    const artifactPart =
+      (Math.min(unlockedArtifactsIds.length, totalCatalogArtifacts) /
+        Math.max(1, totalCatalogArtifacts)) *
+      25;
+    const achPart =
+      (unlockedAchievementObjects.length / Math.max(1, totalAchievementsCount)) * 25;
+    return Math.min(100, Math.round(levelPart + artifactPart + achPart));
+  }, [
+    completedLevels.length,
+    unlockedArtifactsIds.length,
+    totalCatalogArtifacts,
+    unlockedAchievementObjects.length,
+    totalAchievementsCount
+  ]);
 
   const formatTimeAgo = (timestamp) => {
-    if (!timestamp) return 'Just now';
+    if (!timestamp) return 'Recently';
     const date = new Date(timestamp);
     const seconds = Math.floor((new Date() - date) / 1000);
-    let interval = seconds / 31536000;
-    if (interval > 1) return Math.floor(interval) + " years ago";
-    interval = seconds / 2592000;
-    if (interval > 1) return Math.floor(interval) + " months ago";
-    interval = seconds / 86400;
-    if (interval > 1) return Math.floor(interval) + " days ago";
+    let interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + ' days ago';
     interval = seconds / 3600;
-    if (interval > 1) return Math.floor(interval) + " hours ago";
+    if (interval > 1) return Math.floor(interval) + ' hours ago';
     interval = seconds / 60;
-    if (interval > 1) return Math.floor(interval) + " mins ago";
-    return "Just now";
+    if (interval > 1) return Math.floor(interval) + ' mins ago';
+    return 'Just now';
   };
 
+  const displayActivity = useMemo(() => {
+    if (gameState.activityLog && gameState.activityLog.length > 0) {
+      return gameState.activityLog.map(act => ({
+        ...act,
+        displayTitle: t(act.titleKey, act.titleKey),
+        displayDesc: act.descKey ? t(act.descKey, act.descKey) : ''
+      }));
+    }
+    return [
+      {
+        displayTitle: `Exploring Level ${currentLevel}: ${
+          civilizationLevels.find(l => l.id === currentLevel)?.name || 'Early Human Communities'
+        }`,
+        type: 'EXPLORE',
+        timestamp: gameState.lastLogin || Date.now()
+      }
+    ];
+  }, [gameState.activityLog, gameState.lastLogin, currentLevel, t]);
+
   return (
-    <div className="w-full max-w-[1600px] mx-auto p-4 md:p-6 lg:p-8 space-y-6 min-h-screen text-content animate-fade-in">
-      
-      {/* HEADER BANNER */}
-      <div 
-        className="w-full h-[320px] rounded-2xl relative overflow-hidden shadow-2xl border border-gold/20 flex flex-col justify-end p-6 md:p-10"
-        style={{ 
-          backgroundImage: `url('${import.meta.env.BASE_URL}assets/backgrounds/temple.jpg')`,
+    <div
+      className="w-full max-w-[1600px] mx-auto p-4 md:p-6 lg:p-8 space-y-6 min-h-screen text-content animate-fade-in"
+      style={{ backgroundColor: '#070A0C' }}
+    >
+      {/* 1. PROFILE HEADER BANNER */}
+      <div
+        className="w-full rounded-2xl relative overflow-hidden flex flex-col justify-end p-6 md:p-10 border border-gold/10 min-h-[260px]"
+        style={{
+          backgroundImage: `url('${import.meta.env.BASE_URL}assets/backgrounds/login_bg.jpg')`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center'
+          backgroundPosition: 'center 35%'
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-main via-main/80 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-main via-transparent to-transparent opacity-80" />
-        
-        <div className="relative z-10 w-full flex flex-col md:flex-row justify-between items-end md:items-center gap-6">
-          <div className="flex items-center gap-6 md:gap-8">
-            {/* Avatar */}
-            <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-gold shadow-[0_0_30px_rgba(212,166,74,0.4)] flex items-center justify-center shrink-0 bg-surface/80 overflow-hidden relative group">
-               <User size={64} className="text-gold/50" />
-               <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                 <Edit2 size={24} className="text-white" />
-               </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-[#070A0C] via-[#070A0C]/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#070A0C] via-transparent to-transparent" />
+
+        <div className="relative z-10 w-full flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 w-full lg:w-auto">
+            {/* Circular Player Avatar */}
+            <div className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-[#101519] border-2 border-[#D9A441] p-1 shadow-[0_0_25px_rgba(217,164,65,0.25)] shrink-0 relative">
+              <div className="w-full h-full rounded-full bg-gradient-to-b from-[#151B20] to-[#070A0C] flex items-center justify-center overflow-hidden">
+                <User size={48} className="text-[#D9A441]" />
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#D9A441] text-[#070A0C] font-bold text-xs flex items-center justify-center border-2 border-[#070A0C]">
+                {currentLevel}
+              </div>
             </div>
-            
-            {/* User Info */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <h1 className="text-3xl md:text-5xl font-serif font-bold text-white drop-shadow-md">
-                  {gameState.name || 'Traveler'}
-                </h1>
-                <button className="text-gold/70 hover:text-gold transition-colors">
-                  <Edit2 size={20} />
-                </button>
-              </div>
-              <div className="text-gold font-bold tracking-widest uppercase text-sm md:text-base drop-shadow-md">
-                {gameState.playerType || 'Explorer'}
-              </div>
-              
-              {/* Level & XP */}
-              <div className="flex items-center gap-4 py-1">
-                <div className="flex items-center gap-1.5 px-3 py-1 bg-surface/60 backdrop-blur-md rounded-full border border-gold/40 text-xs font-bold text-white shadow-inner">
-                  <Star size={12} className="text-gold" />
-                  Level {currentLevel}
-                </div>
-                <div className="w-32 md:w-48 flex items-center gap-3 hidden sm:flex">
-                  <div className="flex-1 h-2 bg-black/50 rounded-full overflow-hidden border border-white/10 shadow-inner">
-                    <div 
-                      className="h-full bg-gradient-to-r from-gold/50 to-gold rounded-full"
-                      style={{ width: `${xpPercent}%` }}
+
+            {/* Player Info */}
+            <div className="space-y-2.5 flex-1">
+              <div className="flex items-center gap-3 flex-wrap">
+                {isEditingName ? (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={nameInput}
+                      onChange={e => setNameInput(e.target.value)}
+                      className="text-2xl font-serif font-bold bg-[#101519] border border-[#D9A441] rounded-lg px-3 py-1 text-white outline-none w-52"
+                      autoFocus
                     />
+                    <button
+                      onClick={handleSaveName}
+                      className="p-2 bg-[#D9A441] text-[#070A0C] rounded-lg hover:bg-[#D9A441]/90"
+                    >
+                      <Check size={18} />
+                    </button>
                   </div>
-                  <span className="text-[10px] font-bold text-white/80 whitespace-nowrap">
-                    {xp} / {nextLevelXp} XP
+                ) : (
+                  <h1 className="text-3xl md:text-4xl font-serif font-bold text-white flex items-center gap-3 drop-shadow">
+                    {gameState.name || gameState.playerName || 'Explorer'}
+                    <button
+                      onClick={() => setIsEditingName(true)}
+                      aria-label="Edit player name"
+                      className="text-[#C5C9CC] hover:text-[#D9A441] transition-colors"
+                    >
+                      <Edit2 size={18} />
+                    </button>
+                  </h1>
+                )}
+
+                <span className="px-3 py-1 rounded-full bg-[#D9A441]/15 border border-[#D9A441]/40 text-[#D9A441] text-xs font-bold flex items-center gap-1.5">
+                  <Compass size={12} /> {pType}
+                </span>
+              </div>
+
+              {/* XP Progress Bar */}
+              <div className="w-full sm:w-80 space-y-1.5">
+                <div className="flex justify-between text-xs font-bold">
+                  <span className="text-white">Level {currentLevel}</span>
+                  <span className="text-[#D9A441]">
+                    {xp} / {nextLevelXp} Legacy XP
                   </span>
                 </div>
+                <div className="w-full h-2 bg-[#090C0F] rounded-full overflow-hidden border border-[#34302A]">
+                  <div
+                    className="h-full bg-gradient-to-r from-[#B77B2E] to-[#D9A441] rounded-full transition-all duration-500"
+                    style={{ width: `${xpPercent}%` }}
+                  />
+                </div>
               </div>
-              
-              {/* Tags */}
-              <div className="flex flex-wrap gap-2 text-[10px] uppercase font-bold text-white/70 tracking-wider">
-                <span className="px-2 py-1 bg-black/40 rounded border border-white/10 backdrop-blur-sm">Age: {gameState.ageGroup}</span>
-                <span className="px-2 py-1 bg-black/40 rounded border border-white/10 backdrop-blur-sm">Style: {gameState.playerType}</span>
-                <span className="px-2 py-1 bg-black/40 rounded border border-white/10 backdrop-blur-sm">Theme: {theme}</span>
+
+              {/* Badges Row */}
+              <div className="flex flex-wrap gap-2 pt-1">
+                <span className="px-3 py-1 rounded-lg bg-[#101519]/90 border border-[#34302A] text-[11px] font-bold text-[#C5C9CC] flex items-center gap-1.5">
+                  <User size={12} className="text-[#D9A441]" /> Age Group: {gameState.ageGroup || '12-14'}
+                </span>
+                <span className="px-3 py-1 rounded-lg bg-[#101519]/90 border border-[#34302A] text-[11px] font-bold text-[#C5C9CC] flex items-center gap-1.5">
+                  <Sparkles size={12} className="text-[#D9A441]" /> Style: {pType}
+                </span>
+                <span className="px-3 py-1 rounded-lg bg-[#101519]/90 border border-[#34302A] text-[11px] font-bold text-[#C5C9CC] flex items-center gap-1.5">
+                  <CheckCircle size={12} className="text-emerald-400" /> {completedLevels.length}/14 Eras Completed
+                </span>
               </div>
             </div>
           </div>
-          
-          <div className="hidden lg:flex flex-col items-center justify-center max-w-xs text-center pb-8 mr-12">
-            <p className="text-xl font-serif italic text-white/90 drop-shadow-lg leading-relaxed">
-              "Every discovery<br/>builds a better tomorrow."
+
+          {/* Right Quote */}
+          <div className="hidden xl:flex flex-col items-end max-w-xs text-right pb-2">
+            <p className="text-base font-serif italic text-[#D9A441]/90 drop-shadow leading-relaxed">
+              "Every artifact discovered and structure built preserves the story of human civilization."
             </p>
-            <div className="flex items-center gap-2 mt-4 opacity-50">
-               <div className="w-12 h-px bg-gold"></div>
-               <div className="w-2 h-2 rotate-45 border border-gold"></div>
-               <div className="w-12 h-px bg-gold"></div>
-            </div>
           </div>
         </div>
       </div>
 
+      {/* 2. MAIN TWO-COLUMN DASHBOARD LAYOUT */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        
-        {/* LEFT COLUMN (8 cols) */}
+        {/* LEFT MAIN COLUMN (8 cols) */}
         <div className="xl:col-span-8 space-y-6">
-          
-          {/* MY JOURNEY */}
-          <div className="glass-panel p-6 rounded-2xl border border-content/10 flex flex-col">
-            <div className="flex justify-between items-center mb-8">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gold/10 rounded-lg border border-gold/20">
-                  <MapIcon className="text-gold" size={20} />
-                </div>
-                <div>
-                  <h2 className="text-xl font-serif font-bold text-content">My Journey</h2>
-                  <p className="text-xs text-content/50 mt-0.5">Your progress across the 14 levels</p>
-                </div>
+          {/* MY JOURNEY — ALL 14 LEVELS */}
+          <div className="glass-panel p-6 rounded-2xl">
+            <div className="flex flex-wrap justify-between items-center gap-2 mb-5 pb-3 border-b border-[#34302A]">
+              <div className="flex items-center gap-2.5">
+                <Compass className="text-[#D9A441]" size={18} />
+                <h2 className="text-base font-bold text-white">My Journey (14 Historical Eras)</h2>
               </div>
-              <Link to="/journey" className="text-xs font-bold text-gold hover:text-gold/80 flex items-center gap-1 transition-colors">
-                View Journey Map <ArrowRight size={14} />
-              </Link>
+              <div className="flex items-center gap-4 text-[11px] font-bold text-[#C5C9CC]">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" /> Completed ({completedLevels.length})
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#D9A441]" /> Current (Level {currentLevel})
+                </span>
+                <button
+                  onClick={() => navigate('/journey')}
+                  className="text-[#D9A441] hover:underline flex items-center gap-1"
+                >
+                  Open Journey Map <ChevronRight size={14} />
+                </button>
+              </div>
             </div>
-            
-            <div className="relative flex items-center justify-between px-4 pb-2 mt-4 overflow-x-auto no-scrollbar scroll-smooth">
-              {/* Connecting line background */}
-              <div className="absolute top-6 left-8 right-8 h-0.5 bg-content/10 -z-10" />
-              
-              {[1, 2, 3, 4, 5, 14].map((level, index) => {
-                const isUnlocked = gameState.unlockedLevels?.includes(level) || currentLevel >= level;
-                const isCompleted = gameState.completedLevels?.includes(level);
-                const isCurrent = currentLevel === level && !isCompleted;
-                
-                let title = "";
-                if(level===1) title = "Early Human Communities";
-                else if(level===2) title = "Farming Communities";
-                else if(level===3) title = "Indus Civilization";
-                else if(level===4) title = "Trade Networks";
-                else if(level===5) title = "Mahajanapadas";
-                else if(level===14) title = "Preserve the Legacy";
-                
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              {civilizationLevels.map(lvl => {
+                const isCompleted = completedLevels.includes(lvl.id);
+                const isCurrent = currentLevel === lvl.id && !isCompleted;
+                const isUnlocked =
+                  unlockedLevels.includes(lvl.id) || currentLevel >= lvl.id || isCompleted;
+
                 return (
-                  <div 
-                    key={level} 
-                    onClick={() => handleLevelClick(level)}
-                    className={`flex flex-col items-center min-w-[100px] shrink-0 relative z-10 group ${isUnlocked ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                  <div
+                    key={lvl.id}
+                    onClick={() => {
+                      if (isUnlocked) navigate(`/journey/level/${lvl.id}`);
+                    }}
+                    className={`p-3.5 rounded-xl border transition-all flex flex-col justify-between ${
+                      isCurrent
+                        ? 'bg-[#151B20] border-[#D9A441] shadow-[0_0_15px_rgba(217,164,65,0.2)] cursor-pointer'
+                        : isCompleted
+                        ? 'bg-[#151B20]/90 border-emerald-500/40 hover:border-emerald-400 cursor-pointer'
+                        : isUnlocked
+                        ? 'bg-[#151B20]/80 border-[#34302A] hover:border-[#D9A441]/50 cursor-pointer'
+                        : 'bg-[#090C0F]/70 border-[#34302A]/60 opacity-60 cursor-not-allowed'
+                    }`}
                   >
-                    {/* The line fill if completed */}
-                    {index > 0 && isUnlocked && (
-                       <div className="absolute top-6 -left-[50%] w-full h-0.5 bg-gold/50 -z-10" />
-                    )}
-                    
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 shadow-xl ${
-                      isCurrent ? 'bg-main border-gold shadow-[0_0_15px_rgba(212,166,74,0.4)] scale-110' : 
-                      isCompleted ? 'bg-surface border-gold' :
-                      isUnlocked ? 'bg-surface border-gold/50' : 
-                      'bg-surface/50 border-content/10'
-                    }`}>
-                      {isCurrent || isCompleted || isUnlocked ? (
-                        <User size={20} className={isCurrent ? 'text-gold' : 'text-gold/70'} />
-                      ) : (
-                        <Lock size={16} className="text-content/30" />
-                      )}
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span
+                        className={`text-xs font-bold px-2 py-0.5 rounded-md ${
+                          isCurrent
+                            ? 'bg-[#D9A441] text-[#070A0C]'
+                            : isCompleted
+                            ? 'bg-emerald-500/20 text-emerald-400'
+                            : 'bg-[#101519] text-[#C5C9CC]'
+                        }`}
+                      >
+                        Level {lvl.id}
+                      </span>
+                      {isCompleted ? (
+                        <CheckCircle size={15} className="text-emerald-400" />
+                      ) : isCurrent ? (
+                        <Play size={14} className="text-[#D9A441] fill-[#D9A441]" />
+                      ) : !isUnlocked ? (
+                        <Lock size={13} className="text-[#C5C9CC]/50" />
+                      ) : null}
                     </div>
-                    
-                    <div className="mt-4 text-center">
-                      <div className={`text-xs font-bold mb-1 ${isCurrent || isUnlocked ? 'text-content' : 'text-content/50'}`}>Level {level}</div>
-                      <div className="text-[9px] text-content/50 w-20 leading-tight max-w-[80px] truncate-multiline text-center mx-auto whitespace-normal h-6">
-                        {title}
-                      </div>
+
+                    <div className="text-xs font-bold text-white leading-snug mb-1">
+                      {lvl.name}
+                    </div>
+                    <div className="text-[10px] font-semibold text-[#C5C9CC]">
+                      {isCompleted
+                        ? 'Completed'
+                        : isCurrent
+                        ? 'In Progress'
+                        : isUnlocked
+                        ? 'Unlocked'
+                        : 'Locked'}
                     </div>
                   </div>
                 );
@@ -203,209 +363,289 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          {/* STATS GRID */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-             <div className="glass-panel p-5 rounded-2xl border border-content/10 flex flex-col justify-center relative overflow-hidden group hover:border-gold/30 transition-colors">
-                <div className="flex items-center gap-3 mb-4 relative z-10">
-                   <Star className="text-gold" size={28} />
-                   <div>
-                     <div className="text-[10px] text-content/50 uppercase tracking-wider font-bold">Total XP</div>
-                     <div className="text-2xl font-bold text-content">{xp}</div>
-                   </div>
+          {/* STATS & RESOURCES */}
+          <div className="glass-panel p-6 rounded-2xl">
+            <div className="flex items-center gap-2.5 mb-5 pb-3 border-b border-[#34302A]">
+              <BarChart2 className="text-[#D9A441]" size={18} />
+              <h2 className="text-base font-bold text-white">Stats & Resources</h2>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+              <div className="bg-[#151B20] border border-[#34302A] rounded-xl p-4 flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-[#D96B62]/15 border border-[#D96B62]/30 flex items-center justify-center text-[#D96B62] shrink-0">
+                  <Heart size={20} />
                 </div>
-                <div className="w-full h-1.5 bg-surface rounded-full overflow-hidden relative z-10">
-                   <div className="h-full bg-gold rounded-full" style={{ width: `${xpPercent}%` }} />
+                <div>
+                  <div className="text-xl font-bold text-white">{gameState.energy ?? 100}</div>
+                  <div className="text-xs text-[#C5C9CC]">Energy</div>
                 </div>
-                <Star className="absolute -right-4 -bottom-4 text-gold/5 w-24 h-24 rotate-12 group-hover:scale-110 transition-transform" />
-             </div>
-             
-             <div className="glass-panel p-5 rounded-2xl border border-content/10 flex flex-col justify-center relative overflow-hidden group hover:border-blue-400/30 transition-colors">
-                <div className="flex items-center gap-3 mb-4 relative z-10">
-                   <Hexagon className="text-blue-400" size={28} />
-                   <div>
-                     <div className="text-[10px] text-content/50 uppercase tracking-wider font-bold">Mastery</div>
-                     <div className="text-2xl font-bold text-content">{masteryPercent}<span className="text-sm text-content/50 ml-1">%</span></div>
-                   </div>
+              </div>
+
+              <div className="bg-[#151B20] border border-[#34302A] rounded-xl p-4 flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
+                  <Zap size={20} />
                 </div>
-                <div className="w-full h-1.5 bg-surface rounded-full overflow-hidden relative z-10">
-                   <div className="h-full bg-blue-400 rounded-full" style={{ width: `${masteryPercent}%` }} />
+                <div>
+                  <div className="text-xl font-bold text-white">{gameState.knowledge || 0}</div>
+                  <div className="text-xs text-[#C5C9CC]">Knowledge</div>
                 </div>
-                <Hexagon className="absolute -right-4 -bottom-4 text-blue-400/5 w-24 h-24 rotate-12 group-hover:scale-110 transition-transform" />
-             </div>
-             
-             <div className="glass-panel p-5 rounded-2xl border border-content/10 flex flex-col justify-center items-center text-center relative overflow-hidden group hover:border-purple-400/30 transition-colors">
-                <div className="flex items-center justify-center gap-3 relative z-10">
-                   <div className="p-2 rounded-full bg-purple-500/10"><Trophy className="text-purple-400" size={24} /></div>
-                   <div className="text-left">
-                     <div className="text-[10px] text-content/50 uppercase tracking-wider font-bold">Achievements</div>
-                     <div className="text-xl font-bold text-content">{achievementsCount} <span className="text-xs text-content/40 font-normal">/ 20</span></div>
-                   </div>
+              </div>
+
+              <div className="bg-[#151B20] border border-[#34302A] rounded-xl p-4 flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0">
+                  <Landmark size={20} />
                 </div>
-             </div>
-             
-             <div className="glass-panel p-5 rounded-2xl border border-content/10 flex flex-col justify-center items-center text-center relative overflow-hidden group hover:border-emerald-400/30 transition-colors">
-                <div className="flex items-center justify-center gap-3 relative z-10">
-                   <div className="p-2 rounded-full bg-emerald-500/10"><Box className="text-emerald-400" size={24} /></div>
-                   <div className="text-left">
-                     <div className="text-[10px] text-content/50 uppercase tracking-wider font-bold">Artifacts Collected</div>
-                     <div className="text-xl font-bold text-content">{artifactsCount} <span className="text-xs text-content/40 font-normal">/ 50</span></div>
-                   </div>
+                <div>
+                  <div className="text-xl font-bold text-white">{gameState.culture || 0}</div>
+                  <div className="text-xs text-[#C5C9CC]">Culture</div>
                 </div>
-             </div>
+              </div>
+
+              <div className="bg-[#151B20] border border-[#34302A] rounded-xl p-4 flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-[#D9A441]/15 border border-[#D9A441]/30 flex items-center justify-center text-[#D9A441] shrink-0">
+                  <Star size={20} />
+                </div>
+                <div>
+                  <div className="text-xl font-bold text-white">{gameState.legacy || 0}</div>
+                  <div className="text-xs text-[#C5C9CC]">Legacy XP</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-[#34302A]">
+              <div className="p-3 rounded-xl bg-[#090C0F] border border-[#34302A] text-center">
+                <div className="text-xs text-[#C5C9CC] mb-1">Levels Completed</div>
+                <div className="text-lg font-serif font-bold text-white">
+                  {completedLevels.length} <span className="text-xs text-[#C5C9CC]">/ 14</span>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#090C0F] border border-[#34302A] text-center">
+                <div className="text-xs text-[#C5C9CC] mb-1">Overall Mastery</div>
+                <div className="text-lg font-serif font-bold text-[#D9A441]">
+                  {masteryPercentage}%
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#090C0F] border border-[#34302A] text-center">
+                <div className="text-xs text-[#C5C9CC] mb-1">Achievements</div>
+                <div className="text-lg font-serif font-bold text-white">
+                  {unlockedAchievementObjects.length}{' '}
+                  <span className="text-xs text-[#C5C9CC]">/ {totalAchievementsCount}</span>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#090C0F] border border-[#34302A] text-center">
+                <div className="text-xs text-[#C5C9CC] mb-1">Discoveries & Items</div>
+                <div className="text-lg font-serif font-bold text-white">
+                  {collectedPreviewItems.length}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* RECENT ACTIVITY */}
-          <div className="glass-panel p-6 rounded-2xl border border-content/10 flex flex-col">
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gold/10 rounded-lg border border-gold/20">
-                  <Clock className="text-gold" size={20} />
-                </div>
-                <h2 className="text-lg font-serif font-bold text-content">Recent Activity</h2>
+          <div className="glass-panel p-6 rounded-2xl">
+            <div className="flex justify-between items-center mb-4 pb-3 border-b border-[#34302A]">
+              <div className="flex items-center gap-2.5">
+                <Clock className="text-[#D9A441]" size={18} />
+                <h2 className="text-base font-bold text-white">Recent Activity</h2>
               </div>
-              <button className="text-xs font-bold text-gold hover:text-gold/80 flex items-center gap-1 transition-colors">
-                View All <ArrowRight size={14} />
-              </button>
             </div>
-            
-            <div className="space-y-4">
-              {gameState.activityLog && gameState.activityLog.length > 0 ? (
-                gameState.activityLog.slice(0, 3).map((act, idx) => (
-                  <div key={idx} className="flex gap-4 p-4 rounded-xl hover:bg-surface/50 transition-colors border border-transparent hover:border-content/5">
-                    <div className="w-10 h-10 rounded-full bg-surface border border-gold/30 flex items-center justify-center shrink-0 text-gold shadow-sm">
-                      <Activity size={18} />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-bold text-content/90 mb-1">{act.titleKey || act.type}</h3>
-                      <p className="text-xs text-content/50">{formatTimeAgo(act.timestamp)}</p>
-                    </div>
+
+            <div className="space-y-2">
+              {displayActivity.slice(0, 5).map((act, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center gap-4 p-3 rounded-xl bg-[#151B20] border border-[#34302A]"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-[#090C0F] border border-[#34302A] flex items-center justify-center text-[#D9A441] shrink-0">
+                    {act.metadata?.icon ? (
+                      <span>{act.metadata.icon}</span>
+                    ) : act.type === 'ACHIEVEMENT' ? (
+                      <Trophy size={15} />
+                    ) : (
+                      <Activity size={15} />
+                    )}
                   </div>
-                ))
-              ) : (
-                <div className="flex gap-4 p-4 rounded-xl hover:bg-surface/50 transition-colors border border-transparent hover:border-content/5">
-                  <div className="w-10 h-10 rounded-full bg-surface border border-gold/30 flex items-center justify-center shrink-0 text-gold shadow-sm">
-                    <User size={18} />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-bold text-white truncate">{act.displayTitle}</div>
+                    {act.displayDesc && (
+                      <div className="text-[11px] text-[#C5C9CC] truncate">{act.displayDesc}</div>
+                    )}
                   </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-content/90 mb-1">Started Level {currentLevel}</h3>
-                    <p className="text-xs text-content/50">Just now</p>
+                  <div className="text-[11px] text-[#C5C9CC] shrink-0">
+                    {formatTimeAgo(act.timestamp)}
                   </div>
                 </div>
-              )}
+              ))}
             </div>
           </div>
-          
         </div>
 
         {/* RIGHT COLUMN (4 cols) */}
         <div className="xl:col-span-4 space-y-6">
-          
-          {/* ACHIEVEMENTS CARD */}
-          <div className="glass-panel p-6 rounded-2xl border border-content/10 flex flex-col h-[280px]">
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-3">
-                <Trophy className="text-gold" size={20} />
-                <h2 className="text-lg font-bold text-content">Achievements</h2>
+          {/* ACHIEVEMENTS SUMMARY CARD */}
+          <div className="glass-panel p-6 rounded-2xl">
+            <div className="flex justify-between items-center mb-4 pb-3 border-b border-[#34302A]">
+              <div className="flex items-center gap-2">
+                <Trophy className="text-[#D9A441]" size={18} />
+                <h2 className="text-base font-bold text-white">
+                  Achievements ({unlockedAchievementObjects.length}/{totalAchievementsCount})
+                </h2>
               </div>
-              <Link to="/achievements" className="text-xs font-bold text-gold hover:text-gold/80 flex items-center gap-1 transition-colors">
-                View All <ArrowRight size={14} />
-              </Link>
+              <button
+                onClick={() => navigate('/achievements')}
+                className="text-xs font-bold text-[#D9A441] hover:underline"
+              >
+                View All →
+              </button>
             </div>
-            
-            {achievementsCount > 0 ? (
-              <div className="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar">
-                {gameState.achievements.slice(0, 4).map((ach, idx) => (
-                  <div key={idx} className="flex items-center gap-3 p-3 rounded-lg bg-surface/50 border border-content/5">
-                    <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center shrink-0 border border-gold/20">
-                      <CheckCircle className="w-5 h-5 text-gold" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="text-sm font-bold capitalize text-content/90">{ach.replace(/_/g, ' ')}</h4>
-                      <p className="text-xs text-content/50">Unlocked Badge</p>
-                    </div>
-                  </div>
-                ))}
+
+            {unlockedAchievementObjects.length === 0 ? (
+              <div className="p-6 rounded-xl bg-[#151B20] border border-[#34302A] text-center space-y-2">
+                <Trophy size={26} className="text-[#D9A441]/50 mx-auto" />
+                <p className="text-xs text-[#C5C9CC]">
+                  Complete levels, discover artifacts, or construct buildings to unlock your first achievement badge.
+                </p>
+                <button
+                  onClick={() => navigate('/achievements')}
+                  className="text-xs font-bold text-[#D9A441] hover:underline pt-1 inline-block"
+                >
+                  Browse All {totalAchievementsCount} Milestones →
+                </button>
               </div>
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center text-center p-4">
-                <div className="w-16 h-16 rounded-full bg-surface border border-content/10 flex items-center justify-center mb-4 relative">
-                  <Trophy size={28} className="text-content/20" />
-                  <div className="absolute -bottom-1 -right-1 bg-main rounded-full p-1 border border-content/10">
-                     <CheckCircle className="w-3 h-3 text-content/30" />
+              <div className="space-y-2.5">
+                {unlockedAchievementObjects.slice(0, 4).map(ach => (
+                  <div
+                    key={ach.id}
+                    onClick={() => navigate('/achievements')}
+                    className="flex items-center gap-3 p-3 rounded-xl bg-[#151B20] border border-[#34302A] hover:border-[#D9A441]/50 cursor-pointer transition-colors"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-[#090C0F] border border-[#D9A441]/40 flex items-center justify-center text-xl shrink-0">
+                      {ach.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-bold text-white truncate">
+                        {t(`achievements.${ach.titleKey}`, ach.title)}
+                      </div>
+                      <div className="text-[11px] text-[#C5C9CC] truncate">
+                        {t(`achievements.${ach.descKey}`, ach.description)}
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-bold text-[#D9A441] shrink-0">
+                      +{ach.reward} XP
+                    </span>
                   </div>
-                </div>
-                <h3 className="text-sm font-bold text-content/80 mb-2">No achievements yet</h3>
-                <p className="text-xs text-content/40 leading-relaxed max-w-[200px]">Complete levels, explore and earn badges to unlock achievements!</p>
-                
-                <div className="flex items-center gap-1 mt-6">
-                  <div className="w-1.5 h-1.5 rotate-45 bg-gold" />
-                  <div className="w-16 h-px bg-gold/30" />
-                  <div className="w-1.5 h-1.5 rotate-45 bg-gold" />
-                </div>
+                ))}
               </div>
             )}
           </div>
 
-          {/* COLLECTION CARD */}
-          <div className="glass-panel p-6 rounded-2xl border border-content/10 flex flex-col h-[280px]">
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-3">
-                <Box className="text-gold" size={20} />
-                <h2 className="text-lg font-bold text-content">Collection</h2>
+          {/* COLLECTION PREVIEW CARD */}
+          <div className="glass-panel p-6 rounded-2xl">
+            <div className="flex justify-between items-center mb-4 pb-3 border-b border-[#34302A]">
+              <div className="flex items-center gap-2">
+                <Box className="text-[#D9A441]" size={18} />
+                <h2 className="text-base font-bold text-white">
+                  Collection ({collectedPreviewItems.length})
+                </h2>
               </div>
-              <Link to="/inventory" className="text-xs font-bold text-gold hover:text-gold/80 flex items-center gap-1 transition-colors">
-                View All <ArrowRight size={14} />
-              </Link>
+              <button
+                onClick={() => navigate('/inventory')}
+                className="text-xs font-bold text-[#D9A441] hover:underline"
+              >
+                Open Inventory →
+              </button>
             </div>
-            
-            <div className="flex justify-between gap-2 mb-6">
-               {[0,1,2,3,4].map(idx => {
-                 const hasArtifact = idx < artifactsCount;
-                 return (
-                   <div key={idx} className={`flex-1 aspect-square rounded-lg flex items-center justify-center shadow-inner relative overflow-hidden group transition-colors ${hasArtifact ? 'bg-gold/10 border border-gold/30' : 'bg-surface/50 border border-content/5 hover:border-gold/30'}`}>
-                      <Box size={24} className={`${hasArtifact ? 'text-gold' : 'text-content/10 group-hover:text-gold/40'} transition-colors`} />
-                   </div>
-                 );
-               })}
-            </div>
-            
-            <div className="mt-auto">
-              <div className="flex justify-between items-end mb-2">
-                <span className="font-bold text-lg text-content">{artifactsCount}<span className="text-sm text-content/50 ml-1">/ 50</span></span>
-                <span className="text-xs text-content/50 font-bold uppercase tracking-wider">Artifacts Collected</span>
+
+            {collectedPreviewItems.length === 0 ? (
+              <div className="p-6 rounded-xl bg-[#151B20] border border-[#34302A] text-center space-y-2">
+                <Box size={26} className="text-[#D9A441]/50 mx-auto" />
+                <p className="text-xs text-[#C5C9CC]">
+                  No items collected yet. Explore historical sites or forage in the Builder to collect items.
+                </p>
               </div>
-              <div className="w-full h-1.5 bg-surface rounded-full overflow-hidden border border-content/5">
-                <div className="h-full bg-gold rounded-full" style={{ width: `${Math.min((artifactsCount/50)*100, 100)}%` }} />
+            ) : (
+              <div className="grid grid-cols-2 gap-2.5">
+                {collectedPreviewItems.slice(0, 6).map(item => (
+                  <div
+                    key={item.id}
+                    onClick={() => navigate('/inventory')}
+                    className="p-3 rounded-xl bg-[#151B20] border border-[#34302A] hover:border-[#D9A441]/50 flex items-center gap-2.5 cursor-pointer transition-colors"
+                  >
+                    <span className="text-xl shrink-0">{item.icon}</span>
+                    <span className="text-xs font-bold text-white truncate">{item.name}</span>
+                  </div>
+                ))}
               </div>
-            </div>
+            )}
           </div>
 
-          {/* QUICK INFO (Account Settings) */}
-          <div className="glass-panel p-6 rounded-2xl border border-content/10 relative overflow-hidden group hover:border-gold/30 transition-colors cursor-pointer" onClick={() => navigate('/settings')}>
-             <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0 duration-300">
-               <Settings className="text-gold" size={24} />
-             </div>
-             
-             <div className="flex items-center gap-4 relative z-10">
-               <div className="p-3 bg-surface rounded-xl border border-content/10 shadow-sm text-gold">
-                 <User size={24} />
-               </div>
-               <div>
-                 <h2 className="text-sm font-bold text-content mb-1">Quick Info</h2>
-                 <p className="text-xs text-content/60 flex items-center gap-1">Account Settings <ArrowRight size={12} /></p>
-               </div>
-             </div>
-          </div>
+          {/* QUICK PREFERENCES CARD */}
+          <div className="glass-panel p-6 rounded-2xl space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#34302A]">
+              <h2 className="text-base font-bold text-white">Quick Preferences</h2>
+              <button
+                onClick={() => navigate('/settings')}
+                className="text-xs font-bold text-[#D9A441] hover:underline"
+              >
+                All Settings →
+              </button>
+            </div>
 
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-[#C5C9CC] font-bold">Audio Effects</span>
+              <button
+                onClick={toggleMute}
+                className="px-3 py-1.5 rounded-lg bg-[#151B20] border border-[#34302A] hover:border-[#D9A441] text-white font-bold flex items-center gap-1.5"
+              >
+                {audioSettings.muted ? <VolumeX size={14} /> : <Volume2 size={14} />}
+                <span>{audioSettings.muted ? 'Muted' : 'Sound On'}</span>
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-[#C5C9CC] font-bold">Language</span>
+              <div className="flex gap-1.5">
+                {[
+                  { id: 'en', label: 'EN' },
+                  { id: 'hi', label: 'हिं' },
+                  { id: 'te', label: 'తె' }
+                ].map(lang => (
+                  <button
+                    key={lang.id}
+                    onClick={() => changeLanguage(lang.id)}
+                    className={`px-2.5 py-1 rounded-lg font-bold border ${
+                      language === lang.id
+                        ? 'bg-[#D9A441] text-[#070A0C] border-[#D9A441]'
+                        : 'bg-[#151B20] text-[#C5C9CC] border-[#34302A]'
+                    }`}
+                  >
+                    {lang.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-[#34302A] flex justify-between items-center text-xs">
+              <span className="text-[#C5C9CC] font-bold">Guided Tutorial</span>
+              <button
+                onClick={() => {
+                  resetTutorial();
+                  navigate('/dashboard');
+                }}
+                className="text-[#D9A441] font-bold hover:underline flex items-center gap-1"
+              >
+                <HelpCircle size={13} /> Replay Tutorial
+              </button>
+            </div>
+          </div>
         </div>
-
       </div>
     </div>
   );
 };
-
-const CheckCircle = ({ className, ...props }) => (
-  <svg className={className} {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-);
 
 export default ProfilePage;

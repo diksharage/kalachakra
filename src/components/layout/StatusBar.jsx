@@ -1,6 +1,6 @@
 import React from 'react';
 import { useGame } from '../../context/GameContext';
-import { Menu, Heart, Brain, Library, Star, Search, Volume2, VolumeX, CheckCircle2, Loader2, AlertCircle, Wifi, WifiOff } from 'lucide-react';
+import { Menu, Heart, Brain, Library, Star, Search, Volume2, VolumeX, CheckCircle2, Loader2, AlertCircle, WifiOff } from 'lucide-react';
 import { useNetworkStatus } from '../../hooks/useNetworkStatus';
 import { useAudio } from '../../context/AudioContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -8,7 +8,7 @@ import NotificationCenter from './NotificationCenter';
 
 const StatusBar = ({ onMenuToggle }) => {
   const { gameState, saveStatus } = useGame();
-  const { isOnline, isOffline } = useNetworkStatus();
+  const { isOffline } = useNetworkStatus();
   const { settings: audioSettings, toggleMute, playSound } = useAudio();
   const { t } = useLanguage();
 
@@ -16,7 +16,6 @@ const StatusBar = ({ onMenuToggle }) => {
     { name: 'Energy', value: gameState.energy, icon: Heart, color: 'text-red-400' },
     { name: 'Knowledge', value: gameState.knowledge, icon: Brain, color: 'text-blue-400' },
     { name: 'Culture', value: gameState.culture, icon: Library, color: 'text-purple-400' },
-    
     { name: 'Legacy', value: gameState.legacy, icon: Star, color: 'text-orange-400' },
   ];
 
@@ -25,9 +24,10 @@ const StatusBar = ({ onMenuToggle }) => {
       <button className="md:hidden p-2 mr-2 text-content/70 hover:text-gold" onClick={onMenuToggle}>
         <Menu size={24} />
       </button>
-            <div className="flex items-center gap-4 flex-1 max-w-xl mx-4">
-        <button 
-          data-tutorial="global-search" onClick={() => { playSound('ui'); window.dispatchEvent(new CustomEvent('open-global-search')); }}
+      <div className="flex items-center gap-4 flex-1 max-w-xl mx-4">
+        <button
+          data-tutorial="global-search"
+          onClick={() => { playSound('ui'); window.dispatchEvent(new CustomEvent('open-global-search')); }}
           className="w-full flex items-center gap-3 bg-surface/50 hover:bg-surface border border-content/10 hover:border-gold/50 px-4 py-2 rounded-xl transition-all group"
         >
           <Search size={18} className="text-content/50 group-hover:text-gold transition-colors" />
@@ -52,9 +52,9 @@ const StatusBar = ({ onMenuToggle }) => {
           </div>
         ))}
       </div>
-      
-            <div className="flex items-center gap-3">
-                                {gameState.isAuthenticated && (
+
+      <div className="flex items-center gap-3">
+        {gameState.isAuthenticated && (
           <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface/50 border border-content/10 text-xs font-medium text-content/70">
             {saveStatus === 'saving' && <><Loader2 size={12} className="animate-spin text-gold" /> Saving...</>}
             {saveStatus === 'saved' && <><CheckCircle2 size={12} className="text-green-500" /> {isOffline ? 'Saved locally' : 'Saved'}</>}
@@ -67,7 +67,7 @@ const StatusBar = ({ onMenuToggle }) => {
             <WifiOff size={12} /> <span className="hidden sm:inline">Offline Mode</span>
           </div>
         )}
-        <button 
+        <button
           onClick={toggleMute}
           className="w-10 h-10 rounded-xl bg-surface/50 border border-content/10 hover:border-gold hover:text-gold transition-colors flex items-center justify-center"
           title={audioSettings.muted ? t('audio.sound_off', 'Sound Off') : t('audio.sound_on', 'Sound On')}
@@ -76,8 +76,8 @@ const StatusBar = ({ onMenuToggle }) => {
         </button>
         <div data-tutorial="notifications"><NotificationCenter /></div>
         <div className="text-right hidden sm:block">
-          <div className="text-sm font-bold text-content">{gameState.playerType || 'Guest'}</div>
-          <div className="text-xs text-gold">Level {gameState.level}</div>
+          <div className="text-sm font-bold text-content capitalize">{gameState.playerType || 'Explorer'}</div>
+          <div className="text-xs text-gold">Level {gameState.currentLevel || gameState.level || 1}</div>
         </div>
         <div className="w-10 h-10 rounded-full bg-surface border-2 border-gold flex items-center justify-center overflow-hidden">
           <UserIcon type={gameState.playerType} />
@@ -88,24 +88,14 @@ const StatusBar = ({ onMenuToggle }) => {
 };
 
 const UserIcon = ({ type }) => {
-  switch (type) {
-    case 'Explorer': return <span>ðŸ§­</span>;
-    case 'Strategist': return <span>â™Ÿï¸</span>;
-    case 'Historian': return <span>ðŸ“œ</span>;
-    case 'Builder': return <span>ðŸ§±</span>;
-    default: return <span className="text-content">U</span>;
+  const normalized = String(type || '').toLowerCase();
+  switch (normalized) {
+    case 'explorer': return <span>🧭</span>;
+    case 'strategist': return <span>♟️</span>;
+    case 'historian': return <span>📜</span>;
+    case 'builder': return <span>🧱</span>;
+    default: return <span className="text-content">🧭</span>;
   }
-}
+};
 
 export default StatusBar;
-
-
-
-
-
-
-
-
-
-
-

@@ -197,7 +197,7 @@ export const WorldEventWidget = () => {
     <div className="p-6 rounded-2xl border flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-gold/10 border-gold/40 animate-pulse-slow">
       <div className="flex gap-4 items-center">
         <div className="w-14 h-14 rounded-xl bg-gold text-main flex items-center justify-center text-3xl shrink-0 shadow-lg shadow-gold/20">
-          Ã¢Å¡Â¡
+          ⚡
         </div>
         <div>
           <div className="text-[10px] font-bold text-gold uppercase tracking-wider mb-1">{t('event.alert', 'World Event Available')}</div>

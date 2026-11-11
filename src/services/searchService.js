@@ -1,13 +1,11 @@
 ﻿import { heritageLibrary } from '../data/heritageLibrary';
 import { historicalLocations } from '../data/historicalLocations';
-import { getBuilderDataForLevel } from '../data/civilizationBuilder';
 import { questionBank } from '../data/questionBank';
 import { questData } from '../data/quests';
 import { achievementsData } from '../data/achievements';
 
 const LEVEL_COUNT = 14;
 
-// Memoized index to prevent rebuilding on every keystroke
 let cachedIndex = null;
 let cacheKey = null;
 
@@ -29,7 +27,7 @@ export const buildSearchIndex = (t, gameState, currentLanguage) => {
       levelId: i,
       category: 'Levels',
       route: `/journey/level/${i}`,
-      icon: 'ðŸŒ',
+      icon: '🌍',
       locked: (gameState.currentLevel || 1) < i,
       discovered: true,
       tags: ['level', 'journey', 'era']
@@ -42,13 +40,13 @@ export const buildSearchIndex = (t, gameState, currentLanguage) => {
     index.push({
       id: `lib_${item.id}`,
       type: 'library',
-      title: t(`library.entry.${item.id}.title`, item.id),
+      title: t(`library.entry.${item.id}.title`, item.title || item.id),
       subtitle: t(`library.cat.${item.category}`, item.category),
-      description: t(`library.entry.${item.id}.known`, ''),
+      description: t(`library.entry.${item.id}.known`, item.known || ''),
       levelId: item.level,
       category: 'Heritage Library',
       route: `/library?item=${item.id}`,
-      icon: 'ðŸ“š',
+      icon: '📚',
       locked: false,
       discovered: isDiscovered,
       tags: ['library', item.category, 'heritage', 'culture', 'artifact']
@@ -67,14 +65,13 @@ export const buildSearchIndex = (t, gameState, currentLanguage) => {
       levelId: loc.level,
       category: 'Map',
       route: `/explore?loc=${loc.id}`,
-      icon: 'ðŸ—ºï¸',
+      icon: '🗺️',
       locked: false,
       discovered: isDiscovered,
       tags: ['map', 'location', 'place', 'geography']
     });
   });
 
-  
   // 4. Core Pages
   index.push({
     id: 'page_profile',
@@ -146,16 +143,15 @@ export const buildSearchIndex = (t, gameState, currentLanguage) => {
     }
   });
 
-  
   // 7. Achievements
   achievementsData.forEach(ach => {
     const isCompleted = (gameState.achievements || []).includes(ach.id);
     index.push({
       id: `ach_${ach.id}`,
       type: 'achievement',
-      title: t(ach.titleKey, ach.id.replace('_', ' ')),
+      title: t(ach.titleKey, ach.title || ach.id.replace(/_/g, ' ')),
       subtitle: t(`category.${ach.category}`, ach.category),
-      description: t(ach.descKey, ''),
+      description: t(ach.descKey, ach.description || ''),
       levelId: 1,
       category: 'Achievement',
       route: '/achievements',
@@ -165,9 +161,6 @@ export const buildSearchIndex = (t, gameState, currentLanguage) => {
       tags: ['achievement', 'trophy', 'reward', 'milestone', ach.category, ach.rarity]
     });
   });
-
-  // Build searchable text
-
 
   index.forEach(item => {
     item.searchableText = [
@@ -196,15 +189,11 @@ export const performSearch = (query, index) => {
   const scoredResults = index.map(item => {
     let score = 0;
     const titleLower = (item.title || '').toLowerCase();
-    
-    // 1. Exact title match
+
     if (titleLower === q) score += 100;
-    // 2. Starts-with title match
     else if (titleLower.startsWith(q)) score += 50;
-    // 3. Title partial match
     else if (titleLower.includes(q)) score += 25;
-    
-    // 4. Token matching against searchableText
+
     const matchedTokens = qTokens.filter(token => item.searchableText.includes(token));
     if (matchedTokens.length > 0) {
       score += matchedTokens.length * 5;
@@ -213,11 +202,8 @@ export const performSearch = (query, index) => {
     return { ...item, score };
   });
 
-  // Filter out zero scores, sort by score descending, return top 12
   return scoredResults
     .filter(item => item.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, 12);
 };
-
-

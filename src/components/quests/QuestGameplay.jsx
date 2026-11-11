@@ -121,7 +121,7 @@ const QuestGameplay = ({ quest, onComplete, onClose }) => {
     return (
       <div className="flex flex-col items-center gap-6 py-8 px-4 max-w-lg mx-auto text-center animate-in fade-in zoom-in duration-500">
         <div className="text-6xl">{accuracy >= 80 ? '🏆' : accuracy >= 50 ? '⭐' : '📚'}</div>
-        <h2 className={`text-3xl font-serif font-bold ${levelTheme.text}`}>
+        <h2 className="text-3xl font-serif font-bold text-[#D9A441]">
           {accuracy >= 80 ? 'Quest Complete!' : accuracy >= 50 ? 'Well Done!' : 'Keep Exploring!'}
         </h2>
 
@@ -190,12 +190,12 @@ const QuestGameplay = ({ quest, onComplete, onClose }) => {
         </button>
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <Target size={14} className={levelTheme.text} />
-            <span className={`text-xs font-bold uppercase tracking-wider ${levelTheme.text}`}>
-              Level {levelId} Quest
+            <Target size={14} className="text-[#D9A441]" />
+            <span className="text-xs font-bold uppercase tracking-wider text-[#D9A441]">
+              Level {levelId} Quest: {quest?.levelName || ''}
             </span>
           </div>
-          <h2 className="text-base font-bold text-content truncate">{quest?.titleKey?.split('.').pop()?.replace(/_/g,' ')?.replace(/\b\w/g,c=>c.toUpperCase()) || 'Quest'}</h2>
+          <h2 className="text-base font-bold text-content truncate">{quest?.title || quest?.titleKey?.split('.').pop()?.replace(/_/g,' ')?.replace(/\b\w/g,c=>c.toUpperCase()) || 'Quest'}</h2>
         </div>
         <div className="text-right">
           <span className="text-xs text-content/50 font-bold">{qIndex + 1} / {totalQ}</span>

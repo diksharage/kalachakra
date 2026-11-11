@@ -4,7 +4,7 @@ import { questData } from '../data/quests';
 
 export const getDashboardStats = (gameState) => {
   const currentLevel = gameState.currentLevel || 1;
-  const completedLevelsCount = Math.max(0, currentLevel - 1);
+  const completedLevelsCount = (gameState.completedLevels || []).length;
   const journeyPercentage = Math.round((completedLevelsCount / 14) * 100);
 
   // Library stats
@@ -12,7 +12,7 @@ export const getDashboardStats = (gameState) => {
   const libraryTotal = heritageLibrary.length;
   const libraryDiscovered = unlockedArtifacts.length;
   const libraryPercentage = libraryTotal > 0 ? Math.round((libraryDiscovered / libraryTotal) * 100) : 0;
-  
+
   // Categorize library
   const libraryByCategory = heritageLibrary.reduce((acc, item) => {
     if (!acc[item.category]) acc[item.category] = { total: 0, discovered: 0 };
@@ -30,7 +30,9 @@ export const getDashboardStats = (gameState) => {
   const builtEnvironment = gameState.builtEnvironment || {};
   let totalBuildings = 0;
   Object.values(builtEnvironment).forEach(levelBuildings => {
-    totalBuildings += levelBuildings.length;
+    if (Array.isArray(levelBuildings)) {
+      totalBuildings += levelBuildings.length;
+    }
   });
 
   // Event stats
@@ -38,7 +40,7 @@ export const getDashboardStats = (gameState) => {
 
   // Investigation stats
   const completedInvestigations = gameState.completedInvestigations || [];
-  
+
   // Legacy
   const legacy = gameState.legacy || 0;
   const milestones = [25, 50, 100, 150, 250, 500, 1000];
@@ -49,7 +51,7 @@ export const getDashboardStats = (gameState) => {
       currentLevel,
       completedLevelsCount,
       percentage: journeyPercentage,
-      isComplete: currentLevel >= 14 && (gameState.quests?.[`q_l14_main`]?.status === 'completed')
+      isComplete: (gameState.completedLevels || []).includes(14) || (currentLevel >= 14 && (gameState.quests?.['q_l14_preserve']?.status === 'completed'))
     },
     legacy: {
       current: legacy,
@@ -87,8 +89,8 @@ export const getRecommendedActions = (gameState, stats) => {
 
   // 1. Check Quests
   const activeQuests = Object.entries(gameState.quests || {})
-    .filter(([_, q]) => q.status === 'active' && questData.find(xq => xq.id === _ && xq.levelId === cl));
-  
+    .filter(([id, q]) => (q.status === 'active' || q.status === 'in_progress') && questData.find(xq => xq.id === id && xq.levelId === cl));
+
   if (activeQuests.length > 0) {
     actions.push({
       id: 'rec_quest',
@@ -96,7 +98,7 @@ export const getRecommendedActions = (gameState, stats) => {
       descKey: 'dash.rec.quest_desc',
       route: '/quests',
       priority: 1,
-      icon: 'ðŸŽ¯'
+      icon: '🎯'
     });
   } else if (cl < 14) {
     actions.push({
@@ -105,7 +107,7 @@ export const getRecommendedActions = (gameState, stats) => {
       descKey: 'dash.rec.journey_desc',
       route: '/journey',
       priority: 1,
-      icon: 'ðŸ§­'
+      icon: '🧭'
     });
   }
 
@@ -119,20 +121,20 @@ export const getRecommendedActions = (gameState, stats) => {
       descKey: 'dash.rec.map_desc',
       route: '/explore',
       priority: 2,
-      icon: 'ðŸ—ºï¸'
+      icon: '🗺️'
     });
   }
 
   // 3. Builder
   const currentBuildings = (gameState.builtEnvironment?.[cl] || []).length;
-  if (currentBuildings === 0 && cl !== 1) { // Assuming level 1 might not have builder focus right away
+  if (currentBuildings === 0 && cl !== 1) {
     actions.push({
       id: 'rec_build',
       titleKey: 'dash.rec.build_title',
       descKey: 'dash.rec.build_desc',
       route: '/builder',
       priority: 3,
-      icon: 'ðŸ› ï¸'
+      icon: '🛠️'
     });
   }
 
@@ -144,11 +146,9 @@ export const getRecommendedActions = (gameState, stats) => {
       descKey: 'dash.rec.library_desc',
       route: '/library',
       priority: 4,
-      icon: 'ðŸ“–'
+      icon: '📖'
     });
   }
 
-  // Sort and return top 3
   return actions.sort((a, b) => a.priority - b.priority).slice(0, 3);
 };
-

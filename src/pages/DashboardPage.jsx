@@ -33,23 +33,18 @@ const DashboardPage = () => {
   const currentLevelData = levelThemes[currentLevel] || levelThemes.default;
   const continueRoute = isComplete ? '/profile' : (gameState.activeLevelId === currentLevel && gameState.activeLevelState ? `/journey/level/${currentLevel}/play` : `/journey/level/${currentLevel}`);
   
-  const getStageProgress = (state) => {
-    if (!state || !state.stage) return "0 / 5 Stages Completed";
-    const stage = Math.min(state.stage, 5);
-    return `${stage} / 5 Stages Completed`;
-  };
+  const stageCount = (gameState.completedLevels || []).includes(currentLevel)
+    ? 5
+    : (gameState.activeLevelId === currentLevel && gameState.activeLevelState)
+      ? Math.min(Math.max(0, (gameState.activeLevelState.stage || 1) - 1), 5)
+      : 0;
 
-  const stageProgressText = (gameState.activeLevelId === currentLevel && gameState.activeLevelState) 
-    ? getStageProgress(gameState.activeLevelState) 
-    : "2 / 5 Stages Completed"; // Fallback to match reference visually if no state
-
-  const stageProgressPercent = (gameState.activeLevelId === currentLevel && gameState.activeLevelState)
-    ? (Math.min(gameState.activeLevelState.stage || 0, 5) / 5) * 100
-    : 40; // Fallback to 40% to match reference
+  const stageProgressText = `${stageCount} / 5 Stages Completed`;
+  const stageProgressPercent = (stageCount / 5) * 100;
 
   // XP calculation
-  const xp = gameState.legacy || 125;
-  const nextLevelXp = 500;
+  const xp = gameState.legacy || 0;
+  const nextLevelXp = Math.max(500, Math.ceil((xp + 1) / 500) * 500);
   const xpPercent = Math.min((xp / nextLevelXp) * 100, 100);
 
   const formatTimeAgo = (timestamp) => {
@@ -280,7 +275,7 @@ const DashboardPage = () => {
                 <Clock className="text-gold" size={18} />
                 <h2 className="text-[15px] font-bold text-white">Recent Activity</h2>
               </div>
-              <button className="text-[13px] font-bold text-[#D9A441] hover:text-[#D9A441]/80 flex items-center gap-1 transition-colors">
+              <button onClick={() => navigate('/profile')} className="text-[13px] font-bold text-[#D9A441] hover:text-[#D9A441]/80 flex items-center gap-1 transition-colors">
                 View All &rarr;
               </button>
             </div>
@@ -292,7 +287,7 @@ const DashboardPage = () => {
                     {act.type === 'artifact' ? <BookOpen size={14} /> : act.type === 'challenge' ? <Activity size={14} /> : <Star size={14} />}
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-[13px] font-bold text-white">{act.titleKey || act.type}</h3>
+                    <h3 className="text-[13px] font-bold text-white">{t(act.titleKey, act.titleKey || act.type)}</h3>
                     <p className="text-[11px] text-[#C5C9CC] mt-0.5">{formatTimeAgo(act.timestamp)}</p>
                   </div>
                   <div className="text-[#34302A] group-hover:text-[#D9A441]/50">
@@ -320,13 +315,13 @@ const DashboardPage = () => {
                 <div className="w-full h-full rounded-full border-[3px] border-[#D9A441] border-t-transparent animate-spin-slow absolute inset-0" />
                 <div className="w-full h-full rounded-full bg-[#151B20] flex flex-col items-center justify-center">
                   <Star size={18} className="text-[#D9A441] mb-1" />
-                  <span className="text-[10px] font-bold text-white">Level 1</span>
+                  <span className="text-[10px] font-bold text-white">Level {currentLevel}</span>
                 </div>
               </div>
               
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-white mb-0.5">{gameState.playerType || 'Explorer'}</h3>
-                <p className="text-[12px] text-[#C5C9CC] mb-3">Beginner in your journey</p>
+                <h3 className="text-lg font-bold text-white mb-0.5 capitalize">{gameState.playerType || 'Explorer'}</h3>
+                <p className="text-[12px] text-[#C5C9CC] mb-3">{currentLevelData.name}</p>
                 <div className="w-full h-1.5 bg-[#090C0F] rounded-full overflow-hidden border border-[#34302A] mb-1.5">
                   <div className="h-full bg-[#D9A441] rounded-full" style={{ width: `${xpPercent}%` }} />
                 </div>

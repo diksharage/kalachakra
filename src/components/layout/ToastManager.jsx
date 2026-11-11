@@ -80,7 +80,7 @@ const ToastManager = () => {
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0 
               ${isAchievement ? 'bg-gradient-to-br from-gold to-terracotta' : (lTheme ? `${lTheme.bg} ${lTheme.border}` : 'bg-main')}
             `}>
-              {toast.metadata?.icon || 'ðŸ””'}
+              {toast.metadata?.icon || '🔔'}
             </div>
             
             <div className="flex-1 min-w-0 pt-0.5">

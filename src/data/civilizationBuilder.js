@@ -1,242 +1,696 @@
 export const civilizationBuilderData = {
-  // Level 1 - Paleolithic/Mesolithic
   1: {
-    gridSize: { cols: 5, rows: 5 },
-    terrain: { water: [0, 5, 10, 15] },
-    categories: ["Survival", "Tools", "Community"],
-    buildings: [
-      { id: "l1_shelter", category: "Survival", nameKey: "Basic Shelter", descKey: "Construct a simple shelter from natural materials.", icon: "⛺", choices: [
-        { id: "wood_shelter", label: "Wood & Leaf Lean-to", desc: "Fast and easy to assemble.", requirements: { wood: 1, plants: 1 }, effects: { community_capacity: 1, speed: 1 } },
-        { id: "stone_shelter", label: "Stone Cave Modification", desc: "Sturdy and provides great protection.", requirements: { stone: 1, plants: 1 }, effects: { community_capacity: 1, defense: 2 } }
-      ]},
-      { id: "l1_water", category: "Survival", nameKey: "Water Access", descKey: "Establish a safe route to the river.", icon: "💧", choices: [
-        { id: "safe_path", label: "Cleared Path", desc: "A simple trail to the water.", requirements: { tools: 1 }, effects: { water_security: 1 } },
-        { id: "communal_path", label: "Group Guarding", desc: "Establish a watch system.", requirements: { tools: 1, community: 1 }, effects: { water_security: 2 } }
-      ]},
-      { id: "l1_tools", category: "Tools", nameKey: "Knapping Station", descKey: "Create an area dedicated to crafting stone tools.", icon: "🪨", choices: [
-        { id: "flake_station", label: "Flaking Station", desc: "Basic sharp edges.", requirements: { stone: 1 }, effects: { tool_efficiency: 1 } },
-        { id: "advanced_knapping", label: "Biface Knapping", desc: "Complex dual-edged tools.", requirements: { stone: 1, wood: 1 }, effects: { tool_efficiency: 2 } }
-      ]}
+    levelId: 1,
+    eraTitle: 'Early Human Communities',
+    eraSubtitle: 'Paleolithic & Mesolithic Rock Shelters',
+    gridSize: 4,
+    waterTiles: [3, 7, 11, 15],
+    availableBuildings: [
+      {
+        id: 'basic_shelter',
+        nameKey: 'builder.b.shelter',
+        descKey: 'builder.b.shelter_desc',
+        name: 'Rock & Branch Shelter',
+        description: 'Provides essential protection from weather and predators for early foraging bands.',
+        icon: '⛺',
+        terrain: 'land',
+        requirements: { wood: 1, stone: 1 },
+        effects: { community: 15, culture: 5 },
+        choices: [
+          {
+            id: 'basic_shelter_wood',
+            label: 'Construct Lean-to Shelter',
+            desc: 'Use timber branches and plants to build a quick weather break.',
+            requirements: { wood: 1, plants: 1 },
+            effects: { community: 10 }
+          },
+          {
+            id: 'basic_shelter_cave',
+            label: 'Fortify Cave Entrance',
+            desc: 'Stack river stones to block wind and predators.',
+            requirements: { stone: 1 },
+            effects: { community: 15, legacy: 5 }
+          }
+        ]
+      },
+      {
+        id: 'fire_pit',
+        nameKey: 'builder.b.fire',
+        descKey: 'builder.b.fire_desc',
+        name: 'Communal Fire Hearth',
+        description: 'Provides warmth, night security, cooked food, and a gathering place for oral traditions.',
+        icon: '🔥',
+        terrain: 'land',
+        requirements: { wood: 1 },
+        effects: { food: 10, community: 10, culture: 5 },
+        choices: [
+          {
+            id: 'fire_pit_small',
+            label: 'Kindle Cooking Hearth',
+            desc: 'A focused fire for roasting roots and sharing warmth.',
+            requirements: { wood: 1 },
+            effects: { food: 10, community: 5 }
+          },
+          {
+            id: 'fire_pit_large',
+            label: 'Build Watchfire Ring',
+            desc: 'A stone-ringed hearth to ward off nocturnal predators.',
+            requirements: { wood: 1, stone: 1 },
+            effects: { community: 15, culture: 10 }
+          }
+        ]
+      },
+      {
+        id: 'tool_workshop',
+        nameKey: 'builder.b.tools',
+        descKey: 'builder.b.tools_desc',
+        name: 'Stone Tool Knapping Area',
+        description: 'Dedicated riverside stone-working spot for shaping hand axes, scrapers, and microliths.',
+        icon: '🪨',
+        terrain: 'land',
+        requirements: { stone: 1 },
+        effects: { knowledge: 10, food: 10, community: 5 },
+        choices: [
+          {
+            id: 'tool_workshop_flint',
+            label: 'Knap Core Hand Axes',
+            desc: 'Shape heavy quartzite cobbles into multipurpose cutting tools.',
+            requirements: { stone: 1 },
+            effects: { food: 15, knowledge: 10 }
+          }
+        ]
+      }
     ]
   },
-  // Level 2 - Neolithic / Early Farming
+
   2: {
-    gridSize: { cols: 5, rows: 5 },
-    terrain: { water: [2, 3, 4] },
-    categories: ["Agriculture", "Storage", "Settlement"],
-    buildings: [
-      { id: "l2_crops", category: "Agriculture", nameKey: "Wheat Field", descKey: "Clear land and plant early domesticated wheat.", requirements: { wild_seeds: 2, fertile_soil: 1, water: 1 }, effects: { food_production: 2 }, icon: "🌾" },
-      { id: "l2_storage", category: "Storage", nameKey: "Clay Granary", descKey: "Build a sealed granary using early pottery techniques.", requirements: { clay_pots: 2, harvested_grain: 1 }, effects: { storage_capacity: 3 }, icon: "🏺" },
-      { id: "l2_settlement", category: "Settlement", nameKey: "Mudbrick House", descKey: "Construct a permanent dwelling.", requirements: { mudbrick: 2, tools: 1 }, effects: { community_capacity: 2 }, icon: "🛖" }
+    levelId: 2,
+    eraTitle: 'Early Farming Communities',
+    eraSubtitle: 'Neolithic Villages & Domestication',
+    gridSize: 4,
+    waterTiles: [2, 6, 10, 14],
+    availableBuildings: [
+      {
+        id: 'crop_field',
+        nameKey: 'builder.b.crop_field',
+        descKey: 'builder.b.crop_field_desc',
+        name: 'Cultivated Wheat & Barley Field',
+        description: 'Irrigated alluvial plot for growing early domesticated grains.',
+        icon: '🌾',
+        terrain: 'land',
+        requirements: { water: 1, grain: 1 },
+        effects: { food: 20, community: 10 }
+      },
+      {
+        id: 'mud_brick_hut',
+        nameKey: 'builder.b.mud_hut',
+        descKey: 'builder.b.mud_hut_desc',
+        name: 'Mud-Brick Dwelling',
+        description: 'Permanent rectangular mud-brick house inspired by early Mehrgarh settlements.',
+        icon: '🛖',
+        terrain: 'land',
+        requirements: { wood: 1, stone: 1 },
+        effects: { community: 15, culture: 5 }
+      },
+      {
+        id: 'granary_pit',
+        nameKey: 'builder.b.granary',
+        descKey: 'builder.b.granary_desc',
+        name: 'Clay-Lined Storage Granary',
+        description: 'Compartmented mud-brick storage structure to protect surplus grain between harvests.',
+        icon: '🏺',
+        terrain: 'land',
+        requirements: { grain: 1, stone: 1 },
+        effects: { food: 15, knowledge: 10 }
+      }
     ]
   },
-  // Level 3 - Indus Civilization
+
   3: {
-    gridSize: { cols: 5, rows: 5 },
-    terrain: { water: [4, 9, 14, 19, 24] },
-    categories: ["Settlement", "Water", "Storage", "Craft"],
-    buildings: [
-      { id: "indus_water_feature", category: "Water", nameKey: "Great Bath Segment", descKey: "Build advanced public water infrastructure.", icon: "💧", choices: [
-        { id: "public_bath", label: "Ritual Bathing Pool", desc: "Focus on cultural integration.", requirements: { bricks: 1, water: 1 }, effects: { hygiene: 2, culture: 1 } },
-        { id: "sealed_bath", label: "Bitumen-Sealed Pool", desc: "Focus on waterproofing technology.", requirements: { materials: 1, water: 1 }, effects: { hygiene: 3 } }
-      ]},
-      { id: "indus_storage", category: "Storage", nameKey: "Harappan Granary", descKey: "A massive centralized storage facility.", icon: "🏺", choices: [
-        { id: "large_granary", label: "Massive Brick Granary", desc: "Maximum capacity.", requirements: { bricks: 1 }, effects: { storage_capacity: 5 } },
-        { id: "ventilated_granary", label: "Ventilated Storage", desc: "Prevents grain rot.", requirements: { tools: 1, storage: 1 }, effects: { storage_capacity: 4, food_safety: 1 } }
-      ]},
-      { id: "indus_trade", category: "Craft", nameKey: "Bead Workshop", descKey: "Organize the trade of carnelian beads.", icon: "💎", choices: [
-        { id: "carnelian_tools", label: "Specialized Stone Drills", desc: "High-precision tools.", requirements: { tools: 1 }, effects: { craft_production: 3 } },
-        { id: "efficient_workshop", label: "Organized Labor Division", desc: "Assembly line efficiency.", requirements: { craftMaterials: 1 }, effects: { craft_production: 4 } }
-      ]},
-      { id: "indus_drainage", category: "Water", nameKey: "Covered Drains", descKey: "Establish systematic sanitation.", icon: "🧱", choices: [
-        { id: "main_drains", label: "Main Street Drains", desc: "Centralized sewage.", requirements: { bricks: 1 }, effects: { hygiene: 2 } },
-        { id: "house_drains", label: "Connected House Drains", desc: "Direct sanitation.", requirements: { water: 1 }, effects: { hygiene: 4 } }
-      ]},
-      { id: "indus_house", category: "Settlement", nameKey: "Courtyard House", descKey: "Build multi-story brick dwellings.", icon: "🏠", choices: [
-        { id: "multi_story", label: "Multi-Story Dwelling", desc: "Focus on population.", requirements: { bricks: 1 }, effects: { population: 3 } },
-        { id: "craft_house", label: "Artisan Courtyard", desc: "Focus on home industry.", requirements: { craftMaterials: 1 }, effects: { population: 2, craft_production: 1 } }
-      ]}
+    levelId: 3,
+    eraTitle: 'Indus Valley Civilization',
+    eraSubtitle: 'Planned Harappan Urban Grid',
+    gridSize: 4,
+    waterTiles: [0, 4, 8, 12],
+    availableBuildings: [
+      {
+        id: 'mud_brick_house',
+        nameKey: 'builder.b.brick_house',
+        descKey: 'builder.b.brick_house_desc',
+        name: 'Courtyard Brick Residence',
+        description: 'Multi-room house built with standardized 1:2:4 ratio baked bricks and a private bathing platform.',
+        icon: '🧱',
+        terrain: 'land',
+        requirements: { brick: 2, water: 1 },
+        effects: { community: 20, culture: 10 },
+        choices: [
+          {
+            id: 'house_standard',
+            label: 'Standard Courtyard House',
+            desc: 'Single-story brick home around a central open courtyard.',
+            requirements: { brick: 2 },
+            effects: { community: 15 }
+          },
+          {
+            id: 'house_two_story',
+            label: 'Merchant Two-Story Residence',
+            desc: 'Includes a private well and connected street drain.',
+            requirements: { brick: 3, water: 1 },
+            effects: { community: 25, trade: 10 }
+          }
+        ]
+      },
+      {
+        id: 'drain_channel',
+        nameKey: 'builder.b.drain',
+        descKey: 'builder.b.drain_desc',
+        name: 'Covered Brick Drain Channel',
+        description: 'Corbelled underground street drainage line with inspection covers for municipal sanitation.',
+        icon: '💧',
+        terrain: 'land',
+        requirements: { brick: 1, water: 1 },
+        effects: { community: 15, knowledge: 15 },
+        choices: [
+          {
+            id: 'drain_covered',
+            label: 'Covered Street Drain',
+            desc: 'Brick-lined channel sealed with removable stone slabs.',
+            requirements: { brick: 1, water: 1 },
+            effects: { community: 20, knowledge: 10 }
+          }
+        ]
+      },
+      {
+        id: 'bead_workshop',
+        nameKey: 'builder.b.workshop',
+        descKey: 'builder.b.workshop_desc',
+        name: 'Carnelian Bead & Seal Workshop',
+        description: 'Artisan workshop using micro-drills and kilns to craft carnelian beads and steatite seals.',
+        icon: '📿',
+        terrain: 'land',
+        requirements: { stone: 1, brick: 1 },
+        effects: { trade: 25, culture: 10 },
+        choices: [
+          {
+            id: 'workshop_beads',
+            label: 'Carnelian Lapidary Studio',
+            desc: 'Heat-treat and drill stone beads for long-distance exchange.',
+            requirements: { stone: 1, brick: 1 },
+            effects: { trade: 25, culture: 10 }
+          }
+        ]
+      },
+      {
+        id: 'public_bath',
+        nameKey: 'builder.b.bath',
+        descKey: 'builder.b.bath_desc',
+        name: 'Great Public Bath Tank',
+        description: 'Watertight brick tank sealed with natural bitumen mortar and surrounded by colonnades.',
+        icon: '🏛️',
+        terrain: 'land',
+        requirements: { brick: 3, water: 2 },
+        effects: { culture: 30, community: 20 },
+        choices: [
+          {
+            id: 'bath_great',
+            label: 'Watertight Civic Bath',
+            desc: 'Line the basin with finely fitted bricks and gypsum plaster.',
+            requirements: { brick: 3, water: 2 },
+            effects: { culture: 30, community: 20 }
+          }
+        ]
+      }
     ]
   },
-  // Level 4 - Early Indian Trade Networks
+
   4: {
-    gridSize: { cols: 5, rows: 5 },
-    terrain: { water: [2, 7, 12, 17, 22] },
-    categories: ["Logistics", "Trade", "Navigation"],
-    buildings: [
-      { id: "l4_port", category: "Navigation", nameKey: "Coastal Port", descKey: "Establish a safe harbor for maritime vessels.", requirements: { materials: 2, capacity: 1 }, effects: { cargo_space: 2 }, icon: "⛵" },
-      { id: "l4_market", category: "Trade", nameKey: "Trade Hub", descKey: "A centralized location for inland and coastal exchange.", requirements: { tradeGoods: 2, supplies: 1 }, effects: { revenue: 2 }, icon: "⚖️" },
-      { id: "l4_storage", category: "Logistics", nameKey: "Warehouse", descKey: "Safely store cargo and trade goods.", requirements: { materials: 2 }, effects: { capacity: 3 }, icon: "📦" }
+    levelId: 4,
+    eraTitle: 'Early Indian Trade Networks',
+    eraSubtitle: 'Coastal Ports & Caravan Hubs',
+    gridSize: 4,
+    waterTiles: [0, 1, 4, 5, 8, 12],
+    availableBuildings: [
+      {
+        id: 'trade_dock',
+        nameKey: 'builder.b.trade_dock',
+        descKey: 'builder.b.trade_dock_desc',
+        name: 'Tidal Maritime Dockyard',
+        description: 'Brick-lined tidal basin inspired by Lothal for berthing cargo vessels safely.',
+        icon: '⚓',
+        terrain: 'water',
+        requirements: { wood: 2, brick: 1 },
+        effects: { trade: 30, knowledge: 10 }
+      },
+      {
+        id: 'caravanserai',
+        nameKey: 'builder.b.caravanserai',
+        descKey: 'builder.b.caravanserai_desc',
+        name: 'Overland Merchant Rest House',
+        description: 'Secure roadside courtyard along the Uttarapatha and Dakshinapatha trade highways.',
+        icon: '🐪',
+        terrain: 'land',
+        requirements: { wood: 1, stone: 1 },
+        effects: { trade: 20, community: 15 }
+      },
+      {
+        id: 'warehouse_guild',
+        nameKey: 'builder.b.warehouse',
+        descKey: 'builder.b.warehouse_desc',
+        name: 'Shreni Merchant Guild Warehouse',
+        description: 'Elevated storehouse where textiles, spices, and sealed cargo are weighed and registered.',
+        icon: '📦',
+        terrain: 'land',
+        requirements: { brick: 1, textiles: 1 },
+        effects: { trade: 25, culture: 10 }
+      }
     ]
   },
-  // Level 5 - Mahajanapadas
+
   5: {
-    gridSize: { cols: 6, rows: 5 },
-    terrain: { water: [24, 25, 26] },
-    categories: ["Fortification", "Administration", "Economy"],
-    buildings: [
-      { id: "l5_wall", category: "Fortification", nameKey: "City Wall", descKey: "Defend your emerging capital.", requirements: { stone: 3, wood: 2 }, effects: { defense: 5 }, icon: "🧱" },
-      { id: "l5_mint", category: "Economy", nameKey: "Coin Mint", descKey: "Produce punch-marked coins.", requirements: { stone: 2, wealth: 1 }, effects: { economy: 4 }, icon: "🪙" },
-      { id: "l5_assembly", category: "Administration", nameKey: "Sabha Hall", descKey: "Gathering place for council decisions.", requirements: { wood: 3, authority: 1 }, effects: { governance: 3 }, icon: "🏛️" }
+    levelId: 5,
+    eraTitle: 'Mahajanapadas & Early Kingdoms',
+    eraSubtitle: 'Fortified Capitals & Republics',
+    gridSize: 4,
+    waterTiles: [3, 7, 11, 15],
+    availableBuildings: [
+      {
+        id: 'fortification_wall',
+        nameKey: 'builder.b.fort_wall',
+        descKey: 'builder.b.fort_wall_desc',
+        name: 'Cyclopean Stone Rampart',
+        description: 'Massive stone and earthen fortification wall modeled on early Rajagriha defenses.',
+        icon: '🏰',
+        terrain: 'land',
+        requirements: { stone: 2, iron_tool: 1 },
+        effects: { community: 25, knowledge: 10 }
+      },
+      {
+        id: 'iron_smithy',
+        nameKey: 'builder.b.iron_smithy',
+        descKey: 'builder.b.iron_smithy_desc',
+        name: 'Iron Smelting Forge',
+        description: 'Produces iron plowshares and tools that enabled clearing dense Gangetic forests.',
+        icon: '⚒️',
+        terrain: 'land',
+        requirements: { wood: 1, stone: 1 },
+        effects: { food: 20, trade: 15 }
+      },
+      {
+        id: 'assembly_hall',
+        nameKey: 'builder.b.assembly_hall',
+        descKey: 'builder.b.assembly_hall_desc',
+        name: 'Santhagara Assembly Hall',
+        description: 'Deliberative council pavilion where representatives debated civic laws and policy.',
+        icon: '🏛️',
+        terrain: 'land',
+        requirements: { wood: 2, punch_marked_coin: 1 },
+        effects: { culture: 25, community: 20 }
+      }
     ]
   },
-  // Level 6 - Mauryan Empire
+
   6: {
-    gridSize: { cols: 6, rows: 6 },
-    terrain: { water: [0, 6, 12, 18, 24, 30] },
-    categories: ["Infrastructure", "Edicts", "Administration"],
-    buildings: [
-      { id: "maurya_road", category: "Logistics", nameKey: "Royal Highway", descKey: "Expand the Uttarapatha trade route.", icon: "🛣️", choices: [
-        { id: "trade_route", label: "Trade Focus", desc: "Encourage merchant caravans.", requirements: { stone: 1, infrastructure: 1 }, effects: { imperial_control: 1, trade_revenue: 2 } },
-        { id: "msg_route", label: "Messenger Focus", desc: "Fast relays for the emperor.", requirements: { communication: 2 }, effects: { imperial_control: 2, speed: 2 } }
-      ]},
-      { id: "maurya_pillar", category: "Culture", nameKey: "Ashokan Pillar", descKey: "Erect a monument of imperial edicts.", icon: "🏛️", choices: [
-        { id: "dhamma_pillar", label: "Dhamma Edict", desc: "Spread moral philosophy.", requirements: { stone: 2, communication: 2 }, effects: { cultural_unity: 3 } },
-        { id: "border_pillar", label: "Border Marker", desc: "Mark the edge of the empire.", requirements: { stone: 1, infrastructure: 1 }, effects: { imperial_control: 2 } }
-      ]},
-      { id: "maurya_stupa", category: "Religion", nameKey: "Brick Stupa", descKey: "Construct a massive reliquary.", icon: "🕉️", choices: [
-        { id: "stone_stupa", label: "Stone Casing", desc: "Upgrade the exterior.", requirements: { stone: 2, tools: 1 }, effects: { religious_merit: 4 } },
-        { id: "grand_stupa", label: "Carved Toranas (Gates)", desc: "Elaborate entranceways.", requirements: { tools: 1, tradeGoods: 1 }, effects: { religious_merit: 3, culture: 2 } }
-      ]}
+    levelId: 6,
+    eraTitle: 'Mauryan Empire',
+    eraSubtitle: 'Imperial Highways & Dhamma Edicts',
+    gridSize: 4,
+    waterTiles: [12, 13, 14, 15],
+    availableBuildings: [
+      {
+        id: 'royal_highway',
+        nameKey: 'builder.b.highway',
+        descKey: 'builder.b.highway_desc',
+        name: 'Royal Mauryan Highway',
+        description: 'Tree-lined imperial road with distance markers connecting Pataliputra to Taxila.',
+        icon: '🛣️',
+        terrain: 'land',
+        requirements: { stone: 2, wood: 1 },
+        effects: { trade: 25, community: 15 },
+        choices: [
+          {
+            id: 'highway_paved',
+            label: 'Construct Imperial Highway Segment',
+            desc: 'Grade the roadbed and erect distance pillars every kos.',
+            requirements: { stone: 2, wood: 1 },
+            effects: { trade: 25, community: 15 }
+          }
+        ]
+      },
+      {
+        id: 'rest_house',
+        nameKey: 'builder.b.rest_house',
+        descKey: 'builder.b.rest_house_desc',
+        name: 'Shaded Rest House & Well',
+        description: 'Public Banyan-shaded rest stop and step-well built for travelers and animals.',
+        icon: '🏡',
+        terrain: 'land',
+        requirements: { wood: 2, water: 1 },
+        effects: { community: 25, culture: 10 },
+        choices: [
+          {
+            id: 'rest_house_well',
+            label: 'Traveler Rest Stop & Well',
+            desc: 'Provide fresh water and medicinal herbs along the highway.',
+            requirements: { wood: 2, water: 1 },
+            effects: { community: 25, culture: 10 }
+          }
+        ]
+      },
+      {
+        id: 'edict_pillar',
+        nameKey: 'builder.b.pillar',
+        descKey: 'builder.b.pillar_desc',
+        name: 'Polished Ashokan Edict Pillar',
+        description: 'Monolithic Chunar sandstone column inscribed with Prakrit edicts of Dhamma.',
+        icon: '🦁',
+        terrain: 'land',
+        requirements: { stone: 2, ashokan_edict: 1 },
+        effects: { culture: 30, knowledge: 20 },
+        choices: [
+          {
+            id: 'pillar_lion',
+            label: 'Erect Sandstone Edict Pillar',
+            desc: 'Inscribe moral principles of compassion and civic welfare.',
+            requirements: { stone: 2 },
+            effects: { culture: 30, knowledge: 20 }
+          }
+        ]
+      }
     ]
   },
-  // Level 7 - Gupta Period & Knowledge
+
   7: {
-    gridSize: { cols: 5, rows: 5 },
-    terrain: { water: [0, 1, 2] },
-    categories: ["Education", "Observation", "Preservation"],
-    buildings: [
-      { id: "l7_academy", category: "Education", nameKey: "Learning Center", descKey: "Establish a center for mathematics and philosophy.", requirements: { materials: 2, time: 1 }, effects: { knowledge_generation: 2 }, icon: "🏫" },
-      { id: "l7_observatory", category: "Observation", nameKey: "Astronomical Observatory", descKey: "Track celestial movements and record planetary data.", requirements: { materials: 1, knowledge: 2 }, effects: { observation_accuracy: 2 }, icon: "🔭" },
-      { id: "l7_library", category: "Preservation", nameKey: "Manuscript Archive", descKey: "Safeguard treatises and scholarly works.", requirements: { storage: 2, materials: 1 }, effects: { knowledge_preservation: 3 }, icon: "📚" }
+    levelId: 7,
+    eraTitle: 'Gupta Period & Knowledge',
+    eraSubtitle: 'Universities, Astronomy & Metallurgy',
+    gridSize: 4,
+    waterTiles: [3, 7, 11, 15],
+    availableBuildings: [
+      {
+        id: 'observatory',
+        nameKey: 'builder.b.observatory',
+        descKey: 'builder.b.observatory_desc',
+        name: 'Astronomical Observatory (Jyotisha)',
+        description: 'Equipped with gnomons and water clocks to track solstices, eclipses, and planetary motion.',
+        icon: '🔭',
+        terrain: 'land',
+        requirements: { stone: 2, astronomy_tool: 1 },
+        effects: { knowledge: 35, culture: 15 }
+      },
+      {
+        id: 'university_vihara',
+        nameKey: 'builder.b.vihara',
+        descKey: 'builder.b.vihara_desc',
+        name: 'Mahavihara Lecture Courtyard',
+        description: 'Residential monastic college and manuscript library inspired by Nalanda.',
+        icon: '📚',
+        terrain: 'land',
+        requirements: { brick: 2, gupta_manuscript: 1 },
+        effects: { knowledge: 40, community: 15 }
+      },
+      {
+        id: 'metallurgy_foundry',
+        nameKey: 'builder.b.foundry',
+        descKey: 'builder.b.foundry_desc',
+        name: 'Wrought-Iron Pillar Foundry',
+        description: 'Advanced forge producing rust-resistant phosphorus-rich ironwork.',
+        icon: '🔥',
+        terrain: 'land',
+        requirements: { stone: 1, wood: 2 },
+        effects: { knowledge: 25, trade: 15 }
+      }
     ]
   },
-  // Level 8 - Indian Architecture
+
   8: {
-    gridSize: { cols: 5, rows: 5 },
-    terrain: { water: [12, 13, 14] },
-    categories: ["Engineering", "Artistry", "Infrastructure"],
-    buildings: [
-      { id: "l8_temple", category: "Engineering", nameKey: "Stone Temple", descKey: "Construct a massive structural temple.", requirements: { stone: 3, tools: 1 }, effects: { cultural_influence: 3 }, icon: "🛕" },
-      { id: "l8_rockcut", category: "Artistry", nameKey: "Rock-cut Cave", descKey: "Carve exquisite sanctuaries directly into the rock face.", requirements: { stone: 2, skill: 2 }, effects: { artistry: 2 }, icon: "⛰️" },
-      { id: "l8_stepwell", category: "Infrastructure", nameKey: "Stepwell", descKey: "Engineered deep water access and storage.", requirements: { stone: 2, effort: 1 }, effects: { capacity: 2 }, icon: "💧" }
+    levelId: 8,
+    eraTitle: 'Indian Architecture & Engineering',
+    eraSubtitle: 'Rock-Cut Caves, Stupas & Stepwells',
+    gridSize: 4,
+    waterTiles: [5, 6, 9, 10],
+    availableBuildings: [
+      {
+        id: 'rock_cut_shrine',
+        nameKey: 'builder.b.rock_shrine',
+        descKey: 'builder.b.rock_shrine_desc',
+        name: 'Rock-Cut Chaitya & Mural Hall',
+        description: 'Excavated cliff-side hall adorned with natural mineral frescoes and monolithic pillars.',
+        icon: '⛰️',
+        terrain: 'land',
+        requirements: { carved_stone: 1, stone: 2 },
+        effects: { culture: 35, knowledge: 20 }
+      },
+      {
+        id: 'stepwell_baoli',
+        nameKey: 'builder.b.stepwell',
+        descKey: 'builder.b.stepwell_desc',
+        name: 'Subterranean Stepwell (Rani ki Vav Style)',
+        description: 'Multi-tiered stepped water reservoir providing year-round aquifer access and cool shelter.',
+        icon: '🪜',
+        terrain: 'water',
+        requirements: { stone: 2, water: 1 },
+        effects: { community: 30, culture: 20 }
+      },
+      {
+        id: 'shikhara_temple',
+        nameKey: 'builder.b.shikhara_temple',
+        descKey: 'builder.b.shikhara_temple_desc',
+        name: 'Curvilinear Shikhara Temple',
+        description: 'Dry-masonry stone temple aligned to cardinal directions following Shilpa Shastra principles.',
+        icon: '🛕',
+        terrain: 'land',
+        requirements: { carved_stone: 2, architectural_plan: 1 },
+        effects: { culture: 40, community: 15 }
+      }
     ]
   },
-  // Level 9 - Indian Cultural Traditions
+
   9: {
-    gridSize: { cols: 5, rows: 5 },
-    terrain: { water: [4, 9, 14] },
-    categories: ["Arts", "Community", "Heritage"],
-    buildings: [
-      { id: "l9_stage", category: "Arts", nameKey: "Performance Stage", descKey: "A venue for classical dance and music.", requirements: { materials: 2, tradition: 1 }, effects: { culture: 2 }, icon: "🎭" },
-      { id: "l9_plaza", category: "Community", nameKey: "Festival Plaza", descKey: "Open space for communal gatherings and celebrations.", requirements: { community: 2, materials: 1 }, effects: { cohesion: 2 }, icon: "🎪" },
-      { id: "l9_workshop", category: "Heritage", nameKey: "Artisan Workshop", descKey: "Support local craftspeople and textile weavers.", requirements: { materials: 1, knowledge: 1 }, effects: { preservation: 2 }, icon: "🧶" }
+    levelId: 9,
+    eraTitle: 'Indian Cultural Traditions',
+    eraSubtitle: 'Performing Arts, Textiles & Living Crafts',
+    gridSize: 4,
+    waterTiles: [3, 7, 11, 15],
+    availableBuildings: [
+      {
+        id: 'natya_mandapa',
+        nameKey: 'builder.b.natya_mandapa',
+        descKey: 'builder.b.natya_mandapa_desc',
+        name: 'Natya Mandapa Performance Hall',
+        description: 'Acoustically designed pillared pavilion for classical dance, drama, and musical ragas.',
+        icon: '💃',
+        terrain: 'land',
+        requirements: { wood: 2, folk_instrument: 1 },
+        effects: { culture: 40, community: 20 }
+      },
+      {
+        id: 'bronze_atelier',
+        nameKey: 'builder.b.bronze_atelier',
+        descKey: 'builder.b.bronze_atelier_desc',
+        name: 'Madhuchista Lost-Wax Bronze Studio',
+        description: 'Artisan foundry casting expressive bronze sculptures using beeswax and alluvial clay molds.',
+        icon: '🗽',
+        terrain: 'land',
+        requirements: { wood: 1, stone: 2 },
+        effects: { culture: 30, trade: 20 }
+      },
+      {
+        id: 'weaver_loom_house',
+        nameKey: 'builder.b.weaver_loom',
+        descKey: 'builder.b.weaver_loom_desc',
+        name: 'Handloom & Natural Dye Guild',
+        description: 'Weaving cooperative producing indigo, madder, and turmeric-dyed cotton and silk textiles.',
+        icon: '🧵',
+        terrain: 'land',
+        requirements: { wood: 1, water: 1 },
+        effects: { trade: 25, culture: 20 }
+      }
     ]
   },
-  // Level 10 - Chola & Regional Civilizations
+
   10: {
-    gridSize: { cols: 6, rows: 6 },
-    terrain: { water: [30, 31, 32, 33, 34, 35] },
-    categories: ["Agriculture", "Maritime", "Architecture"],
-    buildings: [
-      { id: "chola_temple", category: "Religion", nameKey: "Brihadisvara Temple", descKey: "A massive granite monument.", icon: "🏛️", choices: [
-        { id: "granary_temple", label: "Economic Hub", desc: "Serve as a regional bank.", requirements: { builder: 1, storage: 2 }, effects: { revenue: 3 } },
-        { id: "art_temple", label: "Cultural Hub", desc: "Support dancers and artisans.", requirements: { culture: 2, creative: 1 }, effects: { cultural_influence: 3 } }
-      ]},
-      { id: "chola_navy", category: "Military", nameKey: "Maritime Fleet", descKey: "Expand Chola naval power.", icon: "🚢", choices: [
-        { id: "trade_fleet", label: "Merchant Guild Escorts", desc: "Protect the Ayyavole guild.", requirements: { tradeGoods: 2, trade: 2 }, effects: { maritime_power: 2, wealth: 3 } },
-        { id: "expedition_fleet", label: "Naval Expedition", desc: "Project power across the sea.", requirements: { community: 2, output: 1 }, effects: { maritime_power: 4 } }
-      ]},
-      { id: "chola_water", category: "Infrastructure", nameKey: "Grand Anicut", descKey: "Advanced water management.", icon: "🌊", choices: [
-        { id: "irrigation_focus", label: "Irrigation Network", desc: "Water the delta.", requirements: { water: 2, food: 2 }, effects: { agricultural_boom: 3 } },
-        { id: "flood_control", label: "Flood Defenses", desc: "Protect the capital.", requirements: { builder: 1, community: 1 }, effects: { stability: 3 } }
-      ]}
+    levelId: 10,
+    eraTitle: 'Chola & Regional Civilizations',
+    eraSubtitle: 'Kaveri Delta Irrigation & Maritime Reach',
+    gridSize: 4,
+    waterTiles: [0, 4, 8, 12, 13],
+    availableBuildings: [
+      {
+        id: 'royal_temple',
+        nameKey: 'builder.b.royal_temple',
+        descKey: 'builder.b.royal_temple_desc',
+        name: 'Brihadisvara-Style Vimana Temple',
+        description: 'Monumental all-granite temple serving as a spiritual, economic, and epigraphic record center.',
+        icon: '🛕',
+        terrain: 'land',
+        requirements: { stone: 3, carved_stone: 1 },
+        effects: { culture: 45, community: 25 }
+      },
+      {
+        id: 'shipyard',
+        nameKey: 'builder.b.shipyard',
+        descKey: 'builder.b.shipyard_desc',
+        name: 'Chola Maritime Shipyard',
+        description: 'Coastal dockyard building stitched-plank merchant vessels for Bay of Bengal expeditions.',
+        icon: '⛵',
+        terrain: 'water',
+        requirements: { wood: 2, naval_supplies: 1 },
+        effects: { trade: 40, knowledge: 15 }
+      },
+      {
+        id: 'eri_irrigation_tank',
+        nameKey: 'builder.b.eri_tank',
+        descKey: 'builder.b.eri_tank_desc',
+        name: 'Kaveri Sluice-Gate Tank (Eri)',
+        description: 'Stone-lined reservoir with Kumizhi Thoombu sluices managed by the village Tank Committee.',
+        icon: '🌊',
+        terrain: 'water',
+        requirements: { stone: 2, water: 1 },
+        effects: { food: 35, community: 20 }
+      }
     ]
   },
-  // Level 11 - Vijayanagara
+
   11: {
-    gridSize: { cols: 6, rows: 6 },
-    terrain: { water: [15, 16, 17] },
-    categories: ["Urban", "Markets", "Defense"],
-    buildings: [
-      { id: "l11_bazaar", category: "Markets", nameKey: "Grand Bazaar", descKey: "Trade diamonds, horses, and spices.", requirements: { wealth: 3, stone: 2 }, effects: { prosperity: 5 }, icon: "💎" },
-      { id: "l11_aqueduct", category: "Urban", nameKey: "Stone Aqueduct", descKey: "Channel water through the rocky landscape.", requirements: { stone: 3, engineering: 2 }, effects: { urban_growth: 4 }, icon: "🏛️" },
-      { id: "l11_fort", category: "Defense", nameKey: "Hill Fort", descKey: "Secure the capital against invasions.", requirements: { stone: 4, labor: 2 }, effects: { security: 6 }, icon: "🏰" }
+    levelId: 11,
+    eraTitle: 'Vijayanagara & Medieval Heritage',
+    eraSubtitle: 'Hampi Bazaars, Aqueducts & Mandapas',
+    gridSize: 4,
+    waterTiles: [0, 1, 2, 3],
+    availableBuildings: [
+      {
+        id: 'bazaar_colonade',
+        nameKey: 'builder.b.bazaar',
+        descKey: 'builder.b.bazaar_desc',
+        name: 'Hampi Pillared Market Street',
+        description: 'Grand stone-paved boulevard where international merchants traded gems, textiles, and spices.',
+        icon: '🏪',
+        terrain: 'land',
+        requirements: { stone: 2, vijayanagara_coin: 1 },
+        effects: { trade: 40, community: 20 }
+      },
+      {
+        id: 'aqueduct_channel',
+        nameKey: 'builder.b.aqueduct',
+        descKey: 'builder.b.aqueduct_desc',
+        name: 'Tungabhadra Stone Aqueduct',
+        description: 'Elevated granite water channel feeding stepped pushkaranis and royal enclosures.',
+        icon: '⛲',
+        terrain: 'land',
+        requirements: { stone: 2, water: 1 },
+        effects: { food: 25, community: 25 }
+      },
+      {
+        id: 'musical_mandapa',
+        nameKey: 'builder.b.musical_mandapa',
+        descKey: 'builder.b.musical_mandapa_desc',
+        name: 'Acoustic Saregama Pillar Pavilion',
+        description: 'Granite hall with resonant colonnettes carved to emit distinct musical notes when tapped.',
+        icon: '🏛️',
+        terrain: 'land',
+        requirements: { stone: 2, temple_carving: 1 },
+        effects: { culture: 45, knowledge: 20 }
+      }
     ]
   },
-  // Level 12 - Stories, Literature & Folk Arts
+
   12: {
-    gridSize: { cols: 5, rows: 5 },
-    terrain: { water: [20, 21, 22] },
-    categories: ["Performance", "Archive", "Public Space"],
-    buildings: [
-      { id: "l12_theatre", category: "Performance", nameKey: "Puppet Theatre", descKey: "A traveling or permanent stage for shadow and string puppetry.", requirements: { materials: 2, community: 1 }, effects: { expression: 2 }, icon: "🎪" },
-      { id: "l12_archive", category: "Archive", nameKey: "Palm-Leaf Library", descKey: "Store and copy vulnerable epic manuscripts.", requirements: { materials: 1, knowledge: 2 }, effects: { preservation: 3 }, icon: "📜" },
-      { id: "l12_square", category: "Public Space", nameKey: "Storyteller's Circle", descKey: "A dedicated gathering space for oral traditions.", requirements: { community: 2, stories: 1 }, effects: { audience: 2 }, icon: "🗣️" }
+    levelId: 12,
+    eraTitle: 'Stories, Literature & Folk Arts',
+    eraSubtitle: 'Manuscripts, Epics & Storytelling Spaces',
+    gridSize: 4,
+    waterTiles: [3, 7, 11, 15],
+    availableBuildings: [
+      {
+        id: 'saraswati_bhandara',
+        nameKey: 'builder.b.scriptorium',
+        descKey: 'builder.b.scriptorium_desc',
+        name: 'Palm-Leaf Manuscript Archive',
+        description: 'Climate-ventilated library where scribes incise and preserve birch-bark and palm-leaf texts.',
+        icon: '📜',
+        terrain: 'land',
+        requirements: { wood: 2, palm_leaf_manuscript: 1 },
+        effects: { knowledge: 40, culture: 25 }
+      },
+      {
+        id: 'puppet_theatre',
+        nameKey: 'builder.b.puppet_theatre',
+        descKey: 'builder.b.puppet_theatre_desc',
+        name: 'Tholu Bommalata Shadow Theatre',
+        description: 'Open-air village stage for translucent leather shadow puppetry and epic recitation.',
+        icon: '🎭',
+        terrain: 'land',
+        requirements: { wood: 1, folk_tale: 1 },
+        effects: { culture: 35, community: 25 }
+      }
     ]
   },
-  // Level 13 - Traditional Indian Games
+
   13: {
-    gridSize: { cols: 5, rows: 5 },
-    terrain: { water: [0, 24] },
-    categories: ["Recreation", "Training", "Community"],
-    buildings: [
-      { id: "l13_board", category: "Recreation", nameKey: "Pachisi Courtyard", descKey: "A beautiful courtyard for strategic board games.", icon: "🎲", choices: [
-        { id: "royal_board", label: "Marble Inlay Board", desc: "Play like royalty.", requirements: { materials: 2, pieces: 1 }, effects: { strategy: 2, prestige: 1 } },
-        { id: "cloth_board", label: "Woven Cloth Board", desc: "Portable and accessible.", requirements: { materials: 1, pieces: 2 }, effects: { strategy: 2, accessibility: 2 } }
-      ]},
-      { id: "l13_arena", category: "Training", nameKey: "Kabaddi Arena", descKey: "A sandy playing field for physical sports.", icon: "🏃", choices: [
-        { id: "sand_arena", label: "Community Sand Pit", desc: "Local tournaments.", requirements: { community: 2, skill: 1 }, effects: { physical_health: 2 } },
-        { id: "training_camp", label: "Guru's Camp", desc: "Intense discipline training.", requirements: { knowledge: 1, skill: 2 }, effects: { physical_health: 3 } }
-      ]},
-      { id: "l13_hall", category: "Community", nameKey: "Game Hall", descKey: "A place to preserve and teach ancient abstract games.", icon: "🏛️", choices: [
-        { id: "preservation_hall", label: "Rules Archive", desc: "Document regional variants.", requirements: { knowledge: 2, materials: 1 }, effects: { preservation: 3 } },
-        { id: "tournament_hall", label: "Tournament Center", desc: "Host grand competitions.", requirements: { community: 1, strategy: 2 }, effects: { preservation: 2, excitement: 2 } }
-      ]}
+    levelId: 13,
+    eraTitle: 'Traditional Indian Games',
+    eraSubtitle: 'Courts of Strategy, Logic & Community Play',
+    gridSize: 4,
+    waterTiles: [5, 6],
+    availableBuildings: [
+      {
+        id: 'game_pavilion',
+        nameKey: 'builder.b.game_pavilion',
+        descKey: 'builder.b.game_pavilion_desc',
+        name: 'Chaturanga & Pachisi Courtyard',
+        description: 'Inlaid stone courtyard where scholars and citizens practice strategy and probability games.',
+        icon: '♟️',
+        terrain: 'land',
+        requirements: { stone: 2, wood: 1 },
+        effects: { knowledge: 30, community: 30 }
+      },
+      {
+        id: 'akhara_arena',
+        nameKey: 'builder.b.akhara',
+        descKey: 'builder.b.akhara_desc',
+        name: 'Community Mallakhamb & Kalaripayattu Arena',
+        description: 'Traditional training ground cultivating agility, breath control, and cooperative sportsmanship.',
+        icon: '🤸',
+        terrain: 'land',
+        requirements: { wood: 2, water: 1 },
+        effects: { community: 35, culture: 20 }
+      }
     ]
   },
-  // Level 14 - Preserve the Legacy
+
   14: {
-    gridSize: { cols: 6, rows: 6 },
-    terrain: { water: [] },
-    categories: ["Gallery", "Archive", "Community"],
-    buildings: [
-      { id: "legacy_gallery", category: "Gallery", nameKey: "Physical Gallery", descKey: "Curate physical artifacts for public learning.", requirements: { legacy: 2 }, effects: { preservation: 5 }, icon: "🏛️" },
-      { id: "legacy_digital", category: "Archive", nameKey: "Digital Twin Archive", descKey: "3D scan and digitize vulnerable monuments.", requirements: { technology: 3, legacy: 1 }, effects: { data_preservation: 5 }, icon: "💾" },
-      { id: "legacy_community", category: "Community", nameKey: "Heritage Workshop", descKey: "Teach ancient crafts to the next generation.", requirements: { knowledge: 2, legacy: 1 }, effects: { cultural_transmission: 4 }, icon: "🧑‍🏫" },
-      { id: "legacy_vr", category: "Archive", nameKey: "VR Experience Center", descKey: "Rebuild lost cities in virtual reality.", requirements: { technology: 4 }, effects: { engagement: 5 }, icon: "👓" },
-      { id: "legacy_global", category: "Gallery", nameKey: "World Heritage Nomination", descKey: "Secure global protection and recognition.", requirements: { legacy: 4, knowledge: 3 }, effects: { global_impact: 10 }, icon: "🌍" }
+    levelId: 14,
+    eraTitle: 'Preserve the Legacy',
+    eraSubtitle: 'Modern Heritage Conservation & Digital Archives',
+    gridSize: 4,
+    waterTiles: [3, 7],
+    availableBuildings: [
+      {
+        id: 'exhibition_gallery',
+        nameKey: 'builder.b.exhibition_gallery',
+        descKey: 'builder.b.exhibition_gallery_desc',
+        name: 'Interactive Heritage Museum & Gallery',
+        description: 'Public cultural center showcasing authenticated artifacts, epigraphy, and living craft traditions.',
+        icon: '🏛️',
+        terrain: 'land',
+        requirements: { stone: 2, wood: 1 },
+        effects: { culture: 50, knowledge: 35, community: 25 }
+      },
+      {
+        id: 'conservation_lab',
+        nameKey: 'builder.b.conservation_lab',
+        descKey: 'builder.b.conservation_lab_desc',
+        name: 'Archaeological Conservation & 3D Archive Lab',
+        description: 'Restores fragile manuscripts and laser-scans monuments to safeguard them for future generations.',
+        icon: '🔬',
+        terrain: 'land',
+        requirements: { stone: 1, brick: 1 },
+        effects: { knowledge: 50, culture: 30 }
+      }
     ]
   }
 };
 
 export const getBuilderDataForLevel = (levelId) => {
-  if (civilizationBuilderData[levelId]) {
-    return civilizationBuilderData[levelId];
-  }
-  return {
-    gridSize: { cols: 5, rows: 5 },
-    terrain: { water: [0, 5, 10] },
-    categories: ["Settlement", "Community"],
-    buildings: [
-      {
-        id: "generic_shelter",
-        category: "Settlement",
-        nameKey: "Local Settlement",
-        descKey: "Expand the core settlement infrastructure.",
-        requirements: { materials: 2 },
-        effects: { community_capacity: 1 },
-        icon: "🛖"
-      },
-      {
-        id: "generic_trade",
-        category: "Community",
-        nameKey: "Trade Post",
-        descKey: "Establish a connection with neighboring groups.",
-        requirements: { materials: 1, knowledge: 1 },
-        effects: { trade_efficiency: 1 },
-        icon: "🤝"
-      }
-    ]
-  };
+  return civilizationBuilderData[levelId] || civilizationBuilderData[1];
 };

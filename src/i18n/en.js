@@ -270,17 +270,167 @@ export const en = {
         name: "Temporary Shelter",
         desc: "A basic dwelling providing community space.",
         hist: "Early human communities utilized locally available materials to adapt to their environment."
+      },
+      farm_field: {
+        name: "Irrigated Crop Field",
+        desc: "Cultivated plots for barley and wheat near seasonal streams.",
+        hist: "Early farming villages like Mehrgarh domesticated barley and wheat alongside herding cattle."
+      },
+      granary_pit: {
+        name: "Mud-Brick Granary",
+        desc: "Compartmentalized mud-brick storage for surplus grain.",
+        hist: "Shared storage structures allowed Neolithic communities to survive dry seasons and support craft specialization."
+      },
+      pottery_kiln: {
+        name: "Pottery Firing Kiln",
+        desc: "An updraft kiln for baking clay storage jars and cooking vessels.",
+        hist: "Fired ceramic vessels transformed food storage and preparation across early agricultural settlements."
+      },
+      dockyard_basin: {
+        name: "Tidal Dockyard Basin",
+        desc: "A brick-lined basin connected to tidal channels for berthing merchant vessels.",
+        hist: "Lothal's monumental brick basin is one of the earliest known maritime dockyards in the ancient world."
+      },
+      craft_bead_shop: {
+        name: "Bead & Shell Workshop",
+        desc: "Specialized artisan quarters for drilling carnelian and shaping shell ornaments.",
+        hist: "Export-oriented craft workshops produced high-value beads traded across the Persian Gulf."
+      },
+      caravan_serai: {
+        name: "Merchant Caravan Post",
+        desc: "A secure staging post where overland and coastal traders exchange cargo.",
+        hist: "Inland trade routes linked resource-rich plateaus with coastal ports."
+      },
+      fortified_wall: {
+        name: "Earthen & Brick Rampart",
+        desc: "Massive defensive embankments protecting the capital city.",
+        hist: "Mahajanapada capitals like Rajagriha and Kaushambi constructed towering ramparts and moats."
+      },
+      council_hall: {
+        name: "Sabha Assembly Hall",
+        desc: "A pillared civic hall for royal deliberation and republic assemblies.",
+        hist: "Both monarchies and gana-sanghas relied on assembly halls for governance and debate."
+      },
+      mint_workshop: {
+        name: "Punch-Marked Coin Mint",
+        desc: "A state-supervised smithy stamping silver karshapana coins.",
+        hist: "Standardized silver punch-marked coinage accelerated urban commerce across northern India."
+      },
+      edicts_pillar: {
+        name: "Inscribed Dhamma Pillar",
+        desc: "A polished sandstone monolith bearing imperial proclamations.",
+        hist: "Ashoka erected polished Chunar sandstone pillars at key crossroads and pilgrimage sites."
+      },
+      observatory_court: {
+        name: "Astronomical Observation Court",
+        desc: "An open court equipped with gnomons and water clocks for tracking celestial motion.",
+        hist: "Gupta-era astronomers calculated solar and lunar eclipses and Earth's axial rotation."
+      },
+      scholar_vihara: {
+        name: "Monastic University Hall",
+        desc: "A residential courtyard with lecture halls and manuscript libraries.",
+        hist: "Centers of learning like Nalanda attracted scholars from across Asia."
+      },
+      metallurgy_foundry: {
+        name: "Iron & Bronze Foundry",
+        desc: "High-temperature furnaces forging rust-resistant iron and cast bronze.",
+        hist: "The Iron Pillar of Delhi demonstrates the remarkable metallurgical skill of Gupta smiths."
+      },
+      rock_cut_chaitya: {
+        name: "Rock-Cut Chaitya Hall",
+        desc: "A vaulted prayer hall excavated directly into a basalt cliff face.",
+        hist: "Master stonecutters carved apsidal halls and ribbed stone vaults at Karle and Ajanta."
+      },
+      stepwell_baoli: {
+        name: "Subterranean Stepwell",
+        desc: "A multi-story stepped corridor descending to the deep water table.",
+        hist: "Stepwells (vav or baoli) combined hydraulic engineering with cool subterranean civic spaces."
+      },
+      shikhara_shrine: {
+        name: "Stone Temple Sanctum",
+        desc: "A dry-masonry stone shrine crowned with a curvilinear or pyramidal tower.",
+        hist: "Regional temple traditions developed distinct Nagara, Dravida, and Vesara architectural styles."
+      },
+      natya_mandapa: {
+        name: "Natya Mandapa Performance Hall",
+        desc: "An acoustically designed pillared pavilion for classical dance and music.",
+        hist: "Temple complexes integrated dedicated halls for performing arts rooted in the Natya Shastra."
+      },
+      bronze_atelier: {
+        name: "Lost-Wax Bronze Atelier",
+        desc: "Artisan foundry casting sacred bronze icons using the madhuchhishta vidhana process.",
+        hist: "Each beeswax model was uniquely sculpted before being encased in clay and poured with molten bronze."
+      },
+      weaver_guild: {
+        name: "Silk & Cotton Weavers' Guild",
+        desc: "Community looms producing patterned textiles and ceremonial garments.",
+        hist: "Weaving guilds (shrenis) were influential economic and cultural patrons across medieval India."
+      },
+      chola_sluice: {
+        name: "Kudimaramathu Tank & Sluice",
+        desc: "An engineered stone sluice regulating irrigation from a rain-fed reservoir.",
+        hist: "Chola village assemblies maintained intricate tank networks and stone sluices across the Kaveri delta."
+      },
+      vimana_sanctum: {
+        name: "Granite Royal Vimana",
+        desc: "A towering granite temple sanctum with inscribed base mouldings.",
+        hist: "Brihadisvara Temple at Thanjavur rose over 60 meters in solid granite."
+      },
+      maritime_wharf: {
+        name: "Oceanic Guild Wharf",
+        desc: "A coastal harbor facility supporting merchant guilds and overseas expeditions.",
+        hist: "Merchant guilds like the Ayyavole 500 and Manigramam connected South India with Southeast Asia."
+      },
+      mandapa_court: {
+        name: "Thousand-Pillared Mandapa",
+        desc: "A grand granite pavilion with carved musical and narrative pillars.",
+        hist: "Vijayanagara complexes featured expansive pillared halls for festivals and public gatherings."
+      },
+      scriptorium_hall: {
+        name: "Palm-Leaf Scriptorium",
+        desc: "A ventilated archive where scribes incise and ink dried talipot palm leaves.",
+        hist: "Manuscripts were preserved by rubbing lampblack and oil into incised palm leaves bound with cord."
+      },
+      puppet_stage: {
+        name: "Shadow Puppetry Pavilion",
+        desc: "A backlit cloth screen stage for leather shadow-puppet performances.",
+        hist: "Tholu Bommalata and Ravana Chhaya troupes brought epics and local folklore to village squares."
+      },
+      katha_courtyard: {
+        name: "Kathavachaka Story Courtyard",
+        desc: "A shaded banyan courtyard where oral historians and bards recite regional epics.",
+        hist: "Oral storytelling traditions kept plural regional narratives alive across generations."
+      },
+      board_pavilion: {
+        name: "Chaupar & Chaturanga Pavilion",
+        desc: "A stone-inlaid courtyard with carved game boards for strategic play.",
+        hist: "Courtyards at Fatehpur Sikri and ancient mandapas feature permanent game boards etched into stone."
+      },
+      akhada_arena: {
+        name: "Traditional Akhada & Arena",
+        desc: "A prepared earth arena for Kabaddi, Kho-Kho, and Mallakhamb training.",
+        hist: "Community arenas fostered agility, breath control, and team strategy."
+      },
+      toy_artisan_hut: {
+        name: "Lacquer & Ivory Game Workshop",
+        desc: "A craft workshop turning wooden pawns, cowrie dice, and board textiles.",
+        hist: "Artisans crafted intricate game pieces in wood, terracotta, ivory, and embroidered cloth."
+      },
+      community_plaza: {
+        name: "Community Heritage Forum",
+        desc: "An open civic space for workshops, living craft demonstrations, and public dialogue.",
+        hist: "Sustainable heritage preservation depends on active community participation and living traditions."
       }
     }
   },
   quest: {
     title: "Quest Board",
-    subtitle: "Follow the kalachakra journey through meaningful missions.",
+    subtitle: "Follow the KALACHAKRA journey through meaningful missions.",
     filter_all: "All",
     filter_available: "Available",
     filter_active: "Active",
     filter_completed: "Completed",
-    locked: "Unknown Quest",
+    locked: "Locked Quest",
     type_main: "Main Quest",
     type_side: "Side Quest",
     accept: "Accept Quest",
@@ -297,12 +447,39 @@ export const en = {
       inv_ashoka: "Read an Ashokan Edict",
       inv_hampi: "Explore Architecture at Hampi",
       discover_hampi: "Discover the city of Vijayanagara",
-      build_water: "Build a Water Management Feature"
+      build_water: "Build a Water Management Feature",
+      discover_pottery: "Discover Early Neolithic Pottery",
+      minigame_indus: "Complete the Indus Urban Drainage Minigame",
+      discover_cargo: "Discover Maritime Cargo & Trade Goods",
+      discover_coin: "Discover Punch-Marked Coins",
+      discover_aryabhata: "Discover Aryabhata's Astronomical Treatise",
+      discover_sanchi: "Explore the Sanchi Stupa Architecture",
+      discover_dance: "Discover Classical Dance Traditions",
+      discover_chola: "Explore the Brihadisvara Temple & Chola Bronzes",
+      discover_jataka: "Discover the Jataka Tales & Oral Traditions",
+      discover_pachisi: "Discover Traditional Board Games (Pachisi)",
+      discover_archives: "Establish Digital & Community Heritage Archives",
+      minigame_3: "Achieve Mastery Across 3 Historical Minigames"
     },
     q_l1_main: {
-      title: "Build a Safe Shelter",
-      desc: "Early humans need tools to survive. Find evidence of early stone tools.",
-      hint: "Check the exploration map in Central India."
+      title: "Survival in the Rock Shelters",
+      desc: "Early human communities relied on stone tools and cooperative foraging. Uncover Acheulean stone tools in the prehistoric rock shelters.",
+      hint: "Explore Level 1 (Early Human Communities) or visit the Bhimbetka region on the Heritage Map."
+    },
+    q_l2_farming: {
+      title: "Seeds of the First Villages",
+      desc: "Transition from foraging to settled agriculture by discovering early pottery used to store harvested barley and wheat.",
+      hint: "Explore Level 2 (Early Farming Communities) or inspect the Mehrgarh region."
+    },
+    q_l3_drainage: {
+      title: "Architects of the Indus",
+      desc: "The Indus Civilization pioneered urban sanitation and standardized trade. Discover the Great Bath, examine a steatite seal, and construct a water feature.",
+      hint: "Complete the Indus Seal Investigation and build a Water Management Feature in the Civilization Builder."
+    },
+    q_minigame_l3: {
+      title: "Master the Urban Grid",
+      desc: "Connect the brick-lined channels of Mohenjo-daro to keep the lower town clean and supplied with fresh water.",
+      hint: "Play the Indus Urban Drainage minigame inside Level 3."
     },
     q_l3_main: {
       title: "Build and Manage an Indus City",
@@ -314,22 +491,82 @@ export const en = {
       desc: "Water management was critical. Find the Great Bath in Mohenjo-daro.",
       hint: "Check the map for Mohenjo-daro."
     },
+    q_l4_trade: {
+      title: "Monsoon Winds & Merchant Guilds",
+      desc: "Trace how Indian cotton, spices, and carnelian beads traveled across coastal ports and oceanic routes.",
+      hint: "Explore Level 4 (Early Indian Trade Networks) to uncover maritime cargo."
+    },
+    q_l5_kingdoms: {
+      title: "Rise of the Mahajanapadas",
+      desc: "As iron tools cleared the Gangetic plains, fortified cities and silver punch-marked coinage transformed governance and trade.",
+      hint: "Explore Level 5 (Mahajanapadas & Early Kingdoms) and study early coinage."
+    },
+    q_l6_ashoka: {
+      title: "Voices Carved in Stone",
+      desc: "Emperor Ashoka inscribed messages of Dhamma on rocks and polished pillars across the subcontinent. Examine the epigraphic evidence.",
+      hint: "Complete the Ashokan Edict investigation on the Artifact Investigations page."
+    },
     q_l6_main: {
       title: "Manage a Large Territory",
       desc: "The Mauryan Empire spanned a vast area. Investigate how Ashoka communicated with his subjects.",
       hint: "Go to investigations and read the Ashokan Edict."
     },
+    q_l7_science: {
+      title: "Zero, Stars & Metallurgy",
+      desc: "Explore the classical age of Indian mathematics, astronomy, and medical treatises during the Gupta period.",
+      hint: "Explore Level 7 (Gupta Period & Knowledge) to unlock Aryabhata's findings."
+    },
+    q_l8_architecture: {
+      title: "Carved from Living Rock",
+      desc: "Study how ancient engineers excavated monolithic cave halls, built hemispherical stupas, and designed subterranean stepwells.",
+      hint: "Explore Level 8 (Indian Architecture & Engineering) or visit Sanchi on the Heritage Map."
+    },
+    q_l9_culture: {
+      title: "Rhythm, Rasa & Living Craft",
+      desc: "Discover how classical dance, music, textiles, and metallurgical crafts preserved cultural memory across regions.",
+      hint: "Explore Level 9 (Indian Cultural Traditions)."
+    },
+    q_l10_chola: {
+      title: "Granite Towers & Ocean Voyages",
+      desc: "Investigate the Chola synthesis of monumental granite temple engineering, lost-wax bronze casting, and maritime trade.",
+      hint: "Explore Level 10 (Chola & Regional Civilizations) or Thanjavur on the Heritage Map."
+    },
+    q_l11_vijayanagara: {
+      title: "Guardians of Vijayanagara",
+      desc: "Survey the fortified granite metropolis of Hampi, its colonnaded bazaar streets, and its hydraulic aqueducts.",
+      hint: "Complete the Hampi Architecture Investigation on the Artifact Investigations page."
+    },
     q_l11_main: {
       title: "Protect the Heritage City",
       desc: "The capital of Vijayanagara was a massive urban center. Explore Hampi and investigate its architecture.",
       hint: "Find Hampi on the map, then complete its investigation."
+    },
+    q_l12_stories: {
+      title: "The Endless Thread of Story",
+      desc: "Follow how fables, epics, palm-leaf manuscripts, and shadow puppetry carried ethical and cultural wisdom through the centuries.",
+      hint: "Explore Level 12 (Stories, Literature & Folk Arts)."
+    },
+    q_l13_games: {
+      title: "Strategy on the Crossed Board",
+      desc: "Explore the history of Chaturanga, Pachisi, Ganjifa, and traditional arena sports that sharpened strategic thinking.",
+      hint: "Explore Level 13 (Traditional Indian Games)."
+    },
+    q_l14_preserve: {
+      title: "Curator of the Living Past",
+      desc: "Synthesize your discoveries by documenting endangered heritage, building a preservation archive, and safeguarding history for the future.",
+      hint: "Explore Level 14 (Preserve the Legacy) and build a Heritage Archive."
+    },
+    q_minigame_mastery: {
+      title: "Tactician of the Ages",
+      desc: "Demonstrate mastery across multiple historical simulations and traditional strategy challenges.",
+      hint: "Complete at least 3 interactive minigames across your journey."
     }
   },
   investigation: {
     title: "Artifact Investigations",
     subtitle: "Observe evidence, collect clues, and classify historical claims.",
     completed: "Completed",
-    locked: "Unknown Investigation",
+    locked: "Locked Investigation",
     start: "Start Investigation",
     status_completed: "Completed",
     begin: "Begin Observation",
@@ -486,7 +723,7 @@ export const en = {
     title: "My Inventory",
     subtitle: "Your collected resources, trade goods, and discovered heritage items across all civilizations.",
     collected: "Collected Types",
-    unknown: "Unknown Item",
+    unknown: "Undiscovered Item",
     unknown_desc: "Continue exploring to find this.",
     historical: "Historical Reference",
     no_items: "No items found for this filter.",
@@ -559,17 +796,25 @@ export const en = {
     firstDiscovery: { title: "First Discovery", description: "Discover your first heritage item." },
     curiousExplorer: { title: "Curious Explorer", description: "Discover 10 heritage items." },
     masterExplorer: { title: "Master Explorer", description: "Discover 25 heritage items." },
-    journeyBegins: { title: "Journey Begins", description: "Complete Level 1." },
-    civilizationTraveler: { title: "Civilization Traveler", description: "Complete 5 levels." },
-    heritageVoyager: { title: "Heritage Voyager", description: "Complete 10 levels." },
-    knowledgeSeeker: { title: "Knowledge Seeker", description: "Complete 10 knowledge challenges." },
-    knowledgeKeeper: { title: "Knowledge Keeper", description: "Complete 25 knowledge challenges." },
-    earlyFarmer: { title: "Early Farmer", description: "Complete the farming community challenge in Level 2." },
-    indusUrbanPlanner: { title: "Indus Urban Planner", description: "Complete the Indus city-building challenge in Level 3." },
-    tradePathfinder: { title: "Trade Pathfinder", description: "Complete the trade route challenge in Level 4." },
-    heritageArchitect: { title: "Heritage Architect", description: "Complete the architecture challenge in Level 8." },
-    gameHistorian: { title: "Game Historian", description: "Complete the traditional games challenge in Level 13." },
-    preserverOfTheLegacy: { title: "Preserver of the Legacy", description: "Complete Level 14 and finish KALACHAKRA." },
+    artifactCollector: { title: "Artifact Collector", description: "Collect 5 historical artifacts across eras." },
+    journeyBegins: { title: "Journey Begins", description: "Complete Level 1: Early Human Communities." },
+    civilizationTraveler: { title: "Civilization Traveler", description: "Complete 5 civilization levels." },
+    heritageVoyager: { title: "Heritage Voyager", description: "Complete 10 civilization levels." },
+    knowledgeSeeker: { title: "Knowledge Seeker", description: "Complete 10 historical knowledge challenges." },
+    knowledgeKeeper: { title: "Knowledge Keeper", description: "Complete 25 historical knowledge challenges." },
+    historian: { title: "Master Historian", description: "Answer 15 historical challenges accurately." },
+    earlyFarmer: { title: "Early Farmer", description: "Master early agriculture and complete Level 2." },
+    indusUrbanPlanner: { title: "Indus Urban Planner", description: "Complete the Indus Civilization city planning in Level 3." },
+    masterBuilder: { title: "Master Builder", description: "Construct 5 settlement buildings or heritage structures." },
+    tradePathfinder: { title: "Trade Pathfinder", description: "Establish early Indian trade networks in Level 4." },
+    tradeMaster: { title: "Trade Master", description: "Master maritime and overland trade routes." },
+    heritageArchitect: { title: "Heritage Architect", description: "Complete the Indian Architecture & Engineering challenges in Level 8." },
+    gameHistorian: { title: "Game Historian", description: "Master traditional Indian strategy games in Level 13." },
+    preserverOfTheLegacy: { title: "Preserver of the Legacy", description: "Complete Level 14 and safeguard India's cultural heritage." },
+    perfectCivilization: { title: "Perfect Civilization", description: "Complete 3 quests to strengthen your civilization's legacy." },
+    firstMinigame: { title: "Tactician's Debut", description: "Successfully complete your first historical minigame." },
+    masterSolver: { title: "Grand Strategist", description: "Successfully complete 5 historical minigames." },
+    perfectHistorian: { title: "Flawless Mastery", description: "Earn a 3-star mastery rating in any historical minigame." },
   },
   common: {
     next: "Next",

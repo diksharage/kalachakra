@@ -1,251 +1,550 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useGame } from '../context/GameContext';
 import { questData } from '../data/quests';
-import { levelThemes } from '../data/levelThemes';
-import { useTheme } from '../context/ThemeContext';
-import { useAudio } from '../context/AudioContext';
-import { Target, CheckCircle2, Lock, Star, Trophy } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import BackButton from '../components/common/BackButton';
 import QuestGameplay from '../components/quests/QuestGameplay';
-import { useBackground } from '../context/BackgroundContext';
+import {
+  Target,
+  CheckCircle,
+  Circle,
+  Compass,
+  Award,
+  Star,
+  Lock,
+  Play,
+  ArrowRight,
+  Sparkles,
+  Package
+} from 'lucide-react';
+import BackButton from '../components/common/BackButton';
+
+const computeObjectiveCurrent = (obj, stateQ, gameState, idx, levelId) => {
+  if (stateQ?.status === 'completed') return obj.required;
+  const savedVal = stateQ?.progress?.[idx] || 0;
+
+  const unlockedArtifacts = gameState?.unlockedArtifacts || [];
+  const completedInvestigations = gameState?.completedInvestigations || [];
+  const completedChallenges = gameState?.completedChallenges || [];
+  const miniGameResults = gameState?.miniGameResults || {};
+  const builtEnv = gameState?.builtEnvironment || {};
+  const levelBuilt = builtEnv[levelId] || [];
+  const allBuiltIds = Object.values(builtEnv)
+    .flat()
+    .map(b => b.buildingId);
+  const activeBuilt = gameState?.activeLevelState?.builtItems || [];
+  const directBuildings = gameState?.buildings || [];
+
+  let liveVal = 0;
+
+  if (obj.type === 'explore' || obj.type === 'discover') {
+    if (
+      unlockedArtifacts.includes(obj.target) ||
+      (gameState?.activeLevelState?.exploration || []).includes(obj.target) ||
+      (gameState?.activeLevelState?.discovery || []).includes(obj.target)
+    ) {
+      liveVal = obj.required;
+    }
+  } else if (obj.type === 'build') {
+    const matchingCount =
+      allBuiltIds.filter(id => id === obj.target || id.startsWith(`${obj.target}_`)).length +
+      activeBuilt.filter(id => id === obj.target || id.startsWith(`${obj.target}_`)).length +
+      directBuildings.filter(id => id === obj.target || id.startsWith(`${obj.target}_`)).length;
+
+    if (matchingCount > 0) {
+      liveVal = Math.min(obj.required, matchingCount);
+    } else if (levelBuilt.length >= obj.required) {
+      liveVal = obj.required;
+    }
+  } else if (obj.type === 'investigate') {
+    if (completedInvestigations.includes(obj.target)) {
+      liveVal = obj.required;
+    }
+  } else if (obj.type === 'solve') {
+    if (completedChallenges.includes(obj.target)) {
+      liveVal = obj.required;
+    }
+  } else if (obj.type === 'minigame') {
+    if (miniGameResults[obj.target]) {
+      liveVal = obj.required;
+    }
+  } else if (obj.type === 'minigame_stars') {
+    const hasStars = Object.values(miniGameResults).some(r => (r?.stars || 0) >= obj.target);
+    if (hasStars) {
+      liveVal = obj.required;
+    }
+  }
+
+  return Math.min(obj.required, Math.max(savedVal, liveVal));
+};
+
+const formatRewardItemName = (key) =>
+  key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
 const QuestsPage = () => {
   const { t } = useLanguage();
-  const { gameState, startQuest, completeQuestDirectly } = useGame();
-  const { setBgType } = useBackground();
-
-  React.useEffect(() => {
-    setBgType('quests');
-  }, [setBgType]);
-
-  const { theme } = useTheme();
-  const { playSound } = useAudio();
+  const { gameState, startQuest, completeQuestDirectly, logActivity, notify } = useGame();
   const navigate = useNavigate();
-  const [filter, setFilter] = useState('all');
-  // activeQuest: the quest object currently being played; null = show list
-  const [activeQuest, setActiveQuest] = useState(null);
-  // completionResult: shown briefly when quest finishes
-  const [completionResult, setCompletionResult] = useState(null);
+
+  const [filter, setFilter] = useState('all'); // 'all', 'available', 'in_progress', 'completed'
+  const [activeGameplayQuest, setActiveGameplayQuest] = useState(null);
 
   const currentLevel = gameState.currentLevel || 1;
-  const userQuests = gameState.quests || {};
   const unlockedLevels = gameState.unlockedLevels || [1];
+  const questsState = gameState.quests || {};
+
+  const questsWithStatus = useMemo(() => {
+    return questData.map(q => {
+      const stateQ = questsState[q.id];
+      const isLevelUnlocked =
+        q.levelId <= currentLevel ||
+        unlockedLevels.includes(q.levelId) ||
+        (gameState.completedLevels || []).includes(q.levelId);
+
+      let status = 'locked';
+      if (stateQ?.status === 'completed') {
+        status = 'completed';
+      } else if (stateQ?.status === 'in_progress') {
+        status = 'in_progress';
+      } else if (isLevelUnlocked) {
+        status = 'available';
+      }
+
+      const objectivesWithProg = q.objectives.map((obj, idx) => {
+        const current = computeObjectiveCurrent(obj, stateQ, gameState, idx, q.levelId);
+        return {
+          ...obj,
+          current,
+          isDone: current >= obj.required
+        };
+      });
+
+      const allObjectivesMet =
+        objectivesWithProg.length > 0 && objectivesWithProg.every(o => o.isDone);
+
+      return {
+        ...q,
+        status,
+        stateQ,
+        objectivesWithProg,
+        allObjectivesMet
+      };
+    });
+  }, [questsState, currentLevel, unlockedLevels, gameState]);
+
+  const counts = useMemo(() => {
+    return {
+      all: questsWithStatus.length,
+      available: questsWithStatus.filter(q => q.status === 'available').length,
+      in_progress: questsWithStatus.filter(q => q.status === 'in_progress').length,
+      completed: questsWithStatus.filter(q => q.status === 'completed').length
+    };
+  }, [questsWithStatus]);
 
   const filteredQuests = useMemo(() => {
-    return questData.filter(q => {
-      const state = userQuests[q.id];
-      const status = state?.status || (unlockedLevels.includes(q.levelId) || q.levelId === null ? 'available' : 'locked');
-      if (filter === 'active' && status !== 'in_progress') return false;
-      if (filter === 'completed' && status !== 'completed') return false;
-      if (filter === 'available' && status !== 'available') return false;
-      return true;
-    }).sort((a, b) => {
-      if (a.levelId === currentLevel && b.levelId !== currentLevel) return -1;
-      if (a.levelId !== currentLevel && b.levelId === currentLevel) return 1;
-      return (a.levelId || 99) - (b.levelId || 99);
+    return questsWithStatus.filter(q => {
+      if (filter === 'all') return true;
+      return q.status === filter;
     });
-  }, [userQuests, filter, currentLevel, unlockedLevels]);
+  }, [questsWithStatus, filter]);
 
-  // Handle Accept Quest → open gameplay
-  const handleAccept = useCallback((quest) => {
+  const handleAcceptQuest = (quest) => {
     startQuest(quest.id);
-    setActiveQuest(quest);
-    playSound?.('ui');
-  }, [startQuest, playSound]);
+    logActivity('QUEST', quest.title || quest.titleKey, 'Accepted quest on the Quest Board.', {
+      icon: '🎯'
+    });
+    notify('SYSTEM', quest.title || quest.titleKey, 'Quest is now Active! Complete objectives or verify your knowledge.', {
+      icon: '🎯',
+      route: '/quests'
+    });
+  };
 
-  // Handle Continue Quest → also open gameplay
-  const handleContinue = useCallback((quest) => {
-    setActiveQuest(quest);
-    playSound?.('ui');
-  }, [playSound]);
+  const handleStartQuiz = (quest) => {
+    if (quest.status !== 'completed' && quest.status !== 'in_progress') {
+      startQuest(quest.id);
+    }
+    setActiveGameplayQuest(quest);
+  };
 
-  // Called by QuestGameplay when the session ends
-  const handleQuestComplete = useCallback(({ correct, total, accuracy, earnedLegacy, mastery }) => {
-    if (!activeQuest) return;
-    playSound?.('quest');
-    completeQuestDirectly(activeQuest, { earnedLegacy, accuracy, mastery });
-    setCompletionResult({ correct, total, accuracy, earnedLegacy, mastery, quest: activeQuest });
-    setActiveQuest(null);
-  }, [activeQuest, completeQuestDirectly, playSound]);
+  const handleClaimObjectiveCompletion = (quest) => {
+    const baseLegacy = quest.rewards?.legacy || 40;
+    completeQuestDirectly(quest, {
+      earnedLegacy: baseLegacy,
+      accuracy: 100,
+      mastery: 3
+    });
+    logActivity('QUEST_COMPLETE', quest.title || quest.titleKey, 'Completed all quest objectives!', {
+      icon: '🏆'
+    });
+    notify('QUEST_COMPLETE', quest.title || quest.titleKey, `Earned +${baseLegacy} Legacy XP!`, {
+      icon: '🏆',
+      reward: baseLegacy
+    });
+  };
 
-  const handleCloseGameplay = useCallback(() => {
-    setActiveQuest(null);
-  }, []);
+  const handleQuestComplete = ({ earnedLegacy, accuracy, mastery }) => {
+    if (activeGameplayQuest) {
+      completeQuestDirectly(activeGameplayQuest, { earnedLegacy, accuracy, mastery });
+      logActivity(
+        'QUEST_COMPLETE',
+        activeGameplayQuest.title || activeGameplayQuest.titleKey,
+        `Completed quest with ${accuracy}% accuracy.`,
+        { icon: '🏆' }
+      );
+    }
+    setActiveGameplayQuest(null);
+  };
 
-  const handleDismissResult = useCallback(() => {
-    setCompletionResult(null);
-  }, []);
-
-  /* ─── QUEST GAMEPLAY VIEW ─── */
-  if (activeQuest) {
+  // Render interactive MCQ screen when active
+  if (activeGameplayQuest) {
     return (
-      <div className="pb-20 max-w-3xl mx-auto">
+      <div className="max-w-3xl mx-auto py-8 pb-20 px-4">
         <QuestGameplay
-          quest={activeQuest}
+          quest={activeGameplayQuest}
           onComplete={handleQuestComplete}
-          onClose={handleCloseGameplay}
+          onClose={() => setActiveGameplayQuest(null)}
         />
       </div>
     );
   }
 
-  /* ─── COMPLETION TOAST / SUMMARY ─── */
-  const CompletionBanner = completionResult && (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
-      onClick={handleDismissResult}>
-      <div
-        className="bg-surface border border-gold/30 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl animate-in zoom-in fade-in duration-300"
-        onClick={e => e.stopPropagation()}
-      >
-        <div className="text-5xl mb-4">🏆</div>
-        <h3 className="text-2xl font-serif font-bold text-gold mb-1">Quest Complete!</h3>
-        <p className="text-content/70 text-sm mb-4">{completionResult.quest?.id?.replace(/_/g,' ')}</p>
-        <div className="flex justify-center gap-2 mb-4">
-          {[1,2,3].map(s => (
-            <Star key={s} size={28} className={s <= completionResult.mastery ? 'text-gold fill-gold' : 'text-content/50'} />
-          ))}
-        </div>
-        <div className="text-gold font-bold text-xl mb-1">+{completionResult.earnedLegacy} Legacy</div>
-        <div className="text-content/60 text-sm mb-6">{completionResult.correct}/{completionResult.total} correct · {completionResult.accuracy}% accuracy</div>
-        <button onClick={handleDismissResult}
-          className="px-8 py-3 bg-gold text-main font-bold rounded-xl hover:scale-105 transition-transform">
-          Claim Rewards
-        </button>
-      </div>
-    </div>
-  );
-
-  /* ─── QUEST LIST VIEW ─── */
   return (
-    <div className="space-y-6 pb-20 max-w-5xl mx-auto">
-      {CompletionBanner}
-
-      <header className="flex items-center gap-6 mb-8">
-        <BackButton />
-        <div className="flex-1">
+    <div className="space-y-6 pb-20 max-w-6xl mx-auto p-4 md:p-6 text-[#F5F1E8] animate-fade-in">
+      {/* Header Banner */}
+      <header className="bg-[#101519] border border-[#34302A] rounded-2xl p-6 md:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6 shadow-xl">
+        <div className="flex items-start gap-4">
+          <BackButton />
           <div>
-            <div className="w-14 h-14 bg-gradient-to-br from-gold to-terracotta rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-gold/20">
-              <Target size={28} className="text-main" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D9A441]/15 border border-[#D9A441]/30 text-[#D9A441] text-xs font-bold uppercase tracking-wider mb-3">
+              <Target size={14} /> Royal Chronicles & Missions
             </div>
-            <h1 className="text-3xl font-serif font-bold gold-gradient-text mb-2">{t('quest.title', 'Quest Board')}</h1>
-            <p className="text-content/70 text-sm max-w-xl">{t('quest.subtitle', 'Follow the kalachakra journey through meaningful missions.')}</p>
+            <h1 className="text-3xl md:text-4xl font-serif font-bold text-[#F5F1E8] mb-2">
+              {t('quest.title', 'Quest Board')}
+            </h1>
+            <p className="text-[#C5C9CC] text-sm md:text-base max-w-2xl">
+              {t(
+                'quest.subtitle',
+                'Accept historical missions across all 14 eras, complete in-world building and discovery objectives, or test your historical mastery.'
+              )}
+            </p>
+          </div>
+        </div>
+
+        {/* Summary Counters */}
+        <div className="grid grid-cols-3 gap-3 bg-[#151B20] border border-[#34302A] p-4 rounded-2xl shrink-0">
+          <div className="text-center px-3">
+            <div className="text-2xl font-serif font-bold text-[#D9A441]">{counts.available}</div>
+            <div className="text-[11px] text-[#C5C9CC] uppercase tracking-wider font-bold mt-0.5">Available</div>
+          </div>
+          <div className="text-center px-3 border-x border-[#34302A]">
+            <div className="text-2xl font-serif font-bold text-amber-400">{counts.in_progress}</div>
+            <div className="text-[11px] text-[#C5C9CC] uppercase tracking-wider font-bold mt-0.5">Active</div>
+          </div>
+          <div className="text-center px-3">
+            <div className="text-2xl font-serif font-bold text-emerald-400">{counts.completed}</div>
+            <div className="text-[11px] text-[#C5C9CC] uppercase tracking-wider font-bold mt-0.5">Completed</div>
           </div>
         </div>
       </header>
 
-      <div className="flex gap-2 border-b border-content/10 pb-4 overflow-x-auto no-scrollbar">
-        {['all', 'available', 'active', 'completed'].map(f => (
+      {/* Filter Tabs */}
+      <div className="flex flex-wrap gap-2 bg-[#101519] border border-[#34302A] p-2.5 rounded-2xl">
+        {[
+          { id: 'all', label: `${t('quest.filter.all', 'All Quests')} (${counts.all})` },
+          { id: 'available', label: `${t('quest.filter.available', 'Available')} (${counts.available})` },
+          { id: 'in_progress', label: `${t('quest.filter.active', 'Active')} (${counts.in_progress})` },
+          { id: 'completed', label: `${t('quest.filter.completed', 'Completed')} (${counts.completed})` }
+        ].map(tab => (
           <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-colors ${filter === f ? 'bg-gold text-main' : 'bg-surface text-content/60 hover:text-content'}`}
+            key={tab.id}
+            onClick={() => setFilter(tab.id)}
+            className={`px-4 py-2 rounded-xl font-bold text-xs transition-all border ${
+              filter === tab.id
+                ? 'bg-[#D9A441] text-[#070A0C] border-[#D9A441] shadow-md'
+                : 'bg-[#151B20] text-[#C5C9CC] border-[#34302A] hover:border-[#D9A441]/50 hover:text-[#F5F1E8]'
+            }`}
           >
-            {t(`quest.filter_${f}`, f)}
+            {tab.label}
           </button>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filteredQuests.map(q => {
-          const state = userQuests[q.id];
-          const isUnlocked = q.levelId === null || unlockedLevels.includes(q.levelId);
-          const status = state?.status || (isUnlocked ? 'available' : 'locked');
-          const levelThemeData = levelThemes[q.levelId] || levelThemes[1];
+      {/* Quest Cards Grid */}
+      {filteredQuests.length === 0 ? (
+        <div className="bg-[#101519] border border-[#34302A] rounded-2xl p-12 text-center">
+          <Compass size={42} className="mx-auto mb-3 text-[#D9A441]/50" />
+          <h3 className="text-lg font-serif font-bold text-[#F5F1E8] mb-1">
+            {filter === 'in_progress'
+              ? 'No Active Quests Right Now'
+              : filter === 'completed'
+              ? 'No Completed Quests Yet'
+              : 'No Quests Match This Filter'}
+          </h3>
+          <p className="text-sm text-[#C5C9CC] max-w-md mx-auto mb-5">
+            {filter === 'in_progress'
+              ? 'Switch to the Available tab and click "Accept Quest" on any unlocked mission to start tracking its objectives.'
+              : 'Accept an available quest or advance through the Journey Map to unlock more historical missions.'}
+          </p>
+          {filter !== 'all' && (
+            <button
+              onClick={() => setFilter('all')}
+              className="px-5 py-2.5 rounded-xl bg-[#D9A441] text-[#070A0C] font-bold text-xs"
+            >
+              Show All Quests
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {filteredQuests.map(q => {
+            const isLocked = q.status === 'locked';
+            const isCompleted = q.status === 'completed';
+            const isInProgress = q.status === 'in_progress';
+            const isAvailable = q.status === 'available';
 
-          if (status === 'locked') {
+            const title = t(q.titleKey, q.title || q.id);
+            const description = t(q.descKey, q.description || '');
+            const hint = t(q.hintKey, q.hint || '');
+            const primaryRoute =
+              q.objectivesWithProg?.[0]?.route || `/journey/level/${q.levelId}`;
+
             return (
-              <div key={q.id} className="rounded-2xl p-6 flex gap-4 items-center opacity-50 grayscale border border-content/10 bg-surface">
-                <div className="w-12 h-12 rounded-xl bg-main border border-content/20 flex items-center justify-center shrink-0">
-                  <Lock className="text-content/50" />
-                </div>
+              <div
+                key={q.id}
+                className={`rounded-2xl p-6 border flex flex-col justify-between transition-all ${
+                  isInProgress
+                    ? 'bg-[#101519] border-[#D9A441] shadow-[0_0_20px_rgba(217,164,65,0.12)]'
+                    : isCompleted
+                    ? 'bg-[#101519] border-emerald-500/40'
+                    : isAvailable
+                    ? 'bg-[#101519] border-[#34302A] hover:border-[#D9A441]/50'
+                    : 'bg-[#101519]/90 border-[#34302A]'
+                }`}
+              >
                 <div>
-                  <h3 className="font-bold text-content">{t('quest.locked', 'Unknown Quest')}</h3>
-                  <p className="text-xs text-content/60">{t('library.lockedDesc', 'Discover more in Level')} {q.levelId}</p>
+                  {/* Card Header: Level & Status */}
+                  <div className="flex justify-between items-start gap-3 mb-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#151B20] border border-[#34302A] text-[#D9A441]">
+                        Level {q.levelId}: {q.levelName}
+                      </span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#151B20] border border-[#34302A] text-[#C5C9CC]">
+                        {q.type === 'main'
+                          ? t('quest.type.main', 'Main Quest')
+                          : t('quest.type.side', 'Side Quest')}
+                      </span>
+                    </div>
+
+                    {isCompleted && (
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-400 bg-emerald-500/15 px-3 py-1 rounded-full border border-emerald-500/30 shrink-0">
+                        <Award size={13} /> {t('quest.completed', 'Completed')}
+                      </span>
+                    )}
+                    {isInProgress && (
+                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D9A441] bg-[#D9A441]/15 px-3 py-1 rounded-full border border-[#D9A441]/40 shrink-0">
+                        <span className="w-2 h-2 rounded-full bg-[#D9A441] animate-pulse" />
+                        {t('quest.active', 'Active')}
+                      </span>
+                    )}
+                    {isAvailable && (
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-sky-400 bg-sky-500/15 px-3 py-1 rounded-full border border-sky-500/30 shrink-0">
+                        Available
+                      </span>
+                    )}
+                    {isLocked && (
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-[#C5C9CC] bg-[#151B20] px-3 py-1 rounded-full border border-[#34302A] shrink-0">
+                        <Lock size={12} /> Locked
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Title & Description */}
+                  <h2 className="text-xl font-bold font-serif mb-2 text-[#F5F1E8]">{title}</h2>
+                  <p className="text-sm text-[#C5C9CC] leading-relaxed mb-4">{description}</p>
+
+                  {/* Objectives List */}
+                  <div className="space-y-2 mb-4 bg-[#151B20] p-4 rounded-xl border border-[#34302A]">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-[#C5C9CC] mb-2">
+                      {t('quest.objectives', 'Quest Objectives')}
+                    </div>
+                    {q.objectivesWithProg.map((obj, idx) => (
+                      <div
+                        key={idx}
+                        onClick={() => {
+                          if (!isLocked && obj.route) navigate(obj.route);
+                        }}
+                        className={`flex items-center justify-between text-xs gap-2 p-2 rounded-lg transition-colors ${
+                          !isLocked && obj.route
+                            ? 'hover:bg-[#101519] cursor-pointer'
+                            : ''
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          {obj.isDone ? (
+                            <CheckCircle size={15} className="text-emerald-400 shrink-0" />
+                          ) : (
+                            <Circle size={15} className="text-[#D9A441]/60 shrink-0" />
+                          )}
+                          <span
+                            className={
+                              obj.isDone
+                                ? 'line-through text-[#C5C9CC]/60'
+                                : 'text-[#F5F1E8] font-medium'
+                            }
+                          >
+                            {t(obj.labelKey, obj.label || 'Objective')}
+                          </span>
+                        </div>
+                        <span
+                          className={`font-mono font-bold shrink-0 ${
+                            obj.isDone ? 'text-emerald-400' : 'text-[#D9A441]'
+                          }`}
+                        >
+                          {obj.current} / {obj.required}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Active Quest Hint */}
+                  {isInProgress && hint && (
+                    <div className="text-xs text-[#C5C9CC] bg-[#090C0F] p-3 rounded-xl mb-4 border border-[#34302A] flex items-start gap-2">
+                      <Sparkles size={14} className="text-[#D9A441] shrink-0 mt-0.5" />
+                      <span>
+                        <strong className="text-[#D9A441]">{t('common.hint', 'Hint')}:</strong> {hint}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Locked Requirement Banner */}
+                  {isLocked && (
+                    <div className="text-xs text-[#C5C9CC] bg-[#090C0F] p-3 rounded-xl mb-4 border border-[#34302A] flex items-center justify-between gap-2">
+                      <span className="flex items-center gap-1.5">
+                        <Lock size={13} className="text-[#D9A441] shrink-0" />
+                        <span>
+                          Unlocks in <strong className="text-[#F5F1E8]">Level {q.levelId}: {q.levelName}</strong>
+                        </span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => navigate('/journey')}
+                        className="text-[#D9A441] font-bold hover:underline shrink-0"
+                      >
+                        Journey Map →
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Card Footer: Rewards & Actions */}
+                <div className="pt-4 border-t border-[#34302A] flex flex-col gap-3">
+                  {/* Rewards Row */}
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#C5C9CC]">
+                      {t('quest.rewards', 'Rewards')}:
+                    </span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {q.rewards?.legacy && (
+                        <span className="text-xs font-bold text-[#D9A441] flex items-center gap-1 bg-[#151B20] px-2.5 py-1 rounded-lg border border-[#34302A]">
+                          <Star size={12} className="fill-[#D9A441]" /> +{q.rewards.legacy} Legacy XP
+                        </span>
+                      )}
+                      {q.rewards?.inventory &&
+                        Object.entries(q.rewards.inventory).map(([itemKey, qty]) => (
+                          <span
+                            key={itemKey}
+                            className="text-xs font-medium text-[#F5F1E8] flex items-center gap-1 bg-[#151B20] px-2.5 py-1 rounded-lg border border-[#34302A]"
+                          >
+                            <Package size={11} className="text-[#D9A441]" /> +{qty}{' '}
+                            {formatRewardItemName(itemKey)}
+                          </span>
+                        ))}
+                    </div>
+                  </div>
+
+                  {/* Single Clear Action Set Based on Quest Status */}
+                  {isAvailable && (
+                    <div className="flex gap-2.5 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => handleAcceptQuest(q)}
+                        className="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs bg-[#D9A441] text-[#070A0C] shadow-md hover:bg-[#D9A441]/90 transition-colors flex items-center justify-center gap-1.5"
+                      >
+                        <Target size={14} /> {t('quest.accept', 'Accept Quest')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleStartQuiz(q)}
+                        className="py-2.5 px-4 rounded-xl font-bold text-xs bg-[#151B20] text-[#D9A441] border border-[#D9A441]/40 hover:bg-[#D9A441]/15 transition-colors flex items-center justify-center gap-1.5"
+                      >
+                        <Play size={13} /> Quick Quiz
+                      </button>
+                    </div>
+                  )}
+
+                  {isInProgress && (
+                    <div className="flex flex-wrap gap-2.5 pt-1">
+                      {q.allObjectivesMet ? (
+                        <button
+                          type="button"
+                          onClick={() => handleClaimObjectiveCompletion(q)}
+                          className="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs bg-emerald-500 text-[#070A0C] shadow-md hover:bg-emerald-400 transition-colors flex items-center justify-center gap-1.5"
+                        >
+                          <Award size={15} /> Claim Quest Reward
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => navigate(primaryRoute)}
+                            className="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs bg-[#151B20] text-[#F5F1E8] border border-[#34302A] hover:border-[#D9A441] transition-colors flex items-center justify-center gap-1.5"
+                          >
+                            <span>Go to Objective</span>
+                            <ArrowRight size={13} className="text-[#D9A441]" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleStartQuiz(q)}
+                            className="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs bg-[#D9A441] text-[#070A0C] shadow-md hover:bg-[#D9A441]/90 transition-colors flex items-center justify-center gap-1.5"
+                          >
+                            <Play size={13} /> Verify Knowledge (Quiz)
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  {isCompleted && (
+                    <div className="flex items-center justify-between pt-1">
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3].map(s => (
+                          <Star
+                            key={s}
+                            size={15}
+                            className={
+                              s <= (q.stateQ?.stars || 3)
+                                ? 'text-[#D9A441] fill-[#D9A441]'
+                                : 'text-[#34302A]'
+                            }
+                          />
+                        ))}
+                        <span className="text-xs text-emerald-400 font-bold ml-1.5">
+                          Rewards Claimed
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleStartQuiz(q)}
+                        className="px-3.5 py-1.5 rounded-xl font-bold text-xs bg-[#151B20] text-[#C5C9CC] border border-[#34302A] hover:border-[#D9A441] hover:text-[#D9A441] transition-colors"
+                      >
+                        Practice Quiz Again
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             );
-          }
-
-          return (
-            <div key={q.id} className={`rounded-2xl p-6 border relative overflow-hidden flex flex-col ${levelThemeData.border} ${theme === 'light' ? levelThemeData.bg : 'bg-surface/80'}`}>
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-2">
-                  <span className={`text-[10px] px-2 py-1 rounded uppercase font-bold tracking-wider ${q.type === 'main' ? 'bg-gold text-main shadow-md shadow-gold/20' : 'bg-surface border border-content/20 text-content'}`}>
-                    {t(`quest.type_${q.type}`, q.type)}
-                  </span>
-                  {q.levelId && <span className="text-[10px] uppercase font-bold text-content/50">Level {q.levelId}</span>}
-                </div>
-                {status === 'completed' && (
-                  <div className="flex items-center gap-1">
-                    {state?.stars && [1,2,3].map(s => (
-                      <Star key={s} size={12} className={s <= state.stars ? 'text-gold fill-gold' : 'text-content/50'} />
-                    ))}
-                    <CheckCircle2 className="text-emerald-500 ml-1" size={18} />
-                  </div>
-                )}
-              </div>
-
-              <h3 className={`font-bold font-serif text-xl mb-1 ${levelThemeData.text}`}>{t(q.titleKey, q.id)}</h3>
-              <p className="text-sm text-content/70 mb-6">{t(q.descKey, 'Quest description')}</p>
-
-              <div className="space-y-3 mb-6 flex-1">
-                {q.objectives.map((obj, idx) => {
-                  const prog = state?.progress?.[idx] || 0;
-                  const isObjDone = prog >= obj.required;
-                  return (
-                    <div key={idx} className="flex gap-3 items-center">
-                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${isObjDone ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-surface border-content/20'}`}>
-                        {isObjDone && <CheckCircle2 size={12} />}
-                      </div>
-                      <div className="text-sm font-medium text-content/90 flex-1">{t(obj.labelKey, 'Objective')}</div>
-                      <div className="text-xs font-bold text-content/50">{prog} / {obj.required}</div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="flex justify-between items-center mt-auto pt-4 border-t border-content/10">
-                <div className="flex items-center gap-3">
-                  {q.rewards.legacy && (
-                    <span className="text-xs font-bold text-gold flex items-center gap-1"><Star size={12}/> {q.rewards.legacy}</span>
-                  )}
-                  {q.rewards.inventory && (
-                    <span className="text-xs font-bold text-content/70">🎒 +Item</span>
-                  )}
-                </div>
-
-                {status === 'available' && (
-                  <button
-                    onClick={() => handleAccept(q)}
-                    className="px-4 py-2 rounded-lg text-xs font-bold bg-gold text-main hover:scale-105 transition-transform"
-                  >
-                    {t('quest.accept', 'Accept Quest')}
-                  </button>
-                )}
-                {status === 'in_progress' && (
-                  <button
-                    onClick={() => handleContinue(q)}
-                    className="px-4 py-2 rounded-lg text-xs font-bold border border-gold text-gold hover:bg-gold hover:text-main transition-colors"
-                  >
-                    {t('quest.continue', 'Continue')}
-                  </button>
-                )}
-                {status === 'completed' && (
-                  <span className="text-xs font-bold text-emerald-500 flex items-center gap-1">
-                    <Trophy size={12} /> Completed
-                  </span>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {filteredQuests.length === 0 && (
-        <div className="py-12 text-center text-content/50 border border-content/10 border-dashed rounded-2xl bg-surface/30">
-          {t('quest.no_quests', 'No quests found for this filter.')}
+          })}
         </div>
       )}
     </div>

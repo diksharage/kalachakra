@@ -4,13 +4,26 @@ import { Bot, X, Lightbulb, Sparkles, Send, Trash2, AlertCircle } from 'lucide-r
 import { askHeritageGuide, buildKalaContext } from '../../services/aiService';
 import { useGame } from '../../context/GameContext';
 
+const COMPANION_STORAGE_KEY = 'kalachakra_companion_history_v1';
+
 const KalaCompanion = ({ stage, levelId, levelState, inventory, activeChallenge, ageGroup }) => {
   const { gameState } = useGame();
   const navigate = useNavigate();
 
   const [isOpen, setIsOpen] = useState(false);
   const [dismissedBubble, setDismissedBubble] = useState(false);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem(COMPANION_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {
+      // ignore storage errors
+    }
+    return [];
+  });
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
@@ -20,6 +33,13 @@ const KalaCompanion = ({ stage, levelId, levelState, inventory, activeChallenge,
   };
 
   useEffect(() => {
+    try {
+      if (messages.length > 0) {
+        sessionStorage.setItem(COMPANION_STORAGE_KEY, JSON.stringify(messages.slice(-24)));
+      }
+    } catch {
+      // ignore storage errors
+    }
     if (isOpen) {
       scrollToBottom();
     }
@@ -42,7 +62,7 @@ const KalaCompanion = ({ stage, levelId, levelState, inventory, activeChallenge,
     const msg = getContextualMessage();
     setMessages(prev => {
       const lastMsg = prev.length > 0 ? prev[prev.length - 1] : null;
-      if (!lastMsg || lastMsg.content !== msg) {
+      if (!lastMsg || (lastMsg.type === 'context' && lastMsg.content !== msg)) {
         return [...prev, { role: 'kala', type: 'context', content: msg }];
       }
       return prev;
@@ -99,13 +119,19 @@ const KalaCompanion = ({ stage, levelId, levelState, inventory, activeChallenge,
   };
 
   const handleClear = () => {
-    setMessages([
+    const reset = [
       {
         role: 'kala',
         type: 'context',
         content: getContextualMessage()
       }
-    ]);
+    ];
+    setMessages(reset);
+    try {
+      sessionStorage.setItem(COMPANION_STORAGE_KEY, JSON.stringify(reset));
+    } catch {
+      // ignore
+    }
   };
 
   const handleActionClick = (act) => {

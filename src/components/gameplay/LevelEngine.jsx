@@ -1052,6 +1052,7 @@ const LevelEngine = ({ config }) => {
   const markDiscovered = (loc) => {
     playSound('discovery');
     unlockArtifact(loc.id);
+    if (checkQuestProgress) checkQuestProgress('explore', loc.id);
     const newResources = { ...resources };
     let yieldStrings = [];
     if (loc.yields) {
@@ -1401,7 +1402,8 @@ const LevelEngine = ({ config }) => {
                        if (data.effects) {
                          Object.keys(data.effects).forEach(k => effectStrings.push(`+${data.effects[k]} ${k.replace('_', ' ')}`));
                        }
-                       notify('BUILD', 'Building Constructed!', effectStrings.length > 0 ? `Produced: ${effectStrings.join(', ')}` : `Consumed required resources.`, { icon: 'dY""' });
+                       if (checkQuestProgress) checkQuestProgress('build', data.id);
+                       notify('BUILD', 'Building Constructed!', effectStrings.length > 0 ? `Produced: ${effectStrings.join(', ')}` : `Consumed required resources.`, { icon: '🏗️' });
                     }} 
                     className={"px-6 py-3 font-bold rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-surface transition-all " + (canAfford ? theme.button : "opacity-60 cursor-not-allowed bg-surface/30 border-transparent text-content/80")}
                   >
