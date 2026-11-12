@@ -10,7 +10,10 @@ import {
   ATLAS_RIVERS,
   ATLAS_TRADE_ROUTES,
   ATLAS_TERRITORIES,
-  ATLAS_TERRAIN
+  ATLAS_TERRAIN,
+  ATLAS_SEAS,
+  SUBCONTINENT_COASTLINE,
+  SRI_LANKA_COASTLINE
 } from '../data/historicalAtlasData';
 import { civilizationLevels } from '../data/civilizationLevels';
 import { askHeritageGuide } from '../services/aiService';
@@ -38,6 +41,17 @@ import {
   ChevronLeft
 } from 'lucide-react';
 
+// Robust asset resolver supporting Vite base path and fallbacks
+export const resolveAsset = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+    return path;
+  }
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  const baseUrl = import.meta.env.BASE_URL || '/';
+  return `${baseUrl}${cleanPath}`;
+};
+
 const ExplorePage = () => {
   const { t } = useLanguage();
   const { gameState, unlockArtifact, updateResources, updateActiveLevelState, notify } = useGame();
@@ -45,8 +59,15 @@ const ExplorePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // State management
-  const [selectedEraId, setSelectedEraId] = useState('indus');
+  // State management: initialize to incoming route state or active level or default to Indus (level_3)
+  const [selectedEraId, setSelectedEraId] = useState(() => {
+    if (location.state?.eraId) return location.state.eraId;
+    if (location.state?.periodId) return location.state.periodId;
+    if (location.state?.levelId) return `level_${location.state.levelId}`;
+    if (gameState?.activeLevelId) return `level_${gameState.activeLevelId}`;
+    return 'level_3';
+  });
+
   const [selectedLoc, setSelectedLoc] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState('map'); // 'map' or 'list'
@@ -69,6 +90,7 @@ const ExplorePage = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const mapContainerRef = useRef(null);
+  const timelineRef = useRef(null);
 
   // Puzzle state
   const [puzzleModal, setPuzzleModal] = useState(null);
@@ -88,34 +110,54 @@ const ExplorePage = () => {
     return ATLAS_ERAS.find(e => e.id === selectedEraId) || ATLAS_ERAS[0];
   }, [selectedEraId]);
 
-  // Filter locations by selected era & search query
+  // Synchronize bottom timeline scroll when selectedEraId changes
+  useEffect(() => {
+    if (timelineRef.current) {
+      const activeBtn = timelineRef.current.querySelector(`[data-era-id="${selectedEraId}"]`);
+      if (activeBtn) {
+        activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+  }, [selectedEraId]);
+
+  // Filter locations by selected era, functional layer toggles & search query
   const filteredLocations = useMemo(() => {
     return ATLAS_LOCATIONS.filter(loc => {
+      // Era matching
       const matchesEra = selectedEraId === 'all' || loc.eraId === selectedEraId;
+
+      // Layer matching
+      const matchesLayer =
+        (layers.settlements && ['city', 'capital', 'port', 'settlement'].includes(loc.category)) ||
+        (layers.monuments && loc.category === 'monument') ||
+        (layers.archaeological && loc.category === 'archaeological');
+
+      // Search matching
       const matchesSearch =
         searchQuery.trim() === '' ||
         loc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         loc.modernLocation.toLowerCase().includes(searchQuery.toLowerCase()) ||
         loc.significance.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesEra && matchesSearch;
+
+      return matchesEra && matchesLayer && matchesSearch;
     });
-  }, [selectedEraId, searchQuery]);
+  }, [selectedEraId, searchQuery, layers.settlements, layers.monuments, layers.archaeological]);
 
   // Filter trade routes by selected era
   const activeTradeRoutes = useMemo(() => {
     if (!layers.tradeRoutes) return [];
     if (selectedEraId === 'all') return ATLAS_TRADE_ROUTES;
-    return ATLAS_TRADE_ROUTES.filter(r => r.eraId === selectedEraId);
+    return ATLAS_TRADE_ROUTES.filter(r => (r.eraIds && r.eraIds.includes(selectedEraId)) || r.eraId === selectedEraId);
   }, [selectedEraId, layers.tradeRoutes]);
 
   // Filter territories by selected era
   const activeTerritories = useMemo(() => {
     if (!layers.kingdoms) return [];
     if (selectedEraId === 'all') return ATLAS_TERRITORIES;
-    return ATLAS_TERRITORIES.filter(t => t.eraId === selectedEraId);
+    return ATLAS_TERRITORIES.filter(t => (t.eraIds && t.eraIds.includes(selectedEraId)) || t.eraId === selectedEraId);
   }, [selectedEraId, layers.kingdoms]);
 
-  // Auto-select first location when era changes if none selected
+  // Auto-select first location when era changes if current selected doesn't belong
   useEffect(() => {
     if (filteredLocations.length > 0 && (!selectedLoc || (selectedEraId !== 'all' && selectedLoc.eraId !== selectedEraId))) {
       setSelectedLoc(filteredLocations[0]);
@@ -239,7 +281,7 @@ const ExplorePage = () => {
                 <div className="w-8 h-8 rounded-lg bg-gold/20 border border-gold/40 flex items-center justify-center text-gold">
                   <Compass size={18} />
                 </div>
-                <div>
+                <div className="text-left">
                   <h1 className="font-serif font-bold text-base md:text-lg text-[#F5F1E8] leading-tight">
                     KALACHAKRA Historical Atlas
                   </h1>
@@ -263,7 +305,7 @@ const ExplorePage = () => {
           {/* Search, Puzzle & View Controls */}
           <div className="flex items-center gap-2">
             <div className="relative">
-              <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-content/40" />
+              <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#C5C9CC]/40" />
               <input
                 type="text"
                 placeholder="Search historical site..."
@@ -319,10 +361,11 @@ const ExplorePage = () => {
         </div>
       </header>
 
-      {/* MAIN ATLAS WORKSPACE */}
+      {/* MAIN ATLAS WORKSPACE (3-PANEL LAYOUT) */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
         {/* LEFT PANEL: HISTORICAL LAYERS & FILTERS */}
-        <aside className="w-full lg:w-72 bg-[#090C0F] border-b lg:border-b-0 lg:border-r border-[#34302A] p-4 flex flex-col gap-4 shrink-0 overflow-y-auto max-h-[220px] lg:max-h-full">
+        <aside className="w-full lg:w-72 bg-[#090C0F] border-b lg:border-b-0 lg:border-r border-[#34302A] p-4 flex flex-col gap-4 shrink-0 overflow-y-auto max-h-[240px] lg:max-h-full text-left">
+          {/* Layer toggles */}
           <div>
             <div className="text-xs uppercase tracking-widest text-gold font-bold flex items-center gap-1.5 mb-2">
               <Layers size={14} className="text-gold" /> Historical Layers
@@ -352,7 +395,7 @@ const ExplorePage = () => {
                   </span>
                   <span
                     className={`w-2 h-2 rounded-full ${
-                      layers[lyr.key] ? 'bg-green-400' : 'bg-content/20'
+                      layers[lyr.key] ? 'bg-green-400' : 'bg-[#C5C9CC]/20'
                     }`}
                   />
                 </button>
@@ -379,12 +422,12 @@ const ExplorePage = () => {
             </div>
           </div>
 
-          {/* Era Quick Jump List */}
+          {/* Era Quick Jump List (All 14 Periods Synchronized) */}
           <div className="hidden lg:block space-y-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-gold block mb-1">
-              Historical Periods
+              Historical Periods (14 Levels)
             </span>
-            <div className="flex flex-col gap-1 max-h-48 overflow-y-auto pr-1">
+            <div className="flex flex-col gap-1 max-h-56 overflow-y-auto pr-1">
               {ATLAS_ERAS.map(era => (
                 <button
                   key={era.id}
@@ -396,8 +439,17 @@ const ExplorePage = () => {
                       : 'text-[#C5C9CC] hover:bg-[#151B20]'
                   }`}
                 >
-                  <span className="truncate">{era.title}</span>
-                  <span className="text-[9px] opacity-75">{era.dates.split(' ')[0]}</span>
+                  <div className="flex items-center gap-1.5 truncate">
+                    {era.levelId && era.levelId !== 'all' && (
+                      <span className={`text-[9px] px-1 py-0.5 rounded font-mono ${
+                        selectedEraId === era.id ? 'bg-[#070A0C] text-gold' : 'bg-gold/20 text-gold'
+                      }`}>
+                        L{era.levelId}
+                      </span>
+                    )}
+                    <span className="truncate">{era.title}</span>
+                  </div>
+                  <span className="text-[9px] opacity-75 shrink-0 ml-1">{era.dates.split(' ')[0]}</span>
                 </button>
               ))}
             </div>
@@ -460,33 +512,76 @@ const ExplorePage = () => {
                 <rect x="0" y="0" width="1000" height="850" fill="url(#oceanGlow)" />
                 <rect x="0" y="0" width="1000" height="850" fill="url(#latLonGrid)" />
 
-                {/* GEOGRAPHIC SUB-CONTINENT LANDMASS */}
-                {/* Accurate continuous coastline of Indian Subcontinent + Sri Lanka */}
+                {/* ACCURATE GEOGRAPHICAL SUB-CONTINENT COASTLINE */}
                 <path
-                  d="M 140,360 C 150,370 170,390 195,420 C 210,430 225,435 240,430 C 230,440 215,450 220,470 C 225,490 240,500 260,500 C 275,500 285,480 290,460 C 295,440 295,420 288,405 C 285,395 280,390 270,395 C 265,405 270,420 275,445 C 275,470 278,500 282,530 C 290,570 305,620 320,660 C 335,700 355,740 390,770 C 405,765 420,750 435,735 C 445,715 455,690 465,670 C 475,640 485,610 500,580 C 530,570 560,550 600,520 C 630,495 660,470 700,450 C 720,445 745,450 770,460 C 790,450 810,430 830,410 C 850,380 840,320 830,270 C 800,260 740,250 670,230 C 590,210 500,180 430,140 C 370,105 310,75 250,70 C 200,80 180,120 170,170 C 160,220 150,280 140,360 Z"
+                  d={SUBCONTINENT_COASTLINE}
                   fill="url(#subcontinentLand)"
                   stroke="#34302A"
                   strokeWidth="2.5"
                   className="filter drop-shadow-[0_0_15px_rgba(0,0,0,0.8)]"
                 />
 
-                {/* Sri Lanka Island */}
+                {/* ACCURATE SRI LANKA COASTLINE */}
                 <path
-                  d="M 435,745 C 445,735 465,745 470,770 C 475,795 460,820 445,815 C 435,805 430,775 435,745 Z"
+                  d={SRI_LANKA_COASTLINE}
                   fill="url(#subcontinentLand)"
                   stroke="#34302A"
                   strokeWidth="1.8"
                 />
 
-                {/* Andaman & Nicobar Archipelago */}
+                {/* ANDAMAN & NICOBAR ISLANDS */}
                 <ellipse cx="670" cy="650" rx="3.5" ry="9" fill="#1B242C" stroke="#34302A" strokeWidth="1" />
                 <ellipse cx="678" cy="690" rx="4" ry="11" fill="#1B242C" stroke="#34302A" strokeWidth="1" />
                 <ellipse cx="685" cy="740" rx="4.5" ry="14" fill="#1B242C" stroke="#34302A" strokeWidth="1" />
 
-                {/* Southeast Asia Maritime Extension (For Chola Era) */}
-                {selectedEraId === 'chola' || selectedEraId === 'all' ? (
+                {/* SURROUNDING BODIES OF WATER */}
+                {layers.rivers && ATLAS_SEAS.map(sea => (
+                  <text
+                    key={sea.name}
+                    x={sea.x}
+                    y={sea.y}
+                    fill="#38BDF8"
+                    fontSize="11"
+                    fontWeight="bold"
+                    letterSpacing="3"
+                    opacity="0.35"
+                    textAnchor="middle"
+                    className="pointer-events-none select-none"
+                  >
+                    {sea.name}
+                  </text>
+                ))}
+
+                {/* PHYSICAL TERRAIN RELIEF (Mountains & Deserts) */}
+                {layers.rivers && ATLAS_TERRAIN.map(terrain => (
+                  <g key={terrain.id} opacity="0.75">
+                    <path
+                      d={terrain.d}
+                      fill={terrain.id === 'thar_desert' ? 'rgba(217, 164, 65, 0.08)' : 'none'}
+                      stroke={terrain.id === 'thar_desert' ? 'rgba(217, 164, 65, 0.25)' : '#6B7280'}
+                      strokeWidth={terrain.id === 'himalayas' ? '4.5' : '3'}
+                      strokeLinecap="round"
+                      strokeDasharray="4 5"
+                    />
+                    <text
+                      x={terrain.labelX}
+                      y={terrain.labelY}
+                      fill={terrain.id === 'thar_desert' ? '#D9A441' : '#9CA3AF'}
+                      fontSize="10"
+                      fontWeight="bold"
+                      letterSpacing="2"
+                      textAnchor="middle"
+                      className="pointer-events-none select-none drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]"
+                    >
+                      {terrain.name}
+                    </text>
+                  </g>
+                ))}
+
+                {/* SOUTHEAST ASIA MARITIME EXTENSION (For Chola Era Level 10 or All) */}
+                {(selectedEraId === 'level_10' || selectedEraId === 'all') && (
                   <g opacity="0.85">
-                    {/* Malay Peninsula */}
+                    {/* Malay Peninsula (Kadaram) */}
                     <path
                       d="M 870,640 C 880,670 890,710 900,740 C 890,755 875,730 865,690 Z"
                       fill="#141B21"
@@ -506,41 +601,6 @@ const ExplorePage = () => {
                     />
                     <text x="920" y="760" fill="#C5C9CC" fontSize="10" fontWeight="bold">
                       Sumatra (Srivijaya)
-                    </text>
-                  </g>
-                ) : null}
-
-                {/* PHYSICAL TERRAIN RELIEF (Mountains & Deserts) */}
-                {layers.rivers && (
-                  <g opacity="0.75">
-                    {/* Himalayas */}
-                    <path d="M 240,110 Q 380,180 550,250 T 800,310" fill="none" stroke="#6B7280" strokeWidth="5" strokeLinecap="round" strokeDasharray="4 6" opacity="0.4" />
-                    <text x="490" y="190" fill="#9CA3AF" fontSize="11" fontWeight="bold" letterSpacing="3">
-                      H I M A L A Y A S
-                    </text>
-
-                    {/* Hindu Kush */}
-                    <path d="M 190,90 Q 230,130 200,220 T 170,320" fill="none" stroke="#6B7280" strokeWidth="4" strokeLinecap="round" strokeDasharray="3 5" opacity="0.4" />
-                    <text x="140" y="165" fill="#9CA3AF" fontSize="9" fontWeight="bold" transform="rotate(-45 140 165)">
-                      HINDU KUSH
-                    </text>
-
-                    {/* Vindhya & Satpura */}
-                    <path d="M 320,415 Q 430,420 520,415" fill="none" stroke="#6B7280" strokeWidth="3" strokeDasharray="3 4" opacity="0.3" />
-                    <text x="390" y="415" fill="#9CA3AF" fontSize="9" fontWeight="bold" letterSpacing="2">
-                      VINDHYAS
-                    </text>
-
-                    {/* Western Ghats */}
-                    <path d="M 270,450 Q 310,540 370,680 T 400,740" fill="none" stroke="#6B7280" strokeWidth="3" strokeDasharray="3 5" opacity="0.35" />
-                    <text x="270" y="580" fill="#9CA3AF" fontSize="8" fontWeight="bold" transform="rotate(72 270 580)">
-                      WESTERN GHATS
-                    </text>
-
-                    {/* Thar Desert */}
-                    <path d="M 250,260 Q 290,280 320,330 T 260,370 Z" fill="rgba(217, 164, 65, 0.08)" stroke="rgba(217, 164, 65, 0.2)" strokeWidth="1" strokeDasharray="4 4" />
-                    <text x="260" y="320" fill="#D9A441" fontSize="9" fontWeight="bold" opacity="0.7">
-                      THAR DESERT
                     </text>
                   </g>
                 )}
@@ -710,7 +770,7 @@ const ExplorePage = () => {
               <button
                 type="button"
                 onClick={handleZoomIn}
-                className="p-2 rounded-lg text-content/70 hover:text-gold hover:bg-[#151B20] transition-colors"
+                className="p-2 rounded-lg text-[#C5C9CC]/70 hover:text-gold hover:bg-[#151B20] transition-colors"
                 title="Zoom In"
               >
                 <ZoomIn size={16} />
@@ -718,7 +778,7 @@ const ExplorePage = () => {
               <button
                 type="button"
                 onClick={handleZoomOut}
-                className="p-2 rounded-lg text-content/70 hover:text-gold hover:bg-[#151B20] transition-colors"
+                className="p-2 rounded-lg text-[#C5C9CC]/70 hover:text-gold hover:bg-[#151B20] transition-colors"
                 title="Zoom Out"
               >
                 <ZoomOut size={16} />
@@ -726,12 +786,12 @@ const ExplorePage = () => {
               <button
                 type="button"
                 onClick={handleResetView}
-                className="p-2 rounded-lg text-content/70 hover:text-gold hover:bg-[#151B20] transition-colors"
+                className="p-2 rounded-lg text-[#C5C9CC]/70 hover:text-gold hover:bg-[#151B20] transition-colors"
                 title="Reset View"
               >
                 <RotateCcw size={16} />
               </button>
-              <span className="text-[11px] font-bold text-content/50 px-2 font-mono">
+              <span className="text-[11px] font-bold text-[#C5C9CC]/50 px-2 font-mono">
                 {Math.round(zoom * 100)}%
               </span>
             </div>
@@ -740,7 +800,7 @@ const ExplorePage = () => {
 
         {/* RIGHT PANEL: SELECTED PLACE INFORMATION & RECONSTRUCTION DECK */}
         {selectedLoc && (
-          <aside className="w-full lg:w-96 bg-[#090C0F] border-t lg:border-t-0 lg:border-l border-[#34302A] flex flex-col shrink-0 shadow-2xl z-30 animate-fade-in max-h-[420px] lg:max-h-full overflow-hidden">
+          <aside className="w-full lg:w-96 bg-[#090C0F] border-t lg:border-t-0 lg:border-l border-[#34302A] flex flex-col shrink-0 shadow-2xl z-30 animate-fade-in max-h-[420px] lg:max-h-full overflow-hidden text-left">
             {/* Place Header */}
             <div className="p-4 bg-[#101519] border-b border-[#34302A] relative flex items-start gap-3">
               <span className="text-4xl p-2 rounded-xl bg-black/40 border border-[#34302A] shrink-0">
@@ -769,12 +829,16 @@ const ExplorePage = () => {
             {/* Visual Reconstruction Image Banner */}
             {selectedLoc.reconstructionImage && (
               <div
-                onClick={() => setEnlargedImage(selectedLoc.reconstructionImage)}
+                onClick={() => setEnlargedImage(resolveAsset(selectedLoc.reconstructionImage))}
                 className="relative h-36 bg-black/60 overflow-hidden cursor-pointer group shrink-0 border-b border-[#34302A]"
               >
                 <img
-                  src={selectedLoc.reconstructionImage}
+                  src={resolveAsset(selectedLoc.reconstructionImage)}
                   alt={selectedLoc.name}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = resolveAsset('assets/backgrounds/indus.jpg');
+                  }}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
@@ -864,7 +928,7 @@ const ExplorePage = () => {
                       🏠 Architecture & Town Planning
                     </span>
                     <p className="text-xs text-[#F5F1E8]/90 leading-relaxed">
-                      {selectedLoc.howPeopleLived?.architecture || 'Constructed with local stone, timber and brick reflecting sophisticated regional building traditions.'}
+                      {selectedLoc.architecture || selectedLoc.howPeopleLived?.architecture || 'Constructed with local stone, timber and brick reflecting sophisticated regional building traditions.'}
                     </p>
                   </div>
 
@@ -873,7 +937,7 @@ const ExplorePage = () => {
                       🧑‍🤝‍🧑 Daily Life & Occupations
                     </span>
                     <p className="text-xs text-[#F5F1E8]/90 leading-relaxed">
-                      {selectedLoc.howPeopleLived?.dailyLife || 'Inhabited by artisans, agriculturalists, and traders participating in lively municipal and ritual assemblies.'}
+                      {selectedLoc.lifestyle || selectedLoc.howPeopleLived?.dailyLife || 'Inhabited by artisans, agriculturalists, and traders participating in lively municipal and ritual assemblies.'}
                     </p>
                   </div>
 
@@ -882,7 +946,7 @@ const ExplorePage = () => {
                       🌾 Food, Farming & Nutrition
                     </span>
                     <p className="text-xs text-[#F5F1E8]/90 leading-relaxed">
-                      {selectedLoc.howPeopleLived?.food || 'Harvested seasonal grains, pulses, and local river and marine produce.'}
+                      {selectedLoc.food || selectedLoc.howPeopleLived?.food || 'Harvested seasonal grains, pulses, and local river and marine produce.'}
                     </p>
                   </div>
 
@@ -891,7 +955,7 @@ const ExplorePage = () => {
                       🧵 Clothing & Adornments
                     </span>
                     <p className="text-xs text-[#F5F1E8]/90 leading-relaxed">
-                      {selectedLoc.howPeopleLived?.clothing || 'Spun and dyed cotton garments decorated with stone, shell and metal ornaments.'}
+                      {selectedLoc.clothing || selectedLoc.howPeopleLived?.clothing || 'Spun and dyed cotton garments decorated with stone, shell and metal ornaments.'}
                     </p>
                   </div>
 
@@ -900,7 +964,7 @@ const ExplorePage = () => {
                       ⚖️ Craft, Industry & Trade
                     </span>
                     <p className="text-xs text-[#F5F1E8]/90 leading-relaxed">
-                      {selectedLoc.howPeopleLived?.trade || 'Exchanged precious raw materials, tools, and finished crafts along major river and land routes.'}
+                      {selectedLoc.trade || selectedLoc.howPeopleLived?.trade || 'Exchanged precious raw materials, tools, and finished crafts along major river and land routes.'}
                     </p>
                   </div>
                 </div>
@@ -990,12 +1054,13 @@ const ExplorePage = () => {
           </div>
 
           {/* Era Pills Track */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar">
+          <div ref={timelineRef} className="flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar">
             {ATLAS_ERAS.map(era => {
               const isSelected = selectedEraId === era.id;
               return (
                 <button
                   key={era.id}
+                  data-era-id={era.id}
                   type="button"
                   onClick={() => setSelectedEraId(era.id)}
                   className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-2 border ${
@@ -1008,6 +1073,11 @@ const ExplorePage = () => {
                     className="w-2 h-2 rounded-full"
                     style={{ backgroundColor: isSelected ? '#070A0C' : era.color }}
                   />
+                  {era.levelId && era.levelId !== 'all' && (
+                    <span className={`text-[10px] px-1 rounded font-mono ${isSelected ? 'bg-[#070A0C]/20' : 'bg-gold/20 text-gold'}`}>
+                      L{era.levelId}
+                    </span>
+                  )}
                   <span>{era.title}</span>
                   <span className={`text-[10px] opacity-75 ${isSelected ? 'text-[#070A0C]' : 'text-gold'}`}>
                     ({era.dates.split(' ')[0]})
