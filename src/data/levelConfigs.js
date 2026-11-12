@@ -162,7 +162,7 @@ export const levelConfigs = {
     id: 2,
     title: "Early Farming Communities",
     totalStages: 8,
-    defaultResources: { food: 0, water: 0, materials: 0, storage: 0 },
+    defaultResources: { grain: 0, seeds: 0, water: 0, clay: 0, mud: 0, wood: 0, stone: 0, tools: 0 },
     locations: level2Locations,
     challenges: level2Challenges,
     

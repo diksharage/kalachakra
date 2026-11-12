@@ -57,37 +57,57 @@ export const minigamesData = {
     id: "mg-l2-farming", levelId: 2,
     variations: [
       {
-        variationId: "v1", type: "historicalDecision", title: "First Harvest",
+        variationId: "v1", type: "historicalDecision", title: "Plan Planting & Seasonal Harvest Schedule",
         rewards: [
-          { type: 'resource', id: 'grain', amount: 5, label: 'Surplus Grain', destination: 'Inventory', usage: 'Used for Settlement Growth' },
-          { type: 'artifact', id: 'early_pottery', amount: 1, label: 'Neolithic Pottery', destination: 'Artifact Collection', usage: 'View in Library' }
+          { type: 'resource', id: 'grain', amount: 3, label: 'Harvested Grain', destination: 'Inventory', usage: 'Used for Settlement Growth' },
+          { type: 'resource', id: 'seeds', amount: 2, label: 'Viable Seed Stock', destination: 'Inventory', usage: 'Used for Field Planting' },
+          { type: 'artifact', id: 'early_pottery', amount: 1, label: 'Neolithic Cord-Marked Pottery', destination: 'Artifact Collection', usage: 'View in Library' }
         ],
-        description: "Manage your first agricultural settlement. Choose the right strategies to grow your village.",
+        description: "Make seasonal planning decisions to establish fields, time planting, protect growing crops, and store the harvest safely.",
         difficulty: "easy", maxScore: 100,
         scenarios: [
-          { text: "The seasonal rains are coming. Where should we plant the wheat?", options: [{ label: "In the fertile river floodplains", score: 10, response: "The soil here is rich in nutrients!" }, { label: "On the rocky mountain peaks", score: -10, response: "Crops cannot grow on barren rock." }] },
-          { text: "The harvest was bountiful! How do we store the surplus grain?", options: [{ label: "Leave it in open baskets", score: -10, response: "Pests ruined the surplus!" }, { label: "Build mud-brick granaries", score: 10, response: "The grain is safe for winter." }] }
+          {
+            text: "The monsoon season is three weeks away. When and where should the village community plant its primary cereal seeds?",
+            options: [
+              { label: "Till the upper alluvial silt terrace and sow seeds just before the first gentle pre-monsoon showers", score: 15, response: "Wise agricultural timing! Early sowing allows seeds to root securely before heavy torrents arrive." },
+              { label: "Wait until floodwaters crest at peak depth, then scatter loose seeds directly into the raging current", score: -10, response: "Severe failure! The floodwaters swept all your precious seed grain out to sea." }
+            ]
+          },
+          {
+            text: "Mid-growth brings aggressive wild weeds competing with young grain stalks for sunlight and soil nutrients. How do you intervene?",
+            options: [
+              { label: "Organize communal weeding using ground-stone hoes to loosen soil and pull weeds by the roots", score: 15, response: "Effective cultivation! Aerating the soil and removing weed competition doubled grain stalk vigor." },
+              { label: "Flood the entire field with two meters of stagnant mud to bury both weeds and crops", score: -10, response: "Disaster! Deep stagnant mud smothered the crops and rotted the delicate grain stems." }
+            ]
+          },
+          {
+            text: "The harvest is complete! You have 100 baskets of grain. How should the community allocate this bounty?",
+            options: [
+              { label: "Set aside the top 25% of healthiest, plumpest grain heads in sealed cord-marked jars as seed stock for next year, and store the rest in elevated granaries", score: 15, response: "Masterful community planning! Protecting next year's seed stock guarantees generational survival and village growth." },
+              { label: "Consume all 100 baskets in a giant week-long banquet without keeping any seeds for next season", score: -10, response: "Critical error! When next year's planting season arrived, the community had zero seeds and faced starvation." }
+            ]
+          }
         ]
       },
       {
-        variationId: "v2", type: "timeline", title: "The Agricultural Cycle",
+        variationId: "v2", type: "timeline", title: "The Early Agricultural Calendar",
         rewards: [
-          { type: 'resource', id: 'grain', amount: 5, label: 'Surplus Grain', destination: 'Inventory', usage: 'Used for Settlement Growth' },
-          { type: 'artifact', id: 'early_pottery', amount: 1, label: 'Neolithic Pottery', destination: 'Artifact Collection', usage: 'View in Library' }
+          { type: 'resource', id: 'grain', amount: 3, label: 'Harvested Grain', destination: 'Inventory', usage: 'Used for Settlement Growth' },
+          { type: 'resource', id: 'seeds', amount: 2, label: 'Viable Seed Stock', destination: 'Inventory', usage: 'Used for Field Planting' },
+          { type: 'artifact', id: 'early_pottery', amount: 1, label: 'Neolithic Cord-Marked Pottery', destination: 'Artifact Collection', usage: 'View in Library' }
         ],
-        description: "Put the steps of early farming into the correct historical order.",
+        description: "Arrange the vital stages of the early farming cycle in correct seasonal sequence.",
         difficulty: "easy", maxScore: 100,
         events: [
-          { id: 't1', label: 'Clear the land of wild brush', order: 1 },
-          { id: 't2', label: 'Till the soil using stone hoes', order: 2 },
-          { id: 't3', label: 'Plant the seeds before the rains', order: 3 },
-          { id: 't4', label: 'Harvest the grown wheat', order: 4 },
-          { id: 't5', label: 'Grind the grain on a quern stone', order: 5 }
+          { id: 't1', text: 'Clear riverbank brush and aerate alluvial soil using polished stone hoes', order: 1 },
+          { id: 't2', text: 'Sow selected cereal seeds before the arrival of seasonal monsoon rains', order: 2 },
+          { id: 't3', text: 'Regulate inundation canal cuts to supply gentle water to growing stalks', order: 3 },
+          { id: 't4', text: 'Reap ripened grain heads cleanly using micro-serrated chert sickles', order: 4 },
+          { id: 't5', text: 'Thresh, dry, and seal reserve grain inside cord-marked jars in elevated granaries', order: 5 }
         ]
       }
     ]
   },
-  
   "mg-l3-city": {
     id: "mg-l3-city", levelId: 3,
     variations: [

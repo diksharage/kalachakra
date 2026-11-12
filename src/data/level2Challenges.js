@@ -1,87 +1,92 @@
 export const level2Challenges = {
   mg_l2_farming: {
     id: "mg-l2-farming",
-    title: "First Harvest",
-    format: "interactive_survival",
-    question: "You have found a fertile patch of land. It is time to plant the first crops.",
-    options: [
-      { 
-        label: "Plant wild seeds in the fertile soil", 
-        costs: { wild_seeds: 2, fertile_soil: 1 }, 
-        resultText: "The seeds grew into tall stalks of grain! You harvested the crop.", 
-        isSuccess: true, 
-        reward: { harvested_grain: 2, xp: 50, culture: 1 } 
+    title: "Plan Planting & Seasonal Harvest Schedule",
+    format: "minigame",
+    difficulty: "medium",
+    reward: { grain: 2, tools: 1, seeds: 2 }
+  },
+  crops: {
+    id: "l2-crops-matching",
+    title: "Select Suitable Crops for Ecological Conditions",
+    format: "matching",
+    difficulty: "medium",
+    reward: { grain: 2, seeds: 2, xp: 50 },
+    pairs: [
+      {
+        id: "c1",
+        left: { id: "paddy", label: "Wet River Floodplains & Low Marshes", icon: "🌾" },
+        right: { id: "paddy_crop", label: "Indica Rice (Thrives in standing monsoon water and deep alluvial silt)" }
       },
-      { 
-        label: "Throw seeds randomly into the forest", 
-        costs: { wild_seeds: 1 }, 
-        resultText: "The seeds failed to grow in the shade.", 
-        isSuccess: false 
+      {
+        id: "c2",
+        left: { id: "winter_alluvium", label: "Well-Drained River Terraces (Cool Winter)", icon: "🌱" },
+        right: { id: "winter_crop", label: "Barley & Emmer Wheat (Requires cool temperatures and moderate soil moisture)" }
+      },
+      {
+        id: "c3",
+        left: { id: "arid_plateau", label: "Semi-Arid Rocky Plateau & Hillslopes", icon: "🪨" },
+        right: { id: "arid_crop", label: "Small Millets & Horse Gram (Drought-resilient grains surviving dry spells)" }
+      },
+      {
+        id: "c4",
+        left: { id: "river_borders", label: "Sandy Loam River Borders & Garden Plots", icon: "🌿" },
+        right: { id: "border_crop", label: "Green Gram & Lentils (Nitrogen-fixing pulses enriching soil between harvests)" }
       }
     ]
   },
-  pottery: {
-    id: "farming-pottery-01",
-    title: "The Art of Pottery",
+  water: {
+    id: "l2-water-allocation",
+    title: "Solve Water-Allocation & Canal Challenges",
     difficulty: "medium",
     format: "interactive_survival",
-    question: "You need a way to store the harvested grain and carry water.",
+    question: "A mid-season dry spell hits as rice seedlings are heading and barley plots need moisture. The single river overflow channel has limited flow. As community planner, how do you allocate the water?",
     options: [
       {
-        label: "Shape and fire clay pots in a kiln",
-        costs: { clay: 2, wood: 1 },
-        resultText: "You successfully baked sturdy clay pots! These will store grain safely.",
+        label: "Construct an alternating clay sluice gate: flood the thirsty rice paddy during midday heat, then divert evening water to the barley plots and cattle pen",
+        costs: { water: 2, mud: 1 },
+        resultText: "Superb planning! The timed sluice gate prevented sun-scalding in the paddy while providing adequate moisture to barley and livestock without wasting a drop.",
         isSuccess: true,
-        reward: { clay_pots: 2, xp: 50, knowledge: 2 }
+        reward: { grain: 2, water: 2, xp: 50 }
       },
       {
-        label: "Weave a basket out of loose grass",
-        costs: {},
-        resultText: "The basket cannot hold water and mice easily ate the grain.",
+        label: "Divert all available water solely into the cattle pen, completely shutting off the field canals",
+        costs: { water: 1 },
+        resultText: "Disastrous decision! The thirsty rice seedlings wilted and died in the heat, resulting in severe food shortages.",
         isSuccess: false
-      }
-    ]
-  },
-  mudbrick: {
-    id: "farming-mudbrick-01",
-    title: "Permanent Settlement",
-    difficulty: "medium",
-    format: "interactive_survival",
-    question: "To protect the community from the elements, you must build sturdy, permanent structures.",
-    options: [
-      {
-        label: "Mix mud with dry plant fibers to bake mudbricks in the sun",
-        costs: { mud: 2, wood: 1 },
-        resultText: "The sun-baked mudbricks are extremely strong! Perfect for building.",
-        isSuccess: true,
-        reward: { mudbrick: 2, xp: 50, legacy: 1 }
       },
       {
-        label: "Stack loose mud without drying it",
+        label: "Tear down the riverbank earthen dykes completely, flooding everything at once without channels",
         costs: { mud: 1 },
-        resultText: "The first rain washed your mud walls away.",
+        resultText: "The sudden uncontrolled torrent washed away topsoil, submerged the low village homes, and damaged mudbrick walls.",
         isSuccess: false
       }
     ]
   },
-  tools: {
-    id: "farming-tools-01",
-    title: "Agricultural Tools",
+  protection: {
+    id: "l2-crop-protection",
+    title: "Protect Crops from Environmental Problems",
     difficulty: "medium",
     format: "interactive_survival",
-    question: "Farming requires advanced tools to till the soil and cut the stalks.",
+    question: "Torrential unseasonal rains threaten to waterlog your ripening grain plots, and a fungal leaf blight is beginning to spread across dense stalks. How do you protect the harvest?",
     options: [
       {
-        label: "Craft stone sickles and wooden hoes",
-        costs: { stone: 1, wood: 1 },
-        resultText: "You crafted specialized tools for agriculture!",
+        label: "Dig perimeter drainage runoffs to release stagnant water into the river, and cut/burn infected crop borders to halt the fungal blight",
+        costs: { tools: 1, wood: 1 },
+        resultText: "Decisive action saved the village harvest! Drainage prevented root rot, and creating firebreaks stopped the blight from entering the main grain fields.",
         isSuccess: true,
-        reward: { tools: 2, xp: 50 }
+        reward: { grain: 2, tools: 1, xp: 50 }
       },
       {
-        label: "Try to dig the soil with bare hands",
+        label: "Pack heavy wet river mud tightly around every waterlogged stem to trap the stagnant water",
+        costs: { mud: 2 },
+        resultText: "Trapping stagnant mud suffocated the plant root systems, rotting the crops within days.",
+        isSuccess: false
+      },
+      {
+        label: "Ignore the fields completely and wait for the sun to evaporate standing water on its own",
         costs: {},
-        resultText: "It's too slow and exhausting. The field remains untilled.",
+        resultText: "Stagnant pools festered for two weeks. Water mold destroyed over 70% of the ripening harvest.",
         isSuccess: false
       }
     ]

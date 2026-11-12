@@ -7,6 +7,11 @@ const ResourceCard = ({ type, value, required, theme }) => {
   if (type === 'wood' || type === 'timber') { emoji = '🪵'; label = type; }
   else if (type === 'stone' || type === 'materials' || type === 'craftMaterials' || type === 'brick' || type === 'bricks') { emoji = '🪨'; label = type; }
   else if (type === 'flint') { emoji = '🔪'; label = 'flint'; }
+  else if (type === 'grain' || type === 'harvested_grain') { emoji = '🌾'; label = 'Grain'; }
+  else if (type === 'seeds' || type === 'wild_seeds') { emoji = '🌱'; label = 'Seeds'; }
+  else if (type === 'clay' || type === 'clay_pots') { emoji = '🏺'; label = 'Pottery / Clay'; }
+  else if (type === 'mud' || type === 'mudbrick') { emoji = '🧱'; label = 'Mudbrick'; }
+  else if (type === 'tools') { emoji = '⛏️'; label = 'Farming Tools'; }
   else if (type === 'plants' || type === 'food' || type === 'agriculture') { emoji = '🌿'; label = type; }
   else if (type === 'water') { emoji = '💧'; label = type; }
   else if (type === 'storage' || type === 'capacity') { emoji = '🏺'; label = type; }

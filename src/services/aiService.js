@@ -101,16 +101,25 @@ export function buildKalaContext(gameStateInput = null, localOverrides = {}) {
   const isBeginner = levelId <= 3;
   const isIntermediate = levelId >= 4 && levelId <= 7;
   const isAdvanced = levelId >= 8 && levelId <= 11;
+  const isL1orL2 = levelId === 1 || levelId === 2;
 
   const targetCount = isBeginner ? 2 : isIntermediate ? 3 : isAdvanced ? 4 : 5;
-  const targetExplore = Math.min(targetCount, Math.max(validLocations.length, 1));
+  const targetExplore = isL1orL2
+    ? Math.min(validLocations.length, Math.max(validLocations.length, 1))
+    : Math.min(targetCount, Math.max(validLocations.length, 1));
   const targetDiscover = targetExplore;
   const targetLearn = targetExplore;
-  const targetChallenges = Math.min(
-    isBeginner ? 2 : isIntermediate ? 3 : 4,
-    Math.max(allChallenges.length, 1)
-  );
-  const targetBuilds = Math.min(targetCount, Math.max(buildActions.length, 1));
+  const targetChallenges = levelId === 1
+    ? Math.min(3, Math.max(allChallenges.length, 1))
+    : levelId === 2
+    ? Math.min(4, Math.max(allChallenges.length, 1))
+    : Math.min(
+        isBeginner ? 2 : isIntermediate ? 3 : 4,
+        Math.max(allChallenges.length, 1)
+      );
+  const targetBuilds = isL1orL2
+    ? Math.min(2, Math.max(buildActions.length, 1))
+    : Math.min(targetCount, Math.max(buildActions.length, 1));
 
   const exploration = Array.isArray(activeState.exploration) ? activeState.exploration : [];
   const discovery = Array.isArray(activeState.discovery) ? activeState.discovery : [];

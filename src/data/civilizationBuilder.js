@@ -56,34 +56,49 @@ export const civilizationBuilderData = {
         id: 'crop_field',
         nameKey: 'builder.b.crop_field',
         descKey: 'builder.b.crop_field_desc',
-        name: 'Cultivated Wheat & Barley Field',
-        description: 'Irrigated alluvial plot for growing early domesticated grains.',
+        name: 'Cultivated Grain & Rice Fields',
+        description: 'Alluvial farm plots divided into embanked paddy fields and winter grain beds, irrigated via shallow ditches.',
+        consequence: 'Produces reliable grain harvests that sustain a year-round population. Poor placement far from water sources causes crops to dry up, leading to food scarcity.',
         icon: '🌾',
         terrain: 'land',
-        requirements: { water: 1, grain: 1 },
-        effects: { food: 20, community: 10 }
+        requirements: { seeds: 2, water: 2, tools: 1 },
+        effects: { food: 20, grain: 2, community: 10 }
       },
       {
         id: 'mud_brick_hut',
         nameKey: 'builder.b.mud_hut',
         descKey: 'builder.b.mud_hut_desc',
-        name: 'Mud-Brick Dwelling',
-        description: 'Permanent rectangular mud-brick house inspired by early Mehrgarh settlements.',
+        name: 'Settled Mudbrick Dwellings',
+        description: 'Permanent rectangular multi-room homes built of sun-dried mudbrick with thatch roofing and clay hearths.',
+        consequence: 'Provides permanent, thermally regulated shelter for farming families through harsh winters and heavy monsoons. Inadequate mud tempering causes walls to slump in the first rain.',
         icon: '🛖',
         terrain: 'land',
-        requirements: { wood: 1, stone: 1 },
-        effects: { community: 15, culture: 5 }
+        requirements: { mud: 2, wood: 2, stone: 1 },
+        effects: { community: 20, culture: 10 }
       },
       {
         id: 'granary_pit',
         nameKey: 'builder.b.granary',
         descKey: 'builder.b.granary_desc',
-        name: 'Clay-Lined Storage Granary',
-        description: 'Compartmented mud-brick storage structure to protect surplus grain between harvests.',
+        name: 'Elevated Clay-Lined Storage Granary',
+        description: 'Raised mudbrick granary with cord-marked storage jars and lime-plastered floors to preserve seed reserves.',
+        consequence: 'Safeguards surplus grain and seed stock between harvests against dampness, rot, and rodents. Lack of elevated storage results in losing over 30% of harvested yield to mold.',
         icon: '🏺',
         terrain: 'land',
-        requirements: { grain: 1, stone: 1 },
-        effects: { food: 15, knowledge: 10 }
+        requirements: { clay: 2, wood: 1, grain: 1 },
+        effects: { storage: 20, food: 15, knowledge: 10 }
+      },
+      {
+        id: 'cattle_pen',
+        nameKey: 'builder.b.cattle_pen',
+        descKey: 'builder.b.cattle_pen_desc',
+        name: 'Community Cattle Pen & Water Channel',
+        description: 'Wattle-fenced corral for domesticated zebu cattle with clay watering troughs and manure collection.',
+        consequence: 'Corrals domesticated livestock safely away from vulnerable crops, providing draught power, milk, and valuable manure for field fertility. Without fencing, free-roaming cattle trample young crops.',
+        icon: '🐂',
+        terrain: 'land',
+        requirements: { wood: 2, water: 1, stone: 1 },
+        effects: { community: 15, food: 10, culture: 10 }
       }
     ]
   },

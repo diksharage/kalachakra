@@ -25,13 +25,17 @@ import { adaptTextForAge, adaptQuestionForAge } from '../../utils/ageAdapter';
 
 const getResourceHint = (resKey) => {
   const hints = {
-    wood: 'Found in Dense Forest & Groves',
-    plants: 'Gathered in Forests & Rock Overhangs',
-    stone: 'Collected at Rocky Outcrops & Riverbeds',
-    water: 'Collected from River Valley & Springs',
-    flint: 'Knapped at Rocky Outcrops & Flint Beds',
-    food: 'Earned through Foraging & Hearth Cooking',
-    grain: 'Harvested from Irrigated Fields',
+    wood: 'Gathered from Riverbank Groves & Forest Borders',
+    plants: 'Gathered in Meadow Stands & Grasslands',
+    stone: 'Collected at River Cobble Beds & Rocky Outcrops',
+    water: 'Channeled from Perennial River & Inundation Cuts',
+    flint: 'Knapped for harvesting sickles & ground celts',
+    food: 'Earned through harvesting, grinding & cooking',
+    grain: 'Harvested from Cultivated Plots & River Terraces',
+    seeds: 'Gathered from Ancestral Grasses & Silt Meadows',
+    clay: 'Dug from Clay Riverbanks & Silt Beds',
+    mud: 'Mixed from Alluvial Silt, Straw & Mudbrick Yards',
+    tools: 'Crafted from Polished Stone, Wood & Sickle Blades',
     brick: 'Formed in Kilns & Settlement Tasks'
   };
   return hints[resKey] || 'Earned by exploring habitats and solving challenges';
@@ -1067,19 +1071,23 @@ const LevelEngine = ({ config }) => {
   const maxChallenges = allChallenges.length || 1;
   const maxBuilds = buildActions.length || 1;
 
-  const targetExplore = config.id === 1
-    ? Math.min(4, maxExplore)
+  const isL1orL2 = config.id === 1 || config.id === 2;
+
+  const targetExplore = isL1orL2
+    ? Math.min(locations.length, maxExplore)
     : Math.min(isBeginner ? 2 : isIntermediate ? 3 : isAdvanced ? 4 : 5, maxExplore);
   const targetDiscover = targetExplore;
   const targetLearn = targetExplore;
 
   const targetChallenges = config.id === 1
     ? Math.min(3, allChallenges.length)
+    : config.id === 2
+    ? Math.min(4, allChallenges.length)
     : Math.min(
         Math.min(isBeginner ? 2 : isIntermediate ? 3 : isAdvanced ? 4 : 4, maxChallenges),
         allChallenges.length
       );
-  const targetBuilds = config.id === 1
+  const targetBuilds = isL1orL2
     ? Math.min(2, maxBuilds)
     : Math.min(isBeginner ? 2 : isIntermediate ? 3 : isAdvanced ? 4 : 5, maxBuilds);
 
@@ -1091,7 +1099,7 @@ const LevelEngine = ({ config }) => {
     exploredDetails: {},
     completedChallenges: [],
     completedEvents: [],
-    activeChallengeIds: config.id === 1 ? allChallenges.map(c => c.id) : [],
+    activeChallengeIds: isL1orL2 ? allChallenges.map(c => c.id) : [],
     builtItems: [],
     resources: { ...config.defaultResources },
     activePopup: null
@@ -1127,7 +1135,7 @@ const LevelEngine = ({ config }) => {
         exploredDetails: saved.exploredDetails || {},
         completedChallenges: savedCompletedChallenges,
         completedEvents: saved.completedEvents || [],
-        activeChallengeIds: config.id === 1
+        activeChallengeIds: isL1orL2
           ? allChallenges.map(c => c.id)
           : savedActiveIds,
         builtItems: savedBuiltItems,
@@ -1168,10 +1176,10 @@ const LevelEngine = ({ config }) => {
   const previousStage = useRef(stage);
   useEffect(() => {
     if (stage > previousStage.current) {
-      if (stage === 2) notify('SUCCESS', 'Stage Unlocked', 'DISCOVER UNLOCKED. Examine prehistoric tools & evidence.', { icon: '🔍' });
-      if (stage === 3) notify('SUCCESS', 'Stage Unlocked', 'LEARN UNLOCKED. Uncover how early humans adapted.', { icon: '📖' });
-      if (stage === 4) notify('SUCCESS', 'Stage Unlocked', 'PLAY + SOLVE UNLOCKED. Complete survival challenges.', { icon: '🎮' });
-      if (stage === 5) notify('SUCCESS', 'Stage Unlocked', 'BUILD / MANAGE UNLOCKED. Construct your shelter & hearth.', { icon: '🔨' });
+      if (stage === 2) notify('SUCCESS', 'Stage Unlocked', config.id === 2 ? 'DISCOVER UNLOCKED. Uncover farming tools, pottery & granaries.' : 'DISCOVER UNLOCKED. Examine prehistoric tools & evidence.', { icon: '🔍' });
+      if (stage === 3) notify('SUCCESS', 'Stage Unlocked', config.id === 2 ? 'LEARN UNLOCKED. Explore the agricultural transition.' : 'LEARN UNLOCKED. Uncover how early humans adapted.', { icon: '📖' });
+      if (stage === 4) notify('SUCCESS', 'Stage Unlocked', config.id === 2 ? 'PLAY + SOLVE UNLOCKED. Plan planting, water & crop protection.' : 'PLAY + SOLVE UNLOCKED. Complete survival challenges.', { icon: '🎮' });
+      if (stage === 5) notify('SUCCESS', 'Stage Unlocked', config.id === 2 ? 'BUILD / MANAGE UNLOCKED. Construct your farming settlement.' : 'BUILD / MANAGE UNLOCKED. Construct your shelter & hearth.', { icon: '🔨' });
       previousStage.current = stage;
     }
   }, [stage, notify]);
@@ -1183,7 +1191,7 @@ const LevelEngine = ({ config }) => {
   // Challenge Selection Logic
   useEffect(() => {
      if (allChallenges.length > 0 && levelState.activeChallengeIds.length === 0) {
-         if (config.id === 1) {
+         if (config.id === 1 || config.id === 2) {
             setLevelState(prev => ({ ...prev, activeChallengeIds: allChallenges.map(c => c.id) }));
             return;
          }
@@ -1664,7 +1672,7 @@ const LevelEngine = ({ config }) => {
                        }
                        if (data.effects) {
                           Object.entries(data.effects).forEach(([k, v]) => {
-                            if (['food', 'wood', 'stone', 'water', 'plants', 'flint'].includes(k)) {
+                            if (['food', 'wood', 'stone', 'water', 'plants', 'flint', 'grain', 'seeds', 'clay', 'mud', 'tools'].includes(k)) {
                               newResources[k] = (newResources[k] || 0) + v;
                             }
                           });
@@ -1700,6 +1708,8 @@ const LevelEngine = ({ config }) => {
                playSound('discovery');
                const bundle = config.id === 1
                  ? { wood: 3, stone: 3, plants: 2, water: 2, flint: 1 }
+                 : config.id === 2
+                 ? { grain: 3, seeds: 3, water: 3, clay: 2, mud: 2, wood: 2, stone: 2, tools: 1 }
                  : { wood: 3, stone: 3, food: 2, water: 2 };
                if (!isReplay) updateResources(bundle);
                setLevelState(prev => {
@@ -1709,28 +1719,41 @@ const LevelEngine = ({ config }) => {
                  });
                  return { ...prev, resources: nextRes, activePopup: null };
                });
-               notify('SUCCESS', 'Foraging Expedition Complete', 'Gathered additional wood, stone, plants, water, and flint from the valley!', { icon: '🌿' });
+               const notifMsg = config.id === 2
+                 ? 'Gathered additional grain, seeds, water, clay, mud, timber, and stone for farming construction!'
+                 : 'Gathered additional wood, stone, plants, water, and flint from the valley!';
+               notify('SUCCESS', 'Supplies Expedition Complete', notifMsg, { icon: '🌿' });
              };
 
              return (
                 <>
-                   <h3 className={"text-xl font-bold mb-2 uppercase " + theme.primary}>Gather Survival Resources</h3>
+                   <h3 className={"text-xl font-bold mb-2 uppercase " + theme.primary}>
+                     {config.id === 2 ? 'Gather Farming & Settlement Supplies' : 'Gather Survival Resources'}
+                   </h3>
                    <p className="text-content/80 mb-5 text-sm">
-                     Complete remaining tasks or lead a foraging expedition into the valley to gather materials for shelter construction.
+                     {config.id === 2
+                       ? 'Complete remaining tasks or lead an expedition along the river terraces and clay banks to gather supplies for settlement construction.'
+                       : 'Complete remaining tasks or lead a foraging expedition into the valley to gather materials for shelter construction.'}
                    </p>
 
                    <div className="flex flex-col gap-3 max-h-[50vh] overflow-y-auto mb-6 w-full text-left">
                       <div className="p-4 rounded-xl bg-gold/10 border border-gold/40 flex flex-col gap-2">
-                        <div className="font-bold text-sm text-gold"> Valley Foraging Expedition</div>
+                        <div className="font-bold text-sm text-gold">
+                          {config.id === 2 ? '🌾 River Terrace & Settlement Supply Expedition' : '🌿 Valley Foraging Expedition'}
+                        </div>
                         <p className="text-xs text-content/80">
-                          Re-visit the forest groves, rocky outcrops, and riverbanks to collect fresh timber, stones, edible plants, and water.
+                          {config.id === 2
+                            ? 'Gather alluvial clay, river timber, crop seeds, harvested grain, mud, and water to complete your village buildings.'
+                            : 'Re-visit the forest groves, rocky outcrops, and riverbanks to collect fresh timber, stones, edible plants, and water.'}
                         </p>
                         <button
                           type="button"
                           onClick={handleForageExpedition}
                           className="mt-1 px-4 py-2.5 rounded-xl bg-[#D9A441] text-[#070A0C] font-bold text-xs uppercase tracking-wider hover:bg-[#D9A441]/90 transition-all"
                         >
-                          Forage Survival Materials (+3 Wood, +3 Stone, +2 Plants, +2 Water, +1 Flint)
+                          {config.id === 2
+                            ? 'Gather Farming Materials (+3 Grain, +3 Seeds, +3 Water, +2 Clay, +2 Mud, +2 Wood, +2 Stone)'
+                            : 'Forage Survival Materials (+3 Wood, +3 Stone, +2 Plants, +2 Water, +1 Flint)'}
                         </button>
                       </div>
 
@@ -1832,7 +1855,7 @@ const LevelEngine = ({ config }) => {
                    setLevelState({
                      ...defaultState,
                      resources: { ...config.defaultResources },
-                     activeChallengeIds: config.id === 1 ? allChallenges.map(c => c.id) : []
+                     activeChallengeIds: isL1orL2 ? allChallenges.map(c => c.id) : []
                    });
                    notify('INFO', 'Level Reset', `Restarted ${config.title} from Stage 1.`, { icon: '🔄' });
                  }}
@@ -2220,11 +2243,11 @@ const LevelEngine = ({ config }) => {
               </div>
 
               {stage === 4 && (
-                <div className="w-full max-w-2xl bg-surface/85 border border-gold/30 rounded-2xl p-4 md:p-5 shadow-xl animate-fade-in">
+                <div className="w-full max-w-4xl bg-surface/85 border border-gold/30 rounded-2xl p-4 md:p-5 shadow-xl animate-fade-in">
                   <div className="text-xs font-bold uppercase tracking-widest text-gold mb-3">
-                    Stage 4: Play & Solve Survival Challenges ({completedChallenges.length}/{targetChallenges})
+                    Stage 4: Play & Solve {config.id === 2 ? 'Farming & Planning Challenges' : 'Survival Challenges'} ({completedChallenges.length}/{targetChallenges})
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className={`grid grid-cols-1 ${allChallenges.length >= 4 ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-3'} gap-3`}>
                     {allChallenges.slice(0, targetChallenges).map((chal, idx) => {
                       const isDone = completedChallenges.includes(chal.id);
                       return (
@@ -2250,9 +2273,9 @@ const LevelEngine = ({ config }) => {
               )}
 
               {stage === 5 && (
-                <div className="w-full max-w-2xl bg-surface/85 border border-gold/30 rounded-2xl p-4 md:p-5 shadow-xl animate-fade-in">
+                <div className="w-full max-w-3xl bg-surface/85 border border-gold/30 rounded-2xl p-4 md:p-5 shadow-xl animate-fade-in">
                   <div className="text-xs font-bold uppercase tracking-widest text-gold mb-3">
-                    Stage 5: Build & Manage Prehistoric Camp ({builtItems.length}/{targetBuilds})
+                    Stage 5: Build & Manage {config.id === 2 ? 'Early Farming Settlement' : 'Prehistoric Camp'} ({builtItems.length}/{targetBuilds})
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {buildActions.slice(0, targetBuilds).map((bAction) => {
