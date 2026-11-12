@@ -33,6 +33,22 @@ export const level1Challenges = {
       }
     ]
   },
+  cave_art: {
+    id: 'early-cave-art-01',
+    title: 'Cave Art Sequence: Ancient Survival Cycle',
+    format: 'cave_art',
+    difficulty: 'medium',
+    question: 'Examine the prehistoric ochre handprints and rock carvings inside the cave shelter. Tap the sacred symbols in the natural seasonal survival sequence:',
+    explanation: 'Prehistoric rock art (such as at Bhimbetka) documented animal migrations, hunting rituals, and communal hearth life, passing vital survival knowledge across generations.',
+    reward: { knowledge: 100, legacy: 50, flint: 2 },
+    symbols: [
+      { id: 'water', icon: '💧', label: 'River Spring', order: 1, hint: 'First: Locate fresh water to sustain the hunting band' },
+      { id: 'stone', icon: '🪨', label: 'Knapped Tools', order: 2, hint: 'Second: Flake sharp stone hand axes and chert blades' },
+      { id: 'fire', icon: '🔥', label: 'Communal Hearth', order: 3, hint: 'Third: Kindle fire for warmth, light and cooking' },
+      { id: 'animal', icon: '🦣', label: 'Migrating Game', order: 4, hint: 'Fourth: Track wild game across the open savanna' },
+      { id: 'shelter', icon: '🛖', label: 'Cave Shelter', order: 5, hint: 'Fifth: Return to the protective rock overhang before nightfall' }
+    ]
+  },
   environment: {
     id: 'early-environment-01',
     title: 'Environmental Problem-Solving: Monsoon Storm',

@@ -11,7 +11,9 @@ import ArtifactInvestigation from './ArtifactInvestigation';
 import WorldEvent from './WorldEvent';
 import NPCInteraction from './NPCInteraction';
 import { useAchievements } from '../../context/AchievementContext';
-import { Star, CheckCircle, AlertTriangle, BookOpen, ImageIcon, ArrowRight, Bot, Target, Lock, Play, Hammer, Trophy, Search } from 'lucide-react';
+import { Star, CheckCircle, AlertTriangle, BookOpen, ImageIcon, ArrowRight, Bot, Target, Lock, Play, Hammer, Trophy, Search, Sparkles, RotateCcw, Compass, Eye, Flame, Layers, Shovel, Brush, Pickaxe, Info, Grid } from 'lucide-react';
+import { questData } from '../../data/quests';
+import QuestGameplay from '../quests/QuestGameplay';
 import { useLanguage } from '../../context/LanguageContext';
 import { levelThemes } from '../../data/levelThemes';
 import ResourceCard from './ResourceCard';
@@ -77,7 +79,7 @@ const SurvivalInteractive = ({ data, theme, resources, onComplete }) => {
           {log.type === 'success' ? (
             <button
               onClick={() => onComplete(true, log.option.reward, log.option.costs)}
-              className="px-6 py-3 bg-[#D9A441] text-[#070A0C] font-bold rounded-xl hover:bg-[#D9A441]/90 transition-all"
+              className="px-6 py-3 bg-[#D9A441] text-[#070A0C] font-bold rounded-xl hover:bg-[#D9A441]/90 transition-all shadow-lg"
             >
               Continue & Claim Rewards →
             </button>
@@ -85,7 +87,7 @@ const SurvivalInteractive = ({ data, theme, resources, onComplete }) => {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
                 onClick={() => onComplete(true, log.option.reward, {})}
-                className="px-5 py-2.5 bg-[#D9A441] text-[#070A0C] font-bold rounded-xl hover:bg-[#D9A441]/90 transition-all text-sm"
+                className="px-5 py-2.5 bg-[#D9A441] text-[#070A0C] font-bold rounded-xl hover:bg-[#D9A441]/90 transition-all text-sm shadow-md"
               >
                 Forage Needed Materials & Execute Plan →
               </button>
@@ -111,7 +113,7 @@ const SurvivalInteractive = ({ data, theme, resources, onComplete }) => {
             <button
               key={i}
               onClick={() => handleChoice(opt)}
-              className="w-full p-4 border border-content/20 rounded-xl flex flex-col gap-2 transition-all text-left bg-surface/60 hover:border-gold hover:bg-surface"
+              className="w-full p-4 border border-content/20 rounded-xl flex flex-col gap-2 transition-all text-left bg-surface/60 hover:border-gold hover:bg-surface shadow-md"
             >
               <div className="font-bold text-base md:text-lg flex items-center justify-between gap-3 text-content">
                 <span>{opt.label}</span>
@@ -135,6 +137,634 @@ const SurvivalInteractive = ({ data, theme, resources, onComplete }) => {
   );
 };
 
+// Cave Art Handprint Sequence Puzzle (Inspired by User Image 4)
+const CaveArtPuzzle = ({ data, theme, onComplete, playSound }) => {
+  const symbols = data.symbols || [
+    { id: 'water', icon: '💧', label: 'River Spring', order: 1, hint: 'First: Locate fresh water' },
+    { id: 'stone', icon: '🪨', label: 'Knapped Tools', order: 2, hint: 'Second: Flake sharp stone tools' },
+    { id: 'fire', icon: '🔥', label: 'Communal Hearth', order: 3, hint: 'Third: Kindle hearth fire' },
+    { id: 'animal', icon: '🦣', label: 'Migrating Game', order: 4, hint: 'Fourth: Track wild game' },
+    { id: 'shelter', icon: '🛖', label: 'Cave Shelter', order: 5, hint: 'Fifth: Return to shelter' }
+  ];
+
+  const [tappedSequence, setTappedSequence] = useState([]);
+  const [errorMsg, setErrorMsg] = useState(null);
+  const [solved, setSolved] = useState(false);
+
+  const handleTap = (sym) => {
+    if (solved) return;
+    playSound?.('ui');
+    const nextExpectedOrder = tappedSequence.length + 1;
+
+    if (sym.order === nextExpectedOrder) {
+      const nextSeq = [...tappedSequence, sym.id];
+      setTappedSequence(nextSeq);
+      setErrorMsg(null);
+      playSound?.('discovery');
+
+      if (nextSeq.length === symbols.length) {
+        setSolved(true);
+        playSound?.('quest');
+      }
+    } else {
+      playSound?.('error');
+      setErrorMsg(`The ancient survival cycle was broken! Look closely: ${symbols[tappedSequence.length]?.hint || 'Start with finding water.'}`);
+      setTappedSequence([]);
+    }
+  };
+
+  const handleReset = () => {
+    setTappedSequence([]);
+    setErrorMsg(null);
+    setSolved(false);
+  };
+
+  return (
+    <div className="w-full max-w-2xl mx-auto flex flex-col items-center gap-5 p-4 text-center animate-fade-in">
+      <div className="bg-surface/80 border border-gold/30 rounded-2xl p-4 w-full text-left">
+        <div className="flex items-center justify-between gap-3 mb-2">
+          <span className="text-xs uppercase tracking-widest font-bold text-gold flex items-center gap-1.5">
+            <Flame size={14} className="text-amber-400" /> Sacred Prehistoric Rock Art
+          </span>
+          <button
+            onClick={handleReset}
+            className="text-xs flex items-center gap-1 text-content/60 hover:text-gold transition-colors"
+          >
+            <RotateCcw size={12} /> Reset Wall
+          </button>
+        </div>
+        <h3 className="text-lg md:text-xl font-serif font-bold text-[#F5F1E8] mb-1">
+          {data.title || 'Cave Art Sequence: Ancient Survival Cycle'}
+        </h3>
+        <p className="text-xs md:text-sm text-content/80 leading-relaxed">
+          {data.question || 'Decipher the prehistoric survival cycle painted on the stone wall. Tap the sacred ochre symbols in their seasonal order of survival.'}
+        </p>
+      </div>
+
+      {/* Cave Stone Slab (Matches User Image 4) */}
+      <div className="relative w-full rounded-3xl p-6 md:p-8 border-4 border-[#34302A] shadow-2xl bg-gradient-to-b from-[#1C1611] via-[#14100D] to-[#0D0907] overflow-hidden">
+        {/* Stone Texture Overlay */}
+        <div className="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(circle_at_50%_50%,rgba(217,164,65,0.15),transparent_70%)]" />
+        
+        {/* Handprints & Symbols Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5 relative z-10">
+          {symbols.map((sym) => {
+            const isActivated = tappedSequence.includes(sym.id);
+            const stepNum = tappedSequence.indexOf(sym.id) + 1;
+
+            return (
+              <button
+                key={sym.id}
+                type="button"
+                onClick={() => handleTap(sym)}
+                disabled={isActivated || solved}
+                className={`relative flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-300 group ${
+                  isActivated
+                    ? 'bg-amber-900/40 border-amber-400 shadow-[0_0_20px_rgba(217,164,65,0.5)] scale-105'
+                    : 'bg-[#241A14]/70 border-[#4A382A] hover:border-[#D9A441] hover:scale-102 hover:bg-[#2C2018]'
+                }`}
+              >
+                {/* Ancient Handprint / Symbol Display */}
+                <div className="relative mb-2">
+                  <span className={`text-4xl transition-all duration-300 ${isActivated ? 'scale-110 drop-shadow-[0_0_12px_#D9A441]' : 'opacity-70 group-hover:opacity-100'}`}>
+                    {sym.icon}
+                  </span>
+                  {isActivated && (
+                    <span className="absolute -top-2 -right-3 w-5 h-5 rounded-full bg-gold text-[#070A0C] font-extrabold text-xs flex items-center justify-center shadow-md">
+                      {stepNum}
+                    </span>
+                  )}
+                </div>
+                <span className={`text-xs font-bold leading-tight line-clamp-1 ${isActivated ? 'text-amber-300' : 'text-content/70'}`}>
+                  {sym.label}
+                </span>
+                <span className="text-[10px] opacity-50 mt-1 uppercase tracking-wider">
+                  {isActivated ? 'Activated' : 'Tap Rock'}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Clue Hint Bar */}
+        <div className="mt-6 pt-4 border-t border-content/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-left">
+          <div className="text-xs text-content/75 flex items-center gap-2">
+            <span className="font-bold text-gold uppercase tracking-wider">Next Step:</span>
+            <span>{symbols[tappedSequence.length]?.hint || 'Sequence fully unlocked!'}</span>
+          </div>
+          <span className="text-xs font-bold text-gold/90 px-3 py-1 rounded-full bg-gold/10 border border-gold/30">
+            Progress: {tappedSequence.length} / {symbols.length}
+          </span>
+        </div>
+      </div>
+
+      {errorMsg && (
+        <div className="p-3 bg-red-900/30 border border-red-500/40 rounded-xl text-red-200 text-xs md:text-sm animate-fade-in w-full text-left flex items-center gap-2">
+          <AlertTriangle size={16} className="text-red-400 shrink-0" />
+          <span>{errorMsg}</span>
+        </div>
+      )}
+
+      {solved && (
+        <div className="bg-green-900/30 border border-green-500/50 rounded-2xl p-5 text-center w-full animate-fade-in space-y-3">
+          <div className="text-green-300 font-serif font-bold text-lg flex items-center justify-center gap-2">
+            <Sparkles size={20} className="text-gold" /> Sacred Prehistoric Sequence Deciphered!
+          </div>
+          <p className="text-xs md:text-sm text-green-100/90 leading-relaxed max-w-xl mx-auto">
+            You reconstructed the seasonal survival cycle recorded by early humans. By honoring the flow of water, stone knapping, fire warmth, herd migration, and shelter, the community thrived.
+          </p>
+          <button
+            onClick={() => onComplete(true)}
+            className="px-8 py-3.5 bg-gradient-to-r from-gold to-amber-500 text-[#070A0C] font-extrabold text-sm rounded-xl shadow-xl hover:scale-105 transition-all"
+          >
+            Claim Challenge Rewards →
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Interactive Archaeological Excavation Grid (Inspired by User Image 2)
+const ArtifactDiscoverer = ({ data, theme, ageGroup, onComplete, playSound }) => {
+  // 3x3 Excavation Trench (9 Quadrants: A1 through C3)
+  const TOTAL_QUADRANTS = 9;
+  const [excavatedCells, setExcavatedCells] = useState([]);
+  const [activeTool, setActiveTool] = useState('trowel'); // 'trowel' or 'brush'
+  const [selectedUseIdx, setSelectedUseIdx] = useState(null);
+
+  const progress = Math.round((excavatedCells.length / TOTAL_QUADRANTS) * 100);
+  const isFullyUncovered = excavatedCells.length >= TOTAL_QUADRANTS;
+
+  const hasUseIdentification = Array.isArray(data.useOptions) && data.useOptions.length > 0;
+  const selectedOpt = selectedUseIdx !== null && hasUseIdentification ? data.useOptions[selectedUseIdx] : null;
+  const canCollect = isFullyUncovered && (!hasUseIdentification || Boolean(selectedOpt?.isCorrect));
+
+  const handleDigCell = (idx) => {
+    if (excavatedCells.includes(idx)) return;
+    playSound?.('ui');
+    const nextCells = [...excavatedCells, idx];
+    setExcavatedCells(nextCells);
+    if (nextCells.length === TOTAL_QUADRANTS) {
+      playSound?.('discovery');
+    }
+  };
+
+  const handleUncoverAll = () => {
+    const all = Array.from({ length: TOTAL_QUADRANTS }, (_, i) => i);
+    setExcavatedCells(all);
+    playSound?.('discovery');
+  };
+
+  const quadrantLabels = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'C1', 'C2', 'C3'];
+
+  return (
+    <div className="w-full max-w-2xl mx-auto flex flex-col p-2 text-center animate-fade-in space-y-4">
+      {/* Header */}
+      <div className="text-left bg-surface/70 p-4 rounded-2xl border border-content/15">
+        <div className="flex items-center justify-between gap-3 mb-1">
+          <span className="text-xs uppercase tracking-widest font-bold text-gold flex items-center gap-1.5">
+            <Shovel size={14} className="text-gold" /> Stage 2: Archaeological Excavation
+          </span>
+          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-gold/15 text-gold border border-gold/30">
+            {progress}% Excavated
+          </span>
+        </div>
+        <h3 className="text-xl md:text-2xl font-serif font-bold text-[#F5F1E8]">
+          {isFullyUncovered ? (data.discoveryTitle || data.label) : `Excavate Trench at ${data.label}`}
+        </h3>
+        <p className="text-xs md:text-sm text-content/80 mt-1 leading-relaxed">
+          {isFullyUncovered
+            ? 'The artifact has been lifted from the sediment! Inspect its physical diagnostic traits and identify its historical use.'
+            : 'Select an archaeological tool and clear away the silt and gravel layers to uncover the hidden artifact.'}
+        </p>
+      </div>
+
+      {!isFullyUncovered ? (
+        <div className="flex flex-col items-center gap-4">
+          {/* Tool Selector Bar */}
+          <div className="flex items-center gap-3 bg-black/40 p-1.5 rounded-2xl border border-content/10">
+            <button
+              type="button"
+              onClick={() => setActiveTool('trowel')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                activeTool === 'trowel'
+                  ? 'bg-gold text-[#070A0C] shadow-md'
+                  : 'text-content/70 hover:text-content'
+              }`}
+            >
+              <Shovel size={14} /> ⛏️ Archaeological Trowel
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTool('brush')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                activeTool === 'brush'
+                  ? 'bg-gold text-[#070A0C] shadow-md'
+                  : 'text-content/70 hover:text-content'
+              }`}
+            >
+              <Brush size={14} /> 🖌️ Fine Excavation Brush
+            </button>
+          </div>
+
+          {/* 3x3 Dig Trench Canvas (Inspired by User Image 2) */}
+          <div className="relative w-full max-w-sm aspect-square p-4 rounded-3xl border-4 border-[#3A2B1D] bg-gradient-to-b from-[#241A13] to-[#120D09] shadow-2xl flex flex-col items-center justify-center overflow-hidden">
+            {/* Underlying Revealed Artifact in Center */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center pointer-events-none">
+              <span className="text-7xl md:text-8xl filter drop-shadow-[0_0_20px_rgba(217,164,65,0.4)] transition-all duration-700 animate-float">
+                {data.icon}
+              </span>
+              <span className="text-sm font-bold text-gold mt-2 uppercase tracking-wider">
+                {data.discoveryTitle || data.label}
+              </span>
+            </div>
+
+            {/* Sediment Quadrant Tiles */}
+            <div className="grid grid-cols-3 grid-rows-3 w-full h-full gap-2 relative z-10">
+              {Array.from({ length: TOTAL_QUADRANTS }, (_, idx) => {
+                const isCleared = excavatedCells.includes(idx);
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleDigCell(idx)}
+                    disabled={isCleared}
+                    className={`rounded-xl border transition-all duration-500 relative flex items-center justify-center ${
+                      isCleared
+                        ? 'opacity-0 scale-90 pointer-events-none'
+                        : 'bg-gradient-to-br from-[#4A3728] via-[#38281B] to-[#261A10] border-[#664C36] hover:border-gold hover:scale-102 shadow-md cursor-pointer'
+                    }`}
+                  >
+                    {!isCleared && (
+                      <div className="flex flex-col items-center justify-center">
+                        <span className="text-xs font-bold text-amber-200/60 font-mono">
+                          {quadrantLabels[idx]}
+                        </span>
+                        <span className="text-[10px] text-amber-300/40 uppercase tracking-tighter">
+                          {activeTool === 'trowel' ? 'Dig' : 'Brush'}
+                        </span>
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between w-full max-w-sm text-xs font-bold text-content/70">
+            <span>Tap each quadrant to excavate ({excavatedCells.length}/9)</span>
+            <button
+              onClick={handleUncoverAll}
+              className="text-gold hover:underline uppercase tracking-wider"
+            >
+              Clear Entire Trench →
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* Field Examination Table & Diagnostic Clue Identification */
+        <div className="text-left space-y-4 animate-in fade-in duration-300">
+          <div className="bg-surface/80 border border-content/15 rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center">
+            <div className="w-24 h-24 rounded-2xl bg-black/40 border border-gold/30 flex items-center justify-center text-5xl shrink-0 shadow-lg">
+              {data.icon}
+            </div>
+            <div className="flex-1">
+              <div className="text-[11px] uppercase tracking-widest text-gold font-bold mb-1">
+                Field Laboratory Analysis • Authenticated Artifact
+              </div>
+              <h4 className="text-lg md:text-xl font-serif font-bold text-content mb-1">
+                {data.discoveryTitle || data.label}
+              </h4>
+              <p className="text-xs md:text-sm text-content/85 leading-relaxed">
+                {data.examinationNotes || (data.getDiscoverMessage ? data.getDiscoverMessage(ageGroup) : (data.discoverMessage || 'You uncovered significant prehistoric evidence here.'))}
+              </p>
+            </div>
+          </div>
+
+          {hasUseIdentification && (
+            <div className="bg-black/35 border border-gold/25 rounded-2xl p-4 space-y-3">
+              <div className="text-xs font-bold uppercase tracking-wider text-gold flex items-center gap-1.5">
+                <Compass size={14} /> Clue Interpretation: Identify Object Use
+              </div>
+              <p className="text-sm font-medium text-content/90">
+                {data.usePrompt || 'How did early human communities primarily use this discovery?'}
+              </p>
+              <div className="space-y-2">
+                {data.useOptions.map((opt, idx) => {
+                  const isChosen = selectedUseIdx === idx;
+                  let btnStyle = 'bg-surface/70 border-content/15 text-content hover:border-gold/50';
+                  if (isChosen) {
+                    btnStyle = opt.isCorrect
+                      ? 'bg-green-900/30 border-green-500 text-green-200'
+                      : 'bg-red-900/30 border-red-500 text-red-200';
+                  }
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setSelectedUseIdx(idx)}
+                      className={`w-full text-left p-3.5 rounded-xl border text-xs md:text-sm font-semibold transition-all ${btnStyle}`}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+              {selectedOpt && (
+                <div className={`p-3 rounded-xl text-xs md:text-sm font-medium border ${selectedOpt.isCorrect ? 'bg-green-900/20 border-green-500/40 text-green-300' : 'bg-amber-900/20 border-amber-500/40 text-amber-200'}`}>
+                  {selectedOpt.feedback}
+                </div>
+              )}
+            </div>
+          )}
+
+          {data.yields && Object.keys(data.yields).length > 0 && (
+            <div className="bg-surface/40 p-3 rounded-xl border border-content/10 text-center">
+              <p className="text-xs uppercase tracking-widest font-bold opacity-70 mb-2">Prehistoric Evidence & Resources Gained</p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {Object.entries(data.yields).map(([res, amt]) => (
+                  <span key={res} className="bg-gold/15 text-gold px-3 py-1 rounded-lg border border-gold/30 font-bold text-xs capitalize">
+                    +{amt} {res}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <button
+            onClick={onComplete}
+            disabled={!canCollect}
+            className={`px-6 py-3.5 font-bold rounded-xl w-full transition-all ${canCollect ? theme.button : 'bg-surface/40 text-content/40 border border-content/10 cursor-not-allowed'}`}
+          >
+            {canCollect ? 'Authenticate & Add to Collection →' : 'Select Correct Historical Use Above to Complete'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Interactive Environmental Landscape Exploration Arena (Inspired by User Images 1 & 3)
+const ExplorePanel = ({ data, theme, ageGroup, isYoung, isReplay, playSound, updateResources, setLevelState, markExplored, levelState }) => {
+  const getDiscoveries = (loc) => {
+    if (Array.isArray(loc.exploreItems) && loc.exploreItems.length > 0) {
+      return loc.exploreItems;
+    }
+    const base = [];
+    const yieldSource = loc.exploreYields || loc.yields;
+    if (yieldSource) {
+      Object.entries(yieldSource).forEach(([res, amt]) => {
+        base.push({
+          id: `yield_${res}`,
+          icon: res === 'wood' ? '🪵' : res === 'stone' ? '🪨' : res === 'plants' ? '🌿' : res === 'food' ? '🌾' : res === 'water' ? '💧' : res === 'flint' ? '🔪' : res === 'grain' ? '🌾' : res === 'seeds' ? '🌱' : res === 'clay' ? '🏺' : res === 'mud' ? '🧱' : res === 'tools' ? '⛏️' : '📜',
+          label: `Find ${res.charAt(0).toUpperCase() + res.slice(1)}`,
+          resourceName: res.charAt(0).toUpperCase() + res.slice(1),
+          examineTitle: `Inspect ${res.charAt(0).toUpperCase() + res.slice(1)} Source`,
+          whyUseful: `Essential resource (${res}) used by early communities for survival, shelter, and settlement.`,
+          feedback: `You gathered ${amt} ${res} — added to your inventory supplies.`,
+          reward: { [res]: amt },
+        });
+      });
+    }
+    base.push({
+      id: 'context',
+      icon: '🔍',
+      label: 'Survey the Habitat Environment',
+      resourceName: 'Environmental Clue',
+      examineTitle: `Environmental Survey: ${loc.label}`,
+      whyUseful: adaptTextForAge(loc.discoverMessage || 'Reveals how early human communities adapted to this landscape.', ageGroup),
+      feedback: adaptTextForAge(loc.discoverMessage || 'You mapped key environmental features at this location.', ageGroup),
+      reward: {},
+    });
+    const max = isYoung ? 2 : 3;
+    return base.slice(0, max);
+  };
+
+  const discoveries = getDiscoveries(data);
+  const savedLocDetails = levelState?.exploredDetails?.[data.id] || {};
+  const found = data.foundDiscoveries || savedLocDetails.found || [];
+  const examined = data.examinedDiscoveries || savedLocDetails.examined || [];
+  const allFound = found.length >= discoveries.length;
+
+  const [activeHotspot, setActiveHotspot] = useState(null);
+
+  // Distribute hotspot positions across the visual environment landscape
+  const hotspotCoords = [
+    { x: '24%', y: '42%' },
+    { x: '62%', y: '68%' },
+    { x: '78%', y: '32%' },
+    { x: '45%', y: '26%' }
+  ];
+
+  const handleInspectHotspot = (disc) => {
+    playSound?.('ui');
+    setActiveHotspot(disc);
+    if (!examined.includes(disc.id)) {
+      const nextExamined = [...examined, disc.id];
+      setLevelState(prev => ({
+        ...prev,
+        exploredDetails: {
+          ...(prev.exploredDetails || {}),
+          [data.id]: {
+            found: prev.exploredDetails?.[data.id]?.found || found,
+            examined: nextExamined
+          }
+        }
+      }));
+    }
+  };
+
+  const handleHarvest = (disc) => {
+    if (found.includes(disc.id)) return;
+    const reward = disc.reward || {};
+    if (Object.keys(reward).length > 0 && !isReplay) {
+      updateResources(reward);
+    }
+    playSound?.('discovery');
+    const nextFound = [...found, disc.id];
+    const nextExamined = examined.includes(disc.id) ? examined : [...examined, disc.id];
+
+    setLevelState(prev => {
+      const nextResources = { ...(prev.resources || {}) };
+      Object.entries(reward).forEach(([k, v]) => {
+        nextResources[k] = (nextResources[k] || 0) + v;
+      });
+      return {
+        ...prev,
+        resources: nextResources,
+        exploredDetails: {
+          ...(prev.exploredDetails || {}),
+          [data.id]: {
+            found: nextFound,
+            examined: nextExamined
+          }
+        }
+      };
+    });
+  };
+
+  return (
+    <div className="relative h-full w-full max-w-4xl mx-auto flex flex-col p-3 md:p-6 overflow-y-auto animate-in fade-in duration-300 space-y-4">
+      {/* Habitat Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-surface/80 p-4 rounded-2xl border border-content/15 shadow-md">
+        <div className="flex items-center gap-3.5">
+          <span className="text-4xl md:text-5xl">{data.icon}</span>
+          <div className="text-left">
+            <div className="text-xs uppercase tracking-widest text-gold font-bold">
+              Stage 1: Environmental Exploration
+            </div>
+            <h3 className="text-xl md:text-2xl font-serif font-bold text-[#F5F1E8]">
+              {data.label}
+            </h3>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-gold/15 text-gold border border-gold/30">
+            {found.length} / {discoveries.length} Areas Surveyed
+          </span>
+          <button
+            type="button"
+            onClick={() => setLevelState(prev => ({ ...prev, activePopup: null }))}
+            className="px-3.5 py-1.5 rounded-xl bg-surface border border-content/20 text-xs font-bold text-content/80 hover:text-gold transition-colors"
+          >
+            ← Map View
+          </button>
+        </div>
+      </div>
+
+      {/* Atmospheric Visual Environment Scene (Images 1 & 3) */}
+      <div className="relative w-full aspect-[16/9] md:aspect-[21/9] rounded-3xl overflow-hidden border-2 border-gold/30 shadow-2xl bg-gradient-to-b from-[#182026] via-[#10161C] to-[#0A0E12] flex items-center justify-center">
+        {/* Layered landscape background elements */}
+        <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_30%_30%,rgba(217,164,65,0.25),transparent_60%)] pointer-events-none" />
+        
+        {/* Environmental Horizon & Terrain Ambience */}
+        <div className="absolute bottom-0 inset-x-0 h-1/2 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
+
+        <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-content/15 text-xs text-content/90 flex items-center gap-2">
+          <Eye size={13} className="text-gold animate-pulse" />
+          <span>Tap environmental beacons across the landscape to investigate and gather resources</span>
+        </div>
+
+        {/* Environmental Hotspot Beacons placed across the landscape */}
+        {discoveries.map((disc, idx) => {
+          const coords = hotspotCoords[idx % hotspotCoords.length];
+          const isFound = found.includes(disc.id);
+          const isSelected = activeHotspot?.id === disc.id;
+
+          return (
+            <button
+              key={disc.id}
+              type="button"
+              onClick={() => handleInspectHotspot(disc)}
+              style={{ left: coords.x, top: coords.y }}
+              aria-label={`Inspect ${disc.label}`}
+              className={`absolute transform -translate-x-1/2 -translate-y-1/2 z-20 group transition-all duration-300 ${
+                isSelected ? 'scale-125 z-30' : 'hover:scale-115'
+              }`}
+            >
+              <div className="relative flex flex-col items-center">
+                {/* Radar Ring */}
+                {!isFound && (
+                  <span className="absolute -inset-2 rounded-full border-2 border-gold/60 animate-ping opacity-75 pointer-events-none" />
+                )}
+                <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-2xl md:text-3xl shadow-2xl border-2 transition-all ${
+                  isFound
+                    ? 'bg-green-950/80 border-green-500/80 text-green-300'
+                    : isSelected
+                    ? 'bg-gold/90 border-white text-[#070A0C] ring-4 ring-gold/40'
+                    : 'bg-surface/90 border-gold/70 text-content hover:border-gold'
+                }`}>
+                  {isFound ? '✓' : disc.icon}
+                </div>
+                <span className={`mt-1.5 px-2.5 py-0.5 rounded-lg text-[10px] md:text-xs font-bold uppercase tracking-wider whitespace-nowrap shadow-md ${
+                  isFound
+                    ? 'bg-green-900/80 text-green-300 border border-green-500/40'
+                    : 'bg-black/80 text-content border border-content/20 group-hover:border-gold'
+                }`}>
+                  {disc.resourceName || disc.label}
+                </span>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Selected Hotspot Inspection Window */}
+      {activeHotspot && (() => {
+        const disc = activeHotspot;
+        const isFound = found.includes(disc.id);
+        const hasReward = disc.reward && Object.keys(disc.reward).length > 0;
+        const rewardLabel = hasReward
+          ? Object.entries(disc.reward).map(([k, v]) => `+${v} ${k}`).join(', ')
+          : 'Environmental Observation';
+
+        return (
+          <div className="bg-surface/90 border-2 border-gold/40 rounded-2xl p-4 md:p-5 shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-300 text-left space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span className="text-4xl p-2 rounded-xl bg-black/40 border border-content/10">
+                  {disc.icon}
+                </span>
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-gold">
+                    {disc.examineTitle || 'Field Inspection'}
+                  </div>
+                  <h4 className="text-base md:text-lg font-bold text-[#F5F1E8]">
+                    {disc.label}
+                  </h4>
+                </div>
+              </div>
+              {isFound ? (
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-green-400 bg-green-900/30 border border-green-500/30 px-3 py-1.5 rounded-xl">
+                  <CheckCircle size={14} /> Collected ✓
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => handleHarvest(disc)}
+                  className="px-5 py-2.5 rounded-xl bg-[#D9A441] text-[#070A0C] font-extrabold text-xs md:text-sm hover:bg-[#D9A441]/90 transition-all shadow-lg shrink-0"
+                >
+                  Harvest & Gather ({rewardLabel}) →
+                </button>
+              )}
+            </div>
+
+            <p className="text-xs md:text-sm text-content/90 leading-relaxed bg-black/30 p-3 rounded-xl border border-content/10">
+              <strong className="text-gold">Survival & Historical Insight: </strong>
+              {disc.whyUseful || disc.feedback}
+            </p>
+          </div>
+        );
+      })()}
+
+      {/* All Hotspots Complete */}
+      {allFound && (
+        <div className="bg-gold/10 border-2 border-gold/40 rounded-2xl p-5 text-left shadow-2xl animate-fade-in space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 text-gold font-bold text-lg">
+              <CheckCircle size={22} /> Habitat Survey Complete!
+            </div>
+            <span className="text-xs font-bold text-green-400 bg-green-900/40 px-3 py-1 rounded-full border border-green-500/30">
+              All Resources Mapped
+            </span>
+          </div>
+          <p className="text-xs md:text-sm text-content/90 leading-relaxed">
+            {adaptTextForAge(data.discoverMessage || 'You surveyed all environmental features in this habitat, gathering essential resources for survival and construction.', ageGroup)}
+          </p>
+          <button
+            onClick={() => markExplored(data)}
+            className={`px-8 py-3.5 font-bold rounded-xl w-full flex items-center justify-center gap-2.5 text-base shadow-xl transition-all hover:scale-[1.01] ${theme.button}`}
+          >
+            <CheckCircle size={18} /> Complete Exploration & Map Location
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Interactive Learn Node with Integrated Era Quests
 const VisualStoryViewer = ({ story, theme, onComplete, playSound }) => {
   const [currentIndex, React_useState] = useState(0);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -248,117 +878,453 @@ const VisualStoryViewer = ({ story, theme, onComplete, playSound }) => {
 };
 
 
-const InteractiveLearnNode = ({ data, onComplete, theme, isYoung, playSound, ageGroup }) => {
-  if (data.visualStory && data.visualStory.length > 0) {
-    return <VisualStoryViewer story={data.visualStory} theme={theme} onComplete={onComplete} playSound={playSound} />;
-  }
 
-  const timers = useRef([]);
-  useEffect(() => () => timers.current.forEach(clearTimeout), []);
-  const safeSetTimeout = (cb, ms) => { const id = setTimeout(cb, ms); timers.current.push(id); return id; };
-  const [step, setStep] = useState(0);
-  const [orderState, setOrderState] = useState([]);
+const InteractiveLearnNode = ({ data, onComplete, theme, isYoung, playSound, ageGroup, levelId }) => {
+  const { gameState, startQuest, completeQuestDirectly } = useGame();
+  const [activeTab, setActiveTab] = useState('story'); // 'story' or 'quests'
+  const [activeQuestForGameplay, setActiveQuestForGameplay] = useState(null);
 
-  // Fallback string extraction
-  const rawText = data.discoverMessage || data.description || "Historical context missing.";
-  const fullText = adaptTextForAge(rawText, ageGroup);
-  
-  // Split into sentences for progressive learning
-  const sentences = fullText.match(/[^.!?]+[.!?]+/g) || [fullText];
-  const fact = sentences[0]?.trim() || fullText;
-  const significance = sentences.slice(1).join(' ').trim() || (isYoung ? "It helped them progress." : "It played a key role in their civilization.");
+  // Relevant quests for this level from questData
+  const levelQuests = useMemo(() => {
+    return (questData || []).filter(q => q.levelId === levelId);
+  }, [levelId]);
 
-  // Interaction type based on data string length
-  const mode = sentences.length > 1 ? 'order' : 'reveal';
+  const userQuests = gameState?.quests || {};
 
-  const handleOrder = (chunk) => {
-    if (playSound) playSound('ui');
-    if (!orderState.includes(chunk)) {
-      const nextState = [...orderState, chunk];
-      setOrderState(nextState);
-      if (nextState.length === 2) {
-        if (nextState[0] === fact && nextState[1] === significance) {
-           safeSetTimeout(() => setStep(2), 500);
-        } else {
-           safeSetTimeout(() => setOrderState([]), 800); // reset if wrong
-        }
-      }
+  const handleCompleteQuest = (q, result) => {
+    if (completeQuestDirectly) {
+      completeQuestDirectly(q.id);
     }
+    setActiveQuestForGameplay(null);
+    playSound?.('quest');
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full">
-      {step === 0 && (
-         <div className="text-center animate-fade-in w-full">
-           <p className="text-sm opacity-70 mb-2 uppercase tracking-widest">Step 1: Identify Location</p>
-           <button onClick={() => setStep(1)} className={"p-6 rounded-xl border-2 w-full flex flex-col items-center hover:scale-105 transition-all " + theme.border + " " + theme.bg}>
-             <span className="text-6xl block mb-4">{data.icon}</span>
-             <span className="font-bold text-lg">Tap to Analyze {data.label}</span>
-           </button>
-           <p className="mt-4 opacity-70 text-sm">{adaptTextForAge(data.description, ageGroup)}</p>
-         </div>
-      )}
-      
-      {step === 1 && mode === 'reveal' && (
-         <div className="text-center animate-fade-in w-full">
-           <p className="text-sm opacity-70 mb-2 uppercase tracking-widest">Step 2: Key Fact</p>
-           <div className={"p-6 rounded-xl border mb-4 text-left " + theme.border + " " + theme.bg + "/50"}>
-             <p className="text-lg font-bold">{fact}</p>
-           </div>
-           <button onClick={() => setStep(2)} className={"px-6 py-3 font-bold rounded-xl w-full flex items-center justify-center gap-2 " + theme.button}>
-             Why did this matter? <ArrowRight size={16} />
-           </button>
-         </div>
-      )}
+    <div className="w-full max-w-4xl mx-auto flex flex-col p-2 text-center animate-fade-in space-y-4">
+      {/* Header with Navigation Tabs */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-surface/80 p-4 rounded-2xl border border-content/15 text-left">
+        <div>
+          <div className="text-xs uppercase tracking-widest font-bold text-gold flex items-center gap-1.5">
+            <BookOpen size={14} className="text-gold" /> Stage 3: Learn & Quests
+          </div>
+          <h3 className="text-xl md:text-2xl font-serif font-bold text-[#F5F1E8]">
+            {data.label}: Knowledge & Community Quests
+          </h3>
+        </div>
 
-      {step === 1 && mode === 'order' && (
-         <div className="text-center animate-fade-in w-full">
-           <p className="text-sm opacity-70 mb-2 uppercase tracking-widest text-blue-400">Step 2: Assemble the Fact</p>
-           <p className="text-xs opacity-60 mb-4">Tap the sentences in the correct historical order (Fact → Significance).</p>
-           
-           <div className="flex flex-col gap-2 min-h-[6rem] p-4 border border-dashed rounded-lg bg-surface/30 mb-4">
-              {orderState.length === 0 && <span className="text-content/40 text-sm m-auto">Select the first fact...</span>}
-              {orderState.map((txt, i) => (
-                <div key={i} className={"p-3 bg-surface border rounded-lg text-left shadow-sm " + theme.border}>
-                  <span className="text-sm font-bold">{txt}</span>
+        {/* Tab Switcher */}
+        <div className="flex items-center gap-2 bg-black/40 p-1.5 rounded-xl border border-content/10">
+          <button
+            type="button"
+            onClick={() => { setActiveTab('story'); setActiveQuestForGameplay(null); }}
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+              activeTab === 'story'
+                ? 'bg-gold text-[#070A0C] shadow-md'
+                : 'text-content/70 hover:text-content'
+            }`}
+          >
+            📖 Visual Story Insights
+          </button>
+          <button
+            type="button"
+            onClick={() => { setActiveTab('quests'); setActiveQuestForGameplay(null); }}
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              activeTab === 'quests'
+                ? 'bg-gold text-[#070A0C] shadow-md'
+                : 'text-content/70 hover:text-content'
+            }`}
+          >
+            <Target size={13} /> Era Quests ({levelQuests.length})
+          </button>
+        </div>
+      </div>
+
+      {/* Quest Gameplay Modal if active */}
+      {activeQuestForGameplay ? (
+        <div className="bg-surface/90 border border-gold/30 rounded-2xl p-4 animate-fade-in">
+          <QuestGameplay
+            quest={activeQuestForGameplay}
+            onComplete={(res) => handleCompleteQuest(activeQuestForGameplay, res)}
+            onClose={() => setActiveQuestForGameplay(null)}
+          />
+        </div>
+      ) : activeTab === 'story' ? (
+        /* Visual Story Tab */
+        <div className="w-full">
+          {data.visualStory && data.visualStory.length > 0 ? (
+            <VisualStoryViewer
+              story={data.visualStory}
+              theme={theme}
+              onComplete={onComplete}
+              playSound={playSound}
+            />
+          ) : (
+            <div className="p-6 bg-surface/60 rounded-2xl border border-content/15 text-left space-y-4">
+              <p className="text-base text-content/90 leading-relaxed">
+                {adaptTextForAge(data.discoverMessage || data.description || 'Prehistoric communities adapted to their environment through cooperative learning and stone tool engineering.', ageGroup)}
+              </p>
+              <button
+                onClick={onComplete}
+                className={`px-6 py-3 font-bold rounded-xl w-full ${theme.button}`}
+              >
+                Complete Knowledge Milestone →
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        /* Quests Tab (Integrated from Sidebar Quests) */
+        <div className="space-y-4 text-left animate-fade-in">
+          <p className="text-xs text-content/70">
+            Era Heritage Quests challenge you to apply your historical knowledge. Complete quest missions to earn Legacy XP and rare rewards!
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {levelQuests.map((q) => {
+              const qState = userQuests[q.id]?.status || 'available';
+              const isDone = qState === 'completed';
+
+              return (
+                <div
+                  key={q.id}
+                  className={`p-4 rounded-2xl border transition-all flex flex-col justify-between gap-3 ${
+                    isDone
+                      ? 'bg-green-950/20 border-green-500/40 text-green-200'
+                      : 'bg-surface/70 border-gold/25 text-content hover:border-gold/50'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-1.5">
+                      <span className="text-[11px] uppercase tracking-wider font-bold text-gold flex items-center gap-1">
+                        <Target size={12} /> Era Quest
+                      </span>
+                      <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                        isDone
+                          ? 'bg-green-900/50 text-green-300 border border-green-500/30'
+                          : 'bg-gold/20 text-gold border border-gold/30'
+                      }`}>
+                        {isDone ? 'Completed ✓' : 'Available'}
+                      </span>
+                    </div>
+
+                    <h4 className="font-serif font-bold text-base text-[#F5F1E8] mb-1">
+                      {q.title}
+                    </h4>
+                    <p className="text-xs text-content/80 leading-relaxed line-clamp-2">
+                      {q.description}
+                    </p>
+                  </div>
+
+                  <div className="pt-2 border-t border-content/10 flex items-center justify-between gap-2">
+                    <span className="text-xs font-bold text-gold">
+                      Reward: +{q.rewards?.legacy || 50} Legacy XP
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setActiveQuestForGameplay(q)}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                        isDone
+                          ? 'bg-surface border border-content/20 text-content/70 hover:border-gold'
+                          : 'bg-gold text-[#070A0C] font-extrabold hover:bg-gold/90 shadow-md'
+                      }`}
+                    >
+                      {isDone ? 'Replay Quest Mission' : 'Engage Quest Mission →'}
+                    </button>
+                  </div>
                 </div>
-              ))}
-           </div>
+              );
+            })}
+          </div>
 
-           <div className="flex flex-col gap-2">
-             {[significance, fact].map((txt, i) => (
-               <button 
-                 key={i} 
-                 onClick={() => handleOrder(txt)}
-                 disabled={orderState.includes(txt)}
-                 className={"p-3 border rounded-lg text-left text-sm transition-all " + (orderState.includes(txt) ? 'opacity-0 h-0 p-0 overflow-hidden border-none' : 'hover:bg-surface/80 bg-surface/40')}
-               >
-                 {txt}
-               </button>
-             ))}
-           </div>
-         </div>
-      )}
-
-      {step === 2 && (
-         <div className="text-center animate-fade-in w-full">
-           <p className="text-sm opacity-70 mb-2 uppercase tracking-widest text-green-400">Step 3: Significance Learned</p>
-           <div className={"p-6 rounded-xl border mb-4 text-left " + theme.border + " " + theme.bg + "/50"}>
-             <p className="text-sm opacity-60 mb-2">{fact}</p>
-             <p className="text-xl font-bold text-gold">{significance}</p>
-           </div>
-           {isYoung && <p className="text-xs font-bold text-blue-400 mb-4 uppercase tracking-wider animate-pulse-slow">💡 Great Job!</p>}
-           
-           <button onClick={onComplete} className={"px-6 py-3 font-bold rounded-xl w-full " + theme.button}>
-             Complete Learning
-           </button>
-         </div>
+          <div className="pt-4 border-t border-content/15 flex justify-end">
+            <button
+              onClick={onComplete}
+              className={`px-8 py-3.5 font-bold rounded-xl text-sm ${theme.button}`}
+            >
+              Finish Stage 3 Learning & Advance →
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
 };
 
+// Stage 5 Settlement Builder & Construction Grid (Integrated from Sidebar Builder)
+const Stage5Builder = ({ config, theme, levelState, setLevelState, resources, updateResources, playSound, notify, checkQuestProgress }) => {
+  const levelId = config.id;
+  const builderConfig = useMemo(() => getBuilderDataForLevel(levelId), [levelId]);
+  const availableBuildings = builderConfig.buildings || [];
 
+  const [selectedBuildingId, setSelectedBuildingId] = useState(
+    availableBuildings[0]?.id || null
+  );
+  const [feedback, setFeedback] = useState(null);
+
+  const selectedBuilding = availableBuildings.find(b => b.id === selectedBuildingId);
+  const currentBuilt = levelState.builtItems || [];
+
+  const canAfford = (reqs = {}) => {
+    for (const [k, v] of Object.entries(reqs)) {
+      if ((resources[k] || 0) < v) return false;
+    }
+    return true;
+  };
+
+  const handleConstruct = (building) => {
+    if (!building) return;
+    const reqs = building.requirements || {};
+
+    if (!canAfford(reqs)) {
+      const missing = Object.entries(reqs)
+        .filter(([k, v]) => (resources[k] || 0) < v)
+        .map(([k, v]) => `${v - (resources[k] || 0)} more ${k}`)
+        .join(', ');
+      setFeedback({
+        type: 'error',
+        text: `Missing resources for ${building.name || building.label}: need ${missing}. Click "Forage Supplies" below to gather materials immediately!`
+      });
+      playSound?.('error');
+      return;
+    }
+
+    playSound?.('building');
+    const newResources = { ...resources };
+    Object.entries(reqs).forEach(([k, v]) => {
+      newResources[k] = Math.max(0, (newResources[k] || 0) - v);
+    });
+
+    if (building.effects) {
+      Object.entries(building.effects).forEach(([k, v]) => {
+        if (['food', 'wood', 'stone', 'water', 'plants', 'flint', 'grain', 'seeds', 'clay', 'mud', 'tools'].includes(k)) {
+          newResources[k] = (newResources[k] || 0) + v;
+        }
+      });
+      updateResources(building.effects);
+    }
+
+    const nextBuilt = [...currentBuilt, building.id];
+    setLevelState(prev => {
+      const next = { ...prev, resources: newResources, builtItems: nextBuilt };
+      if (next.builtItems.length >= 2) next.stage = 6;
+      return next;
+    });
+
+    if (checkQuestProgress) checkQuestProgress('build', building.id);
+    setFeedback({
+      type: 'success',
+      text: `Constructed ${building.name || building.label}! Consequence: ${building.consequence || 'Enhanced settlement survival & stability.'}`
+    });
+    notify('BUILD', `${building.name || building.label} Constructed!`, building.consequence || 'Settlement expanded.', { icon: '🏗️' });
+  };
+
+  const handleForageSupplies = () => {
+    playSound?.('discovery');
+    const bundle = levelId === 1
+      ? { wood: 3, stone: 3, plants: 2, water: 2, flint: 2 }
+      : levelId === 2
+      ? { grain: 3, seeds: 3, water: 3, clay: 2, mud: 2, wood: 2, stone: 2, tools: 1 }
+      : { wood: 3, stone: 3, food: 2, water: 2 };
+
+    updateResources(bundle);
+    setLevelState(prev => {
+      const nextRes = { ...(prev.resources || {}) };
+      Object.entries(bundle).forEach(([k, v]) => {
+        nextRes[k] = (nextRes[k] || 0) + v;
+      });
+      return { ...prev, resources: nextRes };
+    });
+
+    setFeedback({
+      type: 'success',
+      text: 'Foraging expedition returned with fresh construction supplies! Added to your inventory.'
+    });
+  };
+
+  return (
+    <div className="w-full max-w-5xl mx-auto flex flex-col p-4 md:p-6 text-left space-y-5 animate-fade-in">
+      {/* Header Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-surface/80 p-5 rounded-2xl border border-gold/30 shadow-xl">
+        <div>
+          <div className="text-xs uppercase tracking-widest font-bold text-gold flex items-center gap-1.5 mb-1">
+            <Hammer size={14} className="text-gold" /> Stage 5: Civilization Builder & Settlement Planning
+          </div>
+          <h3 className="text-2xl font-serif font-bold text-[#F5F1E8]">
+            {builderConfig.eraTitle || config.title}
+          </h3>
+          <p className="text-xs md:text-sm text-content/80 mt-0.5">
+            {builderConfig.eraSubtitle || 'Construct permanent structures to protect the community and secure generational survival.'}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleForageSupplies}
+          className="px-4 py-2.5 rounded-xl bg-gold/20 border border-gold/50 text-gold hover:bg-gold hover:text-[#070A0C] font-bold text-xs uppercase tracking-wider transition-all shadow-md"
+        >
+          🌿 Forage Construction Supplies (+Supplies)
+        </button>
+      </div>
+
+      {feedback && (
+        <div className={`p-4 rounded-xl text-xs md:text-sm font-medium border flex items-center gap-2 animate-fade-in ${
+          feedback.type === 'success'
+            ? 'bg-green-900/30 border-green-500/50 text-green-200'
+            : 'bg-red-900/30 border-red-500/50 text-red-200'
+        }`}>
+          {feedback.type === 'success' ? <CheckCircle size={18} className="text-green-400 shrink-0" /> : <AlertTriangle size={18} className="text-red-400 shrink-0" />}
+          <span>{feedback.text}</span>
+        </div>
+      )}
+
+      {/* Main Builder Grid: Catalog on Left, Interactive 4x4 Grid on Right (Image 5) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left: Build Catalog */}
+        <div className="lg:col-span-1 flex flex-col gap-3">
+          <div className="text-xs font-bold uppercase tracking-wider text-gold flex items-center justify-between">
+            <span>Available Structures</span>
+            <span className="text-content/60 font-mono">({currentBuilt.length}/2 Built)</span>
+          </div>
+
+          {availableBuildings.map((b) => {
+            const isBuilt = currentBuilt.includes(b.id);
+            const isSelected = selectedBuildingId === b.id;
+            const affordable = canAfford(b.requirements);
+
+            return (
+              <div
+                key={b.id}
+                onClick={() => setSelectedBuildingId(b.id)}
+                className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+                  isSelected
+                    ? 'bg-gold/15 border-gold shadow-lg'
+                    : 'bg-surface/70 border-content/15 hover:border-gold/40'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <span className="text-3xl p-2 rounded-xl bg-black/40 border border-content/10 shrink-0">
+                    {b.icon || '⛺'}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1 mb-1">
+                      <h4 className="font-bold text-sm text-[#F5F1E8] truncate">
+                        {b.name || b.label}
+                      </h4>
+                      {isBuilt && (
+                        <span className="text-[10px] font-bold text-green-400 bg-green-950/60 px-2 py-0.5 rounded-full border border-green-500/30">
+                          Built ✓
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-content/75 line-clamp-2 mb-2.5">
+                      {b.description}
+                    </p>
+
+                    {/* Requirements checklist */}
+                    <div className="flex flex-wrap gap-1.5 text-[11px] mb-2">
+                      {Object.entries(b.requirements || {}).map(([res, cost]) => {
+                        const have = resources[res] || 0;
+                        const met = have >= cost;
+                        return (
+                          <span
+                            key={res}
+                            className={`px-2 py-0.5 rounded-md font-bold ${
+                              met
+                                ? 'bg-green-900/30 text-green-300 border border-green-500/30'
+                                : 'bg-red-900/30 text-red-300 border border-red-500/30'
+                            }`}
+                          >
+                            {have}/{cost} {res}
+                          </span>
+                        );
+                      })}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleConstruct(b);
+                      }}
+                      disabled={!affordable}
+                      className={`w-full py-2 rounded-xl text-xs font-bold transition-all ${
+                        affordable
+                          ? 'bg-gold text-[#070A0C] font-extrabold hover:bg-gold/90 shadow-md'
+                          : 'bg-surface/40 text-content/40 cursor-not-allowed border border-content/10'
+                      }`}
+                    >
+                      {affordable ? `Construct ${b.name || b.label} →` : 'Need Resources'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Right: Interactive 4x4 Settlement Grid (Matches User Image 5) */}
+        <div className="lg:col-span-2 flex flex-col gap-4 bg-surface/60 border border-content/15 rounded-3xl p-5 shadow-xl">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-gold flex items-center gap-1.5">
+              <Grid size={14} /> Settlement Terrain Grid (Level {levelId})
+            </span>
+            <span className="text-xs text-content/60">
+              🌿 Land Tiles • 💧 River Channel
+            </span>
+          </div>
+
+          {/* 4x4 Settlement Grid Canvas */}
+          <div className="grid grid-cols-4 gap-3 aspect-square max-w-md mx-auto w-full p-3 rounded-2xl bg-[#090C0F] border-2 border-content/20 shadow-inner">
+            {Array.from({ length: 16 }, (_, idx) => {
+              const isWater = (builderConfig.waterTiles || [2, 6, 10, 14]).includes(idx);
+              const isCellBuilt = idx < currentBuilt.length;
+              const buildingAtCell = isCellBuilt
+                ? availableBuildings.find(b => b.id === currentBuilt[idx]) || availableBuildings[0]
+                : null;
+
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => selectedBuilding && handleConstruct(selectedBuilding)}
+                  className={`relative rounded-xl border flex flex-col items-center justify-center p-2 transition-all duration-300 group ${
+                    isCellBuilt
+                      ? 'bg-green-950/40 border-green-500/60 shadow-lg'
+                      : isWater
+                      ? 'bg-blue-950/40 border-blue-500/40 hover:border-blue-400'
+                      : 'bg-[#151B20]/80 border-content/15 hover:border-gold hover:bg-[#1A2228]'
+                  }`}
+                >
+                  <span className="text-3xl md:text-4xl transition-transform group-hover:scale-110">
+                    {isCellBuilt ? (buildingAtCell?.icon || '⛺') : isWater ? '💧' : '🌿'}
+                  </span>
+                  <span className="text-[10px] font-bold text-content/70 mt-1 truncate max-w-full">
+                    {isCellBuilt ? (buildingAtCell?.name || 'Built') : isWater ? 'River' : `Plot ${idx + 1}`}
+                  </span>
+                  {isCellBuilt && (
+                    <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-green-400" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Construction Consequence & Historical Impact Box */}
+          {selectedBuilding && (
+            <div className="p-4 rounded-xl bg-black/40 border border-gold/25 text-left space-y-1.5">
+              <div className="text-[11px] uppercase tracking-wider font-bold text-gold">
+                Historical Purpose & Construction Impact
+              </div>
+              <p className="text-xs md:text-sm text-content/90 leading-relaxed">
+                {selectedBuilding.consequence || 'Constructing permanent shelters, hearths, and tool workshops allowed early communities to pool resources, protect against predators, and pass on generational knowledge.'}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 const ObjectiveTracker = ({ stage, levelState, locations, targetExplore, targetDiscover, targetLearn, targetChallenges, targetBuilds, allChallenges, buildActions, handleLocationClick, startChallenge, setBuilderPopup, theme }) => {
   const getStageHeader = () => {
     switch(stage) {
@@ -524,392 +1490,6 @@ const ObjectiveTracker = ({ stage, levelState, locations, targetExplore, targetD
   );
 };
 
-const ArtifactDiscoverer = ({ data, theme, ageGroup, onComplete }) => {
-  const [clicks, setClicks] = useState(0);
-  const [selectedUseIdx, setSelectedUseIdx] = useState(null);
-  const required = 2;
-  const progress = Math.min((clicks / required) * 100, 100);
-  const isUncovered = clicks >= required;
-
-  const hasUseIdentification = Array.isArray(data.useOptions) && data.useOptions.length > 0;
-  const selectedOpt = selectedUseIdx !== null && hasUseIdentification ? data.useOptions[selectedUseIdx] : null;
-  const canCollect = isUncovered && (!hasUseIdentification || Boolean(selectedOpt?.isCorrect));
-
-  return (
-    <div className="text-center animate-fade-in w-full">
-      <h3 className={"text-xl font-bold mb-2 uppercase " + theme.primary}>
-        {isUncovered ? 'Examine Prehistoric Evidence' : 'Uncover Evidence'}
-      </h3>
-      <p className="text-sm opacity-75 mb-4">
-        {isUncovered
-          ? 'Inspect the physical characteristics of this object and identify how early humans used it.'
-          : 'Carefully clear away the sediment layers to examine the object.'}
-      </p>
-
-      <button
-        onClick={() => setClicks(c => c + 1)}
-        disabled={isUncovered}
-        className="relative w-28 h-28 mx-auto rounded-full border-4 border-dashed border-gold/40 flex items-center justify-center hover:scale-105 transition-all overflow-hidden bg-surface/50 mb-4"
-      >
-        <div className="absolute bottom-0 left-0 right-0 bg-gold/20 transition-all duration-300" style={{ height: `${progress}%` }} />
-        <span
-          className="text-5xl relative z-10 transition-all duration-500"
-          style={{ filter: `blur(${Math.max(0, 8 - clicks * 4)}px) grayscale(${100 - progress}%)` }}
-        >
-          {data.icon}
-        </span>
-      </button>
-
-      {!isUncovered ? (
-        <div className="space-y-3">
-          <p className="text-xs font-bold uppercase tracking-widest text-gold animate-pulse">
-            Tap ({clicks}/{required}) to brush away sediment & examine
-          </p>
-          <button
-            onClick={() => setClicks(required)}
-            className="px-5 py-2.5 rounded-xl bg-gold/20 border border-gold/40 text-gold text-xs font-bold uppercase tracking-wider hover:bg-gold hover:text-[#070A0C] transition-colors"
-          >
-            Uncover & Examine Immediately
-          </button>
-        </div>
-      ) : (
-        <div className="animate-in fade-in zoom-in duration-300 text-left space-y-4">
-          <div className="bg-surface/60 border border-content/15 rounded-2xl p-4">
-            <div className="text-[11px] uppercase tracking-widest text-gold font-bold mb-1">
-              Discovered at {data.label}
-            </div>
-            <h4 className="text-lg md:text-xl font-serif font-bold text-content mb-2">
-              {data.discoveryTitle || data.label}
-            </h4>
-            <p className="text-sm text-content/85 leading-relaxed">
-              {data.examinationNotes || (data.getDiscoverMessage ? data.getDiscoverMessage(ageGroup) : (data.discoverMessage || 'You uncovered significant prehistoric evidence here.'))}
-            </p>
-          </div>
-
-          {hasUseIdentification && (
-            <div className="bg-black/30 border border-gold/25 rounded-2xl p-4 space-y-3">
-              <div className="text-xs font-bold uppercase tracking-wider text-gold">
-                Identify Object Use
-              </div>
-              <p className="text-sm font-medium text-content/90">
-                {data.usePrompt || 'How did early human communities primarily use this discovery?'}
-              </p>
-              <div className="space-y-2">
-                {data.useOptions.map((opt, idx) => {
-                  const isChosen = selectedUseIdx === idx;
-                  let btnStyle = 'bg-surface/70 border-content/15 text-content hover:border-gold/50';
-                  if (isChosen) {
-                    btnStyle = opt.isCorrect
-                      ? 'bg-green-900/30 border-green-500 text-green-200'
-                      : 'bg-red-900/30 border-red-500 text-red-200';
-                  }
-                  return (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setSelectedUseIdx(idx)}
-                      className={`w-full text-left p-3 rounded-xl border text-xs md:text-sm font-semibold transition-all ${btnStyle}`}
-                    >
-                      {opt.label}
-                    </button>
-                  );
-                })}
-              </div>
-              {selectedOpt && (
-                <div className={`p-3 rounded-xl text-xs md:text-sm font-medium border ${selectedOpt.isCorrect ? 'bg-green-900/20 border-green-500/40 text-green-300' : 'bg-amber-900/20 border-amber-500/40 text-amber-200'}`}>
-                  {selectedOpt.feedback}
-                </div>
-              )}
-            </div>
-          )}
-
-          {data.yields && Object.keys(data.yields).length > 0 && (
-            <div className="bg-surface/40 p-3 rounded-xl border border-content/10 text-center">
-              <p className="text-xs uppercase tracking-widest font-bold opacity-70 mb-2">Resources & Evidence Gained</p>
-              <div className="flex flex-wrap justify-center gap-2">
-                {Object.entries(data.yields).map(([res, amt]) => (
-                  <span key={res} className="bg-gold/15 text-gold px-3 py-1 rounded-lg border border-gold/30 font-bold text-xs capitalize">
-                    +{amt} {res}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <button
-            onClick={onComplete}
-            disabled={!canCollect}
-            className={`px-6 py-3.5 font-bold rounded-xl w-full transition-all ${canCollect ? theme.button : 'bg-surface/40 text-content/40 border border-content/10 cursor-not-allowed'}`}
-          >
-            {canCollect ? 'Collect Discovery & Resources' : 'Identify the Correct Use Above to Collect'}
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const ExplorePanel = ({ data, theme, ageGroup, isYoung, isReplay, playSound, updateResources, setLevelState, markExplored, levelState }) => {
-  const getDiscoveries = (loc) => {
-    if (Array.isArray(loc.exploreItems) && loc.exploreItems.length > 0) {
-      return loc.exploreItems;
-    }
-    const base = [];
-    const yieldSource = loc.exploreYields || loc.yields;
-    if (yieldSource) {
-      Object.entries(yieldSource).forEach(([res, amt]) => {
-        base.push({
-          id: `yield_${res}`,
-          icon: res === 'wood' ? '🪵' : res === 'stone' ? '🪨' : res === 'plants' ? '🌿' : res === 'food' ? '🌾' : res === 'water' ? '💧' : res === 'flint' ? '🔪' : res === 'knowledge' ? '📜' : '🔮',
-          label: `Find ${res.charAt(0).toUpperCase() + res.slice(1)}`,
-          resourceName: res.charAt(0).toUpperCase() + res.slice(1),
-          examineTitle: `Inspect ${res.charAt(0).toUpperCase() + res.slice(1)} Source`,
-          whyUseful: `Essential survival resource (${res}) used by early communities for shelter, tools, and sustenance.`,
-          feedback: `You collected ${amt} ${res} — added to your survival supplies.`,
-          reward: { [res]: amt },
-        });
-      });
-    }
-    base.push({
-      id: 'context',
-      icon: '🔍',
-      label: 'Survey the Habitat Environment',
-      resourceName: 'Environmental Clue',
-      examineTitle: `Environmental Survey: ${loc.label}`,
-      whyUseful: adaptTextForAge(loc.discoverMessage || 'Reveals how early human communities adapted to this landscape.', ageGroup),
-      feedback: adaptTextForAge(loc.discoverMessage || 'You mapped key environmental features at this location.', ageGroup),
-      reward: {},
-    });
-    const max = isYoung ? 2 : 3;
-    return base.slice(0, max);
-  };
-
-  const discoveries = getDiscoveries(data);
-  const savedLocDetails = levelState?.exploredDetails?.[data.id] || {};
-  const found = data.foundDiscoveries || savedLocDetails.found || [];
-  const examined = data.examinedDiscoveries || savedLocDetails.examined || [];
-  const allFound = found.length >= discoveries.length;
-
-  const handleExamine = (disc) => {
-    if (examined.includes(disc.id)) return;
-    playSound('ui');
-    const nextExamined = [...examined, disc.id];
-    setLevelState(prev => ({
-      ...prev,
-      exploredDetails: {
-        ...(prev.exploredDetails || {}),
-        [data.id]: {
-          found: prev.exploredDetails?.[data.id]?.found || found,
-          examined: nextExamined
-        }
-      },
-      activePopup: prev.activePopup ? {
-        ...prev.activePopup,
-        data: {
-          ...prev.activePopup.data,
-          examinedDiscoveries: nextExamined,
-          foundDiscoveries: found
-        }
-      } : null
-    }));
-  };
-
-  const handleDiscovery = (disc) => {
-    if (found.includes(disc.id)) return;
-    const reward = disc.reward || {};
-    if (Object.keys(reward).length > 0 && !isReplay) {
-      updateResources(reward);
-    }
-    playSound('discovery');
-    const nextFound = [...found, disc.id];
-    const nextExamined = examined.includes(disc.id) ? examined : [...examined, disc.id];
-
-    setLevelState(prev => {
-      const nextResources = { ...(prev.resources || {}) };
-      Object.entries(reward).forEach(([k, v]) => {
-        nextResources[k] = (nextResources[k] || 0) + v;
-      });
-      return {
-        ...prev,
-        resources: nextResources,
-        exploredDetails: {
-          ...(prev.exploredDetails || {}),
-          [data.id]: {
-            found: nextFound,
-            examined: nextExamined
-          }
-        },
-        activePopup: prev.activePopup ? {
-          ...prev.activePopup,
-          data: {
-            ...prev.activePopup.data,
-            examinedDiscoveries: nextExamined,
-            foundDiscoveries: nextFound
-          }
-        } : null
-      };
-    });
-  };
-
-  return (
-    <div className="relative h-full w-full max-w-3xl mx-auto flex flex-col p-4 md:p-6 overflow-y-auto animate-in fade-in duration-300">
-      {/* Header */}
-      <div className="flex flex-wrap items-center gap-4 mb-4 bg-surface/70 p-4 rounded-2xl border border-content/15">
-        <span className="text-4xl md:text-5xl drop-shadow-md">{data.icon}</span>
-        <div className="text-left flex-1 min-w-[180px]">
-          <h3 className={`text-xl md:text-2xl font-bold uppercase ${theme.primary}`}>
-            Explore: {data.label}
-          </h3>
-          <p className="text-xs text-content/70 font-bold uppercase tracking-wider mt-1">
-            {found.length} of {discoveries.length} resources & clues collected
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => setLevelState(prev => ({ ...prev, activePopup: null }))}
-          className="px-3.5 py-2 rounded-xl bg-surface border border-content/20 hover:border-gold text-xs font-bold text-content/80 hover:text-gold transition-colors"
-        >
-          ← Back to Valley Map
-        </button>
-      </div>
-
-      {/* Context description */}
-      <p className="text-sm md:text-base text-content/85 mb-5 text-left leading-relaxed px-1">
-        {adaptTextForAge(data.description || 'Examine each resource in this habitat to understand why it is useful before collecting it.', ageGroup)}
-      </p>
-
-      <div className="space-y-4 mb-6">
-        <p className="text-xs font-bold text-gold uppercase tracking-widest text-left">
-          Step 1: Examine Resource & Survival Value • Step 2: Collect into Inventory
-        </p>
-        {discoveries.map((disc) => {
-          const isExamined = examined.includes(disc.id);
-          const isFound = found.includes(disc.id);
-          const hasReward = disc.reward && Object.keys(disc.reward).length > 0;
-          const rewardLabel = hasReward
-            ? Object.entries(disc.reward).map(([k, v]) => `+${v} ${k}`).join(', ')
-            : 'Clue';
-
-          return (
-            <div
-              key={disc.id}
-              className={`w-full text-left p-4 md:p-5 rounded-2xl border transition-all duration-300 flex flex-col gap-3 ${
-                isFound
-                  ? 'border-green-500/40 bg-green-900/10'
-                  : isExamined
-                  ? 'border-gold bg-surface/90 shadow-lg'
-                  : 'border-content/20 bg-surface/60 hover:border-gold/50'
-              }`}
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-center gap-3.5">
-                  <span className="text-3xl md:text-4xl">{disc.icon}</span>
-                  <div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-base md:text-lg text-content">{disc.label}</span>
-                      <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-gold/15 text-gold border border-gold/30">
-                        {disc.resourceName || rewardLabel}
-                      </span>
-                    </div>
-                    {!isExamined && !isFound && (
-                      <p className="text-xs text-content/60 mt-1">
-                        Examine this resource first to inspect its quality and survival purpose.
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {!isExamined && !isFound && (
-                  <button
-                    type="button"
-                    onClick={() => handleExamine(disc)}
-                    className="px-4 py-2 rounded-xl bg-gold/20 border border-gold/50 text-gold hover:bg-gold hover:text-[#070A0C] font-bold text-xs uppercase tracking-wider transition-all shrink-0"
-                  >
-                    🔍 Examine
-                  </button>
-                )}
-
-                {isFound && (
-                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-green-400 bg-green-900/30 border border-green-500/30 px-3 py-1.5 rounded-xl shrink-0">
-                    <CheckCircle size={15} /> Collected
-                  </span>
-                )}
-              </div>
-
-              {(isExamined || isFound) && (
-                <div className="bg-black/35 border border-content/10 rounded-xl p-3.5 space-y-2 animate-fade-in">
-                  {disc.examineTitle && (
-                    <div className="text-xs font-bold uppercase tracking-wider text-gold">
-                      Examination: {disc.examineTitle}
-                    </div>
-                  )}
-                  <p className="text-xs md:text-sm text-content/90 leading-relaxed">
-                    <strong className="text-gold">Why It Is Useful: </strong>
-                    {disc.whyUseful || disc.feedback}
-                  </p>
-                  {isFound && (
-                    <div className="flex items-center justify-between flex-wrap gap-2 pt-1 border-t border-content/10">
-                      <span className="text-xs text-green-300 font-medium">{disc.feedback}</span>
-                      {hasReward && (
-                        <div className="flex gap-2">
-                          {Object.entries(disc.reward).map(([res, amt]) => (
-                            <span key={res} className="text-xs bg-gold/20 text-gold border border-gold/40 px-2.5 py-0.5 rounded-lg font-bold capitalize">
-                              +{amt} {res}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {isExamined && !isFound && (
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    onClick={() => handleDiscovery(disc)}
-                    className="px-5 py-2.5 rounded-xl bg-[#D9A441] text-[#070A0C] font-bold text-xs md:text-sm hover:bg-[#D9A441]/90 transition-all shadow-md"
-                  >
-                    {hasReward ? `Collect ${disc.resourceName || 'Resource'} (${rewardLabel}) →` : 'Record Habitat Observation →'}
-                  </button>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {allFound && (
-        <div className="animate-in fade-in zoom-in duration-300 mt-auto pb-2">
-          <div className="bg-gold/10 border-2 border-gold/40 rounded-2xl p-5 mb-4 text-left shadow-xl">
-            <div className="flex items-center gap-2.5 text-gold font-bold text-lg mb-2">
-              <CheckCircle size={22} /> Habitat Fully Explored!
-            </div>
-            <p className="text-sm text-content/90 mb-3 leading-relaxed">
-              {adaptTextForAge(data.discoverMessage || 'You examined and gathered the key survival resources from this habitat.', ageGroup)}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {discoveries.filter(d => Object.keys(d.reward || {}).length > 0).map(d =>
-                Object.entries(d.reward).map(([res, amt]) => (
-                  <span key={`${d.id}_${res}`} className="text-xs bg-gold/20 text-gold border border-gold/40 px-3 py-1.5 rounded-xl font-bold capitalize">
-                    +{amt} {res} added to Inventory
-                  </span>
-                ))
-              )}
-            </div>
-          </div>
-          <button
-            onClick={() => markExplored(data)}
-            className={`px-8 py-4 font-bold rounded-xl w-full flex items-center justify-center gap-3 text-base md:text-lg transition-transform hover:scale-[1.01] shadow-lg ${theme.button}`}
-          >
-            <CheckCircle size={20} /> Complete Habitat Exploration
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
 
 const MatchingGame = ({ data, onComplete, theme, isYoung, playSound }) => {
   const timers = useRef([]);
@@ -1500,7 +2080,7 @@ const LevelEngine = ({ config }) => {
           )}
 
           {type === 'learn' && (
-            <InteractiveLearnNode data={data} onComplete={() => markLearned(data)} theme={theme} isYoung={isYoung} playSound={playSound} ageGroup={ageGroup} />
+            <InteractiveLearnNode data={data} onComplete={() => markLearned(data)} theme={theme} isYoung={isYoung} playSound={playSound} ageGroup={ageGroup} levelId={config.id} />
           )}
 
           {type === 'challenge' && (
@@ -1525,6 +2105,8 @@ const LevelEngine = ({ config }) => {
                     <MatchingGame data={data} theme={theme} isYoung={isYoung} playSound={playSound} onComplete={(success) => handleChallengeAnswer(data, success, isBuild)} />
                   ) : data.format === 'ordering' ? (
                     <OrderingGame data={data} theme={theme} isYoung={isYoung} playSound={playSound} onComplete={(success) => handleChallengeAnswer(data, success, isBuild)} />
+                  ) : data.format === 'cave_art' ? (
+                    <CaveArtPuzzle data={data} theme={theme} onComplete={(success) => handleChallengeAnswer(data, success, isBuild, 50)} playSound={playSound} />
                   ) : data.format === 'interactive_survival' ? (
                     <SurvivalInteractive
                       data={data}
@@ -2273,31 +2855,17 @@ const LevelEngine = ({ config }) => {
               )}
 
               {stage === 5 && (
-                <div className="w-full max-w-3xl bg-surface/85 border border-gold/30 rounded-2xl p-4 md:p-5 shadow-xl animate-fade-in">
-                  <div className="text-xs font-bold uppercase tracking-widest text-gold mb-3">
-                    Stage 5: Build & Manage {config.id === 2 ? 'Early Farming Settlement' : 'Prehistoric Camp'} ({builtItems.length}/{targetBuilds})
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {buildActions.slice(0, targetBuilds).map((bAction) => {
-                      const isBuilt = builtItems.includes(bAction.id);
-                      return (
-                        <button
-                          key={bAction.id}
-                          onClick={() => setLevelState(prev => ({ ...prev, activePopup: { type: 'confirm_build', data: bAction } }))}
-                          className={`p-4 rounded-xl border text-left transition-all flex items-center gap-3.5 ${isBuilt ? 'bg-green-900/20 border-green-500/40 text-green-300' : 'bg-black/40 border-gold/40 hover:border-gold hover:bg-gold/10 text-content'}`}
-                        >
-                          <span className="text-3xl">{bAction.icon || '⛺'}</span>
-                          <div className="flex-1">
-                            <div className="font-bold text-sm">{bAction.name || bAction.label || bAction.nameKey}</div>
-                            <div className="text-[11px] text-gold font-bold uppercase mt-1">
-                              {isBuilt ? '✓ Constructed' : 'Inspect Requirements & Build →'}
-                            </div>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+                <Stage5Builder
+                  config={config}
+                  theme={theme}
+                  levelState={levelState}
+                  setLevelState={setLevelState}
+                  resources={resources}
+                  updateResources={updateResources}
+                  playSound={playSound}
+                  notify={notify}
+                  checkQuestProgress={checkQuestProgress}
+                />
               )}
             </div>
           )}

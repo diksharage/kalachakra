@@ -11,8 +11,6 @@ const Sidebar = ({ isOpen, onClose }) => {
     { name: 'Journey', path: '/journey', icon: Map },
     { name: 'Heritage Map', path: '/explore', icon: Compass },
     { name: 'Investigations', path: '/investigations', icon: Search },
-    { name: 'Quests', path: '/quests', icon: Target },
-    { name: 'Build', path: '/builder', icon: Hammer },
     { name: 'KALA Companion', path: '/ai-guide', icon: Bot, highlight: true },
     { name: 'Heritage Library', path: '/library', icon: BookOpen },
     { name: 'Inventory', path: '/inventory', icon: Package },
