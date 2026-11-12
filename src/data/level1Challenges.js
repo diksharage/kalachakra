@@ -1,101 +1,67 @@
 export const level1Challenges = {
   mg_l1_survival: {
-    id: "mg-l1-survival",
-    title: "Survival in the Wild",
-    format: "interactive_survival",
-    question: "A cold night approaches. The community is shivering and needs warmth to survive.",
-    options: [
-      { 
-        label: "Build a Fire in the cave", 
-        costs: { wood: 1, flint: 1 }, 
-        resultText: "You successfully struck flint to light the wood! The fire provides warmth and safety.", 
-        isSuccess: true, 
-        reward: { xp: 50, community: 1, legacy: 10 } 
+    id: 'mg-l1-survival',
+    title: 'Survival Resource Prioritization',
+    format: 'minigame',
+    question: 'Prioritize essential resources and survival actions to keep your prehistoric band safe through day and night.',
+    reward: { wood: 1, stone: 2, plants: 1 }
+  },
+  tools: {
+    id: 'early-tools-01',
+    title: 'Stone-Tool Identification & Usage',
+    difficulty: 'easy',
+    format: 'matching',
+    question: 'Examine the prehistoric tools you uncovered and match each tool to its primary survival use:',
+    explanation: 'Early humans engineered specialized tools for distinct tasks: heavy bifacial hand axes for chopping and digging, sharp flint flakes for scraping hides, fire-hardened wooden sticks for uprooting tubers, and composite microlith spears for hunting.',
+    reward: { stone: 2, flint: 1, wood: 1 },
+    pairs: [
+      {
+        left: { id: 'tool_axe', icon: '🪨', label: 'Acheulean Hand Axe' },
+        right: { id: 'use_axe', label: 'Chopping timber, heavy cutting & digging' }
       },
-      { 
-        label: "Sleep in the open fields", 
-        costs: {}, 
-        resultText: "Too cold! The community suffered through a freezing night.", 
-        isSuccess: false 
+      {
+        left: { id: 'tool_scraper', icon: '🔪', label: 'Flint Side-Scraper' },
+        right: { id: 'use_scraper', label: 'Cleaning animal hides for shelter wraps' }
+      },
+      {
+        left: { id: 'tool_stick', icon: '🪵', label: 'Fire-Hardened Digging Stick' },
+        right: { id: 'use_stick', label: 'Prying up edible underground roots & tubers' }
+      },
+      {
+        left: { id: 'tool_spear', icon: '🏹', label: 'Hafted Microlith Spear' },
+        right: { id: 'use_spear', label: 'Hunting swift game from a safe distance' }
       }
     ]
   },
-  water: {
-    id: "early-water-01",
-    title: "Finding Water",
-    difficulty: "easy",
-    format: "interactive_survival",
-    question: "The community is thirsty. You need to secure a reliable source of water.",
-    options: [
-      { 
-        label: "Use animal hide to carry water from the river", 
-        costs: { hide: 1, water: 1 }, 
-        resultText: "The hide acted as a primitive water skin! You brought enough water for everyone.", 
-        isSuccess: true, 
-        reward: { xp: 50, community: 2 } 
-      },
-      { 
-        label: "Drink directly from muddy puddles", 
-        costs: {}, 
-        resultText: "The water was dirty. Several members fell ill.", 
-        isSuccess: false 
-      }
-    ]
-  },
-  food: {
-    id: "early-food-01",
-    title: "Gathering Food",
-    difficulty: "medium",
-    format: "interactive_survival",
-    question: "You spot tracks of a wild animal. The community is hungry.",
+  environment: {
+    id: 'early-environment-01',
+    title: 'Environmental Problem-Solving: Monsoon Storm',
+    difficulty: 'medium',
+    format: 'interactive_survival',
+    question: 'Dark monsoon clouds burst over the valley! The river is rising rapidly and freezing winds sweep across the open plains. How will your community adapt using the environment and your gathered resources?',
+    explanation: 'Prehistoric bands survived harsh seasonal shifts by choosing elevated rock overhangs above flood lines, stacking stone windbreaks, and maintaining a central fire hearth.',
+    reward: { wood: 2, stone: 1, plants: 2 },
     options: [
       {
-        label: "Hunt with Stone Spear",
-        costs: { stone: 1, wood: 1 },
-        resultText: "A successful hunt! You gathered meat and more hides.",
+        label: 'Move to the elevated rock overhang, stack stone windbreaks, and kindle a hearth with wood & flint',
+        icon: '🔥',
+        costs: { wood: 1, stone: 1, flint: 1 },
+        resultText: 'Excellent adaptation! The high rock overhang kept the band above the river surge, the stone barrier blocked the gale, and the hearth provided life-saving warmth.',
         isSuccess: true,
-        reward: { meat: 2, hide: 1, xp: 50 }
+        reward: { wood: 2, stone: 1, plants: 2 }
       },
       {
-        label: "Forage for berries instead",
-        costs: { plants: 1 },
-        resultText: "You safely gathered berries, but it's barely enough calories.",
-        isSuccess: true,
-        reward: { food: 1, xp: 20 }
-      },
-      {
-        label: "Chase it bare-handed",
+        label: 'Stay on the low riverbank gravel bed to remain next to the water',
+        icon: '🌊',
         costs: {},
-        resultText: "The animal easily outran you. You return empty-handed.",
+        resultText: 'Too risky! Monsoon flash floods quickly submerge low riverbanks. Early humans camped on elevated river terraces or rock overhangs.',
         isSuccess: false
-      }
-    ]
-  },
-  shelter: {
-    id: "early-shelter-01",
-    title: "Approaching Storm",
-    difficulty: "medium",
-    format: "interactive_survival",
-    question: "Dark clouds gather. A severe storm is approaching the valley.",
-    options: [
-      {
-        label: "Reinforce cave entrance with stones and branches",
-        costs: { stone: 2, wood: 1 },
-        resultText: "The heavy stones blocked the wind. Your shelter held strong!",
-        isSuccess: true,
-        reward: { xp: 50, legacy: 10 }
       },
       {
-        label: "Use animal hides as a tent",
-        costs: { hide: 1, wood: 1 },
-        resultText: "The hide tent provided decent cover from the rain.",
-        isSuccess: true,
-        reward: { xp: 40 }
-      },
-      {
-        label: "Hide under a tree",
+        label: 'Wait out the storm in the open tall grass without shelter or fire',
+        icon: '🌾',
         costs: {},
-        resultText: "Lightning strikes nearby! It's extremely dangerous and cold.",
+        resultText: 'Soaking rain and cold winds sap body heat rapidly in the open savanna. Use the cave overhang, stone, and fire!',
         isSuccess: false
       }
     ]

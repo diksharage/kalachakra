@@ -64,7 +64,7 @@ export const levelConfigs = {
     id: 1,
     title: "Early Human Communities",
     totalStages: 8,
-    defaultResources: { wood: 0, stone: 0, plants: 0 },
+    defaultResources: { wood: 0, plants: 0, stone: 0, water: 0, flint: 0 },
     locations: level1Locations,
     challenges: level1Challenges,
     

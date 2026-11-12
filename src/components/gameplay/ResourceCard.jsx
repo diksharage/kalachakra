@@ -6,7 +6,8 @@ const ResourceCard = ({ type, value, required, theme }) => {
   
   if (type === 'wood' || type === 'timber') { emoji = '🪵'; label = type; }
   else if (type === 'stone' || type === 'materials' || type === 'craftMaterials' || type === 'brick' || type === 'bricks') { emoji = '🪨'; label = type; }
-  else if (type === 'plants' || type === 'food' || type === 'agriculture') { emoji = '🌾'; label = type; }
+  else if (type === 'flint') { emoji = '🔪'; label = 'flint'; }
+  else if (type === 'plants' || type === 'food' || type === 'agriculture') { emoji = '🌿'; label = type; }
   else if (type === 'water') { emoji = '💧'; label = type; }
   else if (type === 'storage' || type === 'capacity') { emoji = '🏺'; label = type; }
   else if (type === 'tradeGoods' || type === 'cargo' || type === 'supplies') { emoji = '📦'; label = type; }

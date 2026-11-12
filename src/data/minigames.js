@@ -3,31 +3,52 @@ export const minigamesData = {
     id: "mg-l1-survival", levelId: 1,
     variations: [
       {
-        variationId: "v1", type: "historicalDecision", title: "Survival in the Wild",
+        variationId: "v1", type: "historicalDecision", title: "Survival Resource Prioritization",
         rewards: [
-          { type: 'resource', id: 'stone', amount: 2, label: 'River Stones', destination: 'Inventory', usage: 'Used for Tool Making' },
+          { type: 'resource', id: 'stone', amount: 2, label: 'Quartzite Stones', destination: 'Inventory', usage: 'Used for Shelter & Tools' },
+          { type: 'resource', id: 'wood', amount: 2, label: 'Hardwood Poles', destination: 'Inventory', usage: 'Used for Shelter Construction' },
           { type: 'artifact', id: 'hand_axe', amount: 1, label: 'Stone Hand Axe', destination: 'Artifact Collection', usage: 'View in Library' }
         ],
-        description: "Make critical decisions to ensure your early human community survives the harsh environment.",
+        description: "Prioritize critical survival resources as your prehistoric band establishes camp in a new river valley.",
         difficulty: "easy", maxScore: 100,
         scenarios: [
-          { text: "A cold night approaches and the community is shivering. What is your priority?", options: [{ label: "Use flint to start a fire in the cave", score: 10, response: "Fire provides warmth and safety!" }, { label: "Sleep in the open fields", score: -10, response: "Too cold! The community suffered." }] },
-          { text: "You find a large animal carcass left by predators. What tool do you use to harvest it?", options: [{ label: "Sharp stone hand-axe", score: 10, response: "Perfect for cutting meat and bone!" }, { label: "Bare hands", score: -10, response: "Ineffective and dangerous." }] }
+          {
+            text: "Your band arrives in an unfamiliar valley with three hours of daylight left. Which survival needs must you prioritize FIRST?",
+            options: [
+              { label: "Locate fresh running water and a dry rock overhang on high ground", score: 15, response: "Essential priority! Fresh water prevents dehydration and high ground protects the camp from predators and flash floods." },
+              { label: "Spend all afternoon carving decorative bone ornaments", score: -10, response: "Poor prioritization! Without water and shelter before nightfall, the band faces severe exposure." }
+            ]
+          },
+          {
+            text: "Temperatures are dropping rapidly as dusk settles. Which resources should the foraging party gather immediately?",
+            options: [
+              { label: "Dry hardwood branches, tinder moss, and flint nodules to ignite a hearth fire", score: 15, response: "Correct! A communal fire provides life-saving warmth, light, and protection against nocturnal predators." },
+              { label: "Heavy river clay and wet reeds from the marsh", score: -10, response: "Wet marsh materials cannot fuel a fire or keep the band warm through a freezing night." }
+            ]
+          },
+          {
+            text: "Food supplies are low the next morning. How should you prioritize safe foraging for the group?",
+            options: [
+              { label: "Use digging sticks to harvest known edible roots/tubers and roast them over the embers", score: 15, response: "Smart survival strategy! Roasting fibrous tubers breaks down toxins and provides reliable energy for the whole band." },
+              { label: "Eat unfamiliar brightly colored berries raw without testing them", score: -10, response: "Dangerous mistake! Unknown raw berries can be poisonous to the community." }
+            ]
+          }
         ]
       },
       {
-        variationId: "v2", type: "artifactMatch", title: "Tools of the Paleolithic",
+        variationId: "v2", type: "timeline", title: "Order of Prehistoric Camp Survival",
         rewards: [
-          { type: 'resource', id: 'stone', amount: 2, label: 'River Stones', destination: 'Inventory', usage: 'Used for Tool Making' },
+          { type: 'resource', id: 'stone', amount: 2, label: 'Quartzite Stones', destination: 'Inventory', usage: 'Used for Shelter & Tools' },
+          { type: 'resource', id: 'wood', amount: 2, label: 'Hardwood Poles', destination: 'Inventory', usage: 'Used for Shelter Construction' },
           { type: 'artifact', id: 'hand_axe', amount: 1, label: 'Stone Hand Axe', destination: 'Artifact Collection', usage: 'View in Library' }
         ],
-        description: "Match the early human stone tool to its primary survival use.",
+        description: "Arrange these prehistoric survival priorities in the proper order when establishing a new valley camp.",
         difficulty: "easy", maxScore: 100,
-        pairs: [
-          { id: '1', left: 'Hand-Axe', right: 'Chopping wood and digging', icon: '🪨' },
-          { id: '2', left: 'Stone Scraper', right: 'Cleaning animal hides', icon: '🔪' },
-          { id: '3', left: 'Bone Needle', right: 'Sewing warm clothes', icon: '🪡' },
-          { id: '4', left: 'Spear Point', right: 'Hunting fast prey', icon: '🏹' }
+        events: [
+          { id: '1', text: 'Scout fresh running water and a dry rock shelter above the flood line', order: 1 },
+          { id: '2', text: 'Knap sharp stone flakes and hand axes from river cobbles', order: 2 },
+          { id: '3', text: 'Gather dry deadwood and strike flint to ignite a protective hearth fire', order: 3 },
+          { id: '4', text: 'Forage edible tubers and roast food over the fire for the community', order: 4 }
         ]
       }
     ]

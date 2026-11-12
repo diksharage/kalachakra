@@ -8,6 +8,7 @@ import { PlayCircle, Map, Search, BookOpen, Target, Hammer, ArrowRight } from 'l
 import BackButton from '../components/common/BackButton';
 
 const getLevelBackground = (levelId) => {
+  if (levelId === 1) return 'prehistoric_l1.jpg';
   if (levelId === 3) return 'indus.jpg';
   if (levelId === 4) return 'maritime.jpg';
   if (levelId >= 5 && levelId <= 7) return 'mauryan.jpg';

@@ -8,77 +8,39 @@ export const civilizationBuilderData = {
     availableBuildings: [
       {
         id: 'basic_shelter',
-        nameKey: 'builder.b.shelter',
-        descKey: 'builder.b.shelter_desc',
-        name: 'Rock & Branch Shelter',
-        description: 'Provides essential protection from weather and predators for early foraging bands.',
+        nameKey: 'builder.b.generic_shelter.name',
+        descKey: 'builder.b.generic_shelter.desc',
+        name: 'Simple Prehistoric Shelter',
+        description: 'A sturdy lean-to frame of hardwood branches anchored with river stones and insulated with woven plant thatch against wind and monsoon rain.',
+        consequence: 'Shields the band from rain, cold winds, and predators, creating a dry base camp for storing tools and gathered food.',
         icon: '⛺',
         terrain: 'land',
-        requirements: { wood: 1, stone: 1 },
-        effects: { community: 15, culture: 5 },
-        choices: [
-          {
-            id: 'basic_shelter_wood',
-            label: 'Construct Lean-to Shelter',
-            desc: 'Use timber branches and plants to build a quick weather break.',
-            requirements: { wood: 1, plants: 1 },
-            effects: { community: 10 }
-          },
-          {
-            id: 'basic_shelter_cave',
-            label: 'Fortify Cave Entrance',
-            desc: 'Stack river stones to block wind and predators.',
-            requirements: { stone: 1 },
-            effects: { community: 15, legacy: 5 }
-          }
-        ]
+        requirements: { wood: 2, stone: 2, plants: 2 },
+        effects: { community: 15, culture: 10, legacy: 20 }
       },
       {
         id: 'fire_pit',
         nameKey: 'builder.b.fire',
         descKey: 'builder.b.fire_desc',
         name: 'Communal Fire Hearth',
-        description: 'Provides warmth, night security, cooked food, and a gathering place for oral traditions.',
+        description: 'A stone-ringed hearth fueled by seasoned hardwood and ignited with flint sparks for cooking, warmth, and night security.',
+        consequence: 'Detoxifies and softens tough wild tubers, keeps predators away at night, and brings the community together around shared stories.',
         icon: '🔥',
         terrain: 'land',
-        requirements: { wood: 1 },
-        effects: { food: 10, community: 10, culture: 5 },
-        choices: [
-          {
-            id: 'fire_pit_small',
-            label: 'Kindle Cooking Hearth',
-            desc: 'A focused fire for roasting roots and sharing warmth.',
-            requirements: { wood: 1 },
-            effects: { food: 10, community: 5 }
-          },
-          {
-            id: 'fire_pit_large',
-            label: 'Build Watchfire Ring',
-            desc: 'A stone-ringed hearth to ward off nocturnal predators.',
-            requirements: { wood: 1, stone: 1 },
-            effects: { community: 15, culture: 10 }
-          }
-        ]
+        requirements: { wood: 2, stone: 1, flint: 1 },
+        effects: { food: 15, community: 10, knowledge: 10 }
       },
       {
         id: 'tool_workshop',
         nameKey: 'builder.b.tools',
         descKey: 'builder.b.tools_desc',
         name: 'Stone Tool Knapping Area',
-        description: 'Dedicated riverside stone-working spot for shaping hand axes, scrapers, and microliths.',
+        description: 'Dedicated riverside stone-working spot for shaping quartzite hand axes, flint scrapers, and microlithic blades.',
+        consequence: 'Equips the community with sharp cutting, scraping, and digging tools that double foraging and building efficiency.',
         icon: '🪨',
         terrain: 'land',
-        requirements: { stone: 1 },
-        effects: { knowledge: 10, food: 10, community: 5 },
-        choices: [
-          {
-            id: 'tool_workshop_flint',
-            label: 'Knap Core Hand Axes',
-            desc: 'Shape heavy quartzite cobbles into multipurpose cutting tools.',
-            requirements: { stone: 1 },
-            effects: { food: 15, knowledge: 10 }
-          }
-        ]
+        requirements: { stone: 2, flint: 1 },
+        effects: { knowledge: 15, food: 10, community: 5 }
       }
     ]
   },
@@ -692,5 +654,10 @@ export const civilizationBuilderData = {
 };
 
 export const getBuilderDataForLevel = (levelId) => {
-  return civilizationBuilderData[levelId] || civilizationBuilderData[1];
+  const entry = civilizationBuilderData[levelId] || civilizationBuilderData[1];
+  return {
+    ...entry,
+    buildings: entry.availableBuildings || [],
+    availableBuildings: entry.availableBuildings || []
+  };
 };

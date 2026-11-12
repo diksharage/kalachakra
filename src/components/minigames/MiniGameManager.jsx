@@ -43,6 +43,7 @@ const MiniGameShell = ({ levelId, title, instructions, progressText, onClose, ch
 
 const ArtifactMatch = ({ config, onComplete, theme, ageGroup, setProgress }) => {
   const { t } = useLanguage();
+  const { playSound } = useAudio();
   const band = getBand(ageGroup);
   const [matches, setMatches] = useState({});
   const [selectedLeft, setSelectedLeft] = useState(null);
@@ -403,6 +404,7 @@ const HistoricalDecision = ({ config, onComplete, theme, ageGroup, setProgress }
 
 const TradeRoute = ({ config, onComplete, theme, ageGroup, setProgress }) => {
   const { t } = useLanguage();
+  const { playSound } = useAudio();
   const band = getBand(ageGroup);
   const [currentLeg, setCurrentLeg] = useState(0);
   const [failures, setFailures] = useState(0);

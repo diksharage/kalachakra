@@ -8,6 +8,7 @@ import LevelEngine from '../components/gameplay/LevelEngine';
 import { AlertTriangle } from 'lucide-react';
 
 const getLevelBackground = (levelId) => {
+  if (levelId === 1) return 'prehistoric_l1.jpg';
   if (levelId === 3) return 'indus.jpg';
   if (levelId === 4) return 'maritime.jpg';
   if (levelId >= 5 && levelId <= 7) return 'mauryan.jpg';
