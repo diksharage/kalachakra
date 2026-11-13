@@ -93,9 +93,9 @@ const ArtifactMatch = ({ config, onComplete, theme, ageGroup, setProgress }) => 
   }, [matches, activePairs.length, config, onComplete, errors, band]);
 
   return (
-    <div className="flex flex-col md:flex-row gap-6 w-full max-w-4xl mx-auto motion-safe:animate-fade-in">
-      <div className="flex-1 space-y-3">
-        {band === 'younger' && <div className="text-sm font-bold text-blue-400 mb-2 bg-blue-900/20 p-3 rounded-xl">{t('minigame.hint_match', "Hint: Look at the pictures to find the right match!")}</div>}
+    <div className="flex flex-col md:flex-row gap-4 sm:gap-6 w-full max-w-4xl mx-auto motion-safe:animate-fade-in">
+      <div className="flex-1 space-y-2.5 sm:space-y-3">
+        {band === 'younger' && <div className="text-xs sm:text-sm font-bold text-blue-400 mb-2 bg-blue-900/20 p-2.5 sm:p-3 rounded-xl">{t('minigame.hint_match', "Hint: Look at the pictures to find the right match!")}</div>}
         {leftItems.map(item => {
           const isMatched = matches[item.id];
           const isSelected = selectedLeft === item.id;
@@ -104,19 +104,19 @@ const ArtifactMatch = ({ config, onComplete, theme, ageGroup, setProgress }) => 
               key={'l-'+item.id}
               onClick={() => handleLeftClick(item.id)}
               disabled={isMatched}
-              className={`w-full p-4 rounded-xl border flex items-center gap-4 transition-all text-left focus:outline-none focus:ring-2 focus:ring-gold
+              className={`w-full min-h-[48px] p-3 sm:p-4 rounded-xl border flex items-center gap-3 sm:gap-4 transition-all text-left focus:outline-none focus:ring-2 focus:ring-gold
                 ${isMatched ? 'opacity-50 bg-green-900/20 border-green-500/30' : 
                   isSelected ? 'border-gold bg-gold/10 scale-[1.02] shadow-md' : 'bg-surface border-content/20 hover:border-gold/50 hover:bg-surface/50'}`}
             >
-              {band !== 'older' && <div className="text-3xl shrink-0">{item.icon}</div>}
-              <div className="font-bold flex-1 text-sm md:text-base">{adaptTextForAge(item.left, ageGroup)}</div>
-              {isMatched && <CheckCircle className="text-green-500 shrink-0" size={20} />}
+              {band !== 'older' && <div className="text-2xl sm:text-3xl shrink-0">{item.icon}</div>}
+              <div className="font-bold flex-1 text-xs sm:text-sm md:text-base leading-snug">{adaptTextForAge(item.left, ageGroup)}</div>
+              {isMatched && <CheckCircle className="text-green-500 shrink-0" size={18} />}
             </button>
           );
         })}
       </div>
-      <div className="flex-1 space-y-3">
-        {band === 'older' && <div className="text-sm font-bold text-red-400 mb-2 bg-red-900/20 p-3 rounded-xl border border-red-500/30 flex items-center gap-2"><AlertCircle size={16}/> {t('minigame.hard_mode', "Challenge Mode: Visual hints disabled. High accuracy required.")}</div>}
+      <div className="flex-1 space-y-2.5 sm:space-y-3">
+        {band === 'older' && <div className="text-xs sm:text-sm font-bold text-red-400 mb-2 bg-red-900/20 p-2.5 sm:p-3 rounded-xl border border-red-500/30 flex items-center gap-2"><AlertCircle size={16}/> {t('minigame.hard_mode', "Challenge Mode: Visual hints disabled. High accuracy required.")}</div>}
         {rightItems.map(item => {
           const isMatched = Object.values(matches).includes(item.id);
           const isErr = feedback?.id === item.id && feedback.type === 'incorrect';
@@ -126,15 +126,15 @@ const ArtifactMatch = ({ config, onComplete, theme, ageGroup, setProgress }) => 
               key={'r-'+item.id}
               onClick={() => handleRightClick(item.id)}
               disabled={isMatched}
-              className={`w-full p-4 rounded-xl border transition-all text-sm md:text-base flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-gold
+              className={`w-full min-h-[48px] p-3 sm:p-4 rounded-xl border transition-all text-xs sm:text-sm md:text-base flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-gold
                 ${isMatched ? 'opacity-50 bg-green-900/20 border-green-500/30' : 
                   isErr ? 'bg-red-900/20 border-red-500/50 motion-safe:animate-shake' :
                   selectedLeft ? 'bg-surface border-content/40 hover:border-gold hover:bg-gold/10 cursor-pointer shadow-sm' : 
                   'bg-surface/50 border-content/10 cursor-default opacity-80'}`}
             >
-              <span className="flex-1 text-left">{adaptTextForAge(item.right, ageGroup)}</span>
-              {isErr && <XCircle className="text-red-400 shrink-0 ml-3" size={18} />}
-              {isCorr && <CheckCircle className="text-green-400 shrink-0 ml-3" size={18} />}
+              <span className="flex-1 text-left leading-snug">{adaptTextForAge(item.right, ageGroup)}</span>
+              {isErr && <XCircle className="text-red-400 shrink-0 ml-2 sm:ml-3" size={18} />}
+              {isCorr && <CheckCircle className="text-green-400 shrink-0 ml-2 sm:ml-3" size={18} />}
             </button>
           );
         })}
@@ -200,9 +200,9 @@ const TimelineGame = ({ config, onComplete, theme, ageGroup, setProgress }) => {
       {band === 'younger' && <div className="text-sm font-bold text-blue-400 bg-blue-900/20 p-3 rounded-xl text-center mb-4">{t('minigame.hint_timeline', "Hint: Move the oldest event to the very top!")}</div>}
       {items.map((item, idx) => (
         <div key={item.id} className="flex items-center gap-4 bg-surface border border-content/20 p-3 md:p-4 rounded-xl hover:border-content/40 transition-colors">
-          <div className="flex flex-col gap-1 text-content/40">
-            <button aria-label="Move Up" disabled={idx === 0} onClick={() => moveItem(idx, 'up')} className="hover:text-gold disabled:opacity-30 p-1 focus:outline-none focus:text-gold">▲</button>
-            <button aria-label="Move Down" disabled={idx === items.length - 1} onClick={() => moveItem(idx, 'down')} className="hover:text-gold disabled:opacity-30 p-1 focus:outline-none focus:text-gold">▼</button>
+          <div className="flex flex-col gap-1 text-content/60">
+            <button aria-label="Move Up" disabled={idx === 0} onClick={() => moveItem(idx, 'up')} className="hover:text-gold disabled:opacity-20 p-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg bg-surface/50 border border-content/10 focus:outline-none focus:text-gold">▲</button>
+            <button aria-label="Move Down" disabled={idx === items.length - 1} onClick={() => moveItem(idx, 'down')} className="hover:text-gold disabled:opacity-20 p-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg bg-surface/50 border border-content/10 focus:outline-none focus:text-gold">▼</button>
           </div>
           <div className="flex-1 font-medium text-sm md:text-base leading-snug">{adaptTextForAge(item.label, ageGroup)}</div>
         </div>
@@ -570,7 +570,7 @@ const StrategyBoardGame = ({ config, onComplete, theme, ageGroup, setProgress })
         <div 
           key={`${r}-${c}`}
           onClick={() => handleCellClick(r, c)}
-          className={`w-12 h-12 md:w-16 md:h-16 flex items-center justify-center text-2xl md:text-3xl rounded transition-colors ${bgClass}`}
+          className={`w-9 h-9 sm:w-12 sm:h-12 md:w-16 md:h-16 flex items-center justify-center text-lg sm:text-2xl md:text-3xl rounded transition-colors ${bgClass}`}
         >
           {content}
         </div>

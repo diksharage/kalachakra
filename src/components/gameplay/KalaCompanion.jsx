@@ -143,11 +143,11 @@ const KalaCompanion = ({ stage, levelId, levelState, inventory, activeChallenge,
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end pointer-events-none">
+    <div className="fixed bottom-3 right-3 sm:bottom-4 sm:right-4 z-50 flex flex-col items-end pointer-events-none max-w-[calc(100vw-1.5rem)]">
       {/* KALA Speech Bubble (Contextual Auto-Guidance) */}
       {!isOpen && !dismissedBubble && messages.length > 0 && (
         <div
-          className="mb-3 bg-[#101519]/95 backdrop-blur-md p-3.5 rounded-2xl rounded-br-sm border border-[#D9A441]/50 shadow-2xl max-w-xs sm:max-w-sm pointer-events-auto cursor-pointer hover:border-[#D9A441] transition-all animate-fade-in"
+          className="mb-2 sm:mb-3 bg-[#101519]/95 backdrop-blur-md p-3 sm:p-3.5 rounded-2xl rounded-br-sm border border-[#D9A441]/50 shadow-2xl w-[calc(100vw-2rem)] sm:w-auto sm:max-w-sm pointer-events-auto cursor-pointer hover:border-[#D9A441] transition-all animate-fade-in"
           onClick={() => setIsOpen(true)}
         >
           <div className="flex items-center justify-between gap-2 mb-1">
@@ -161,9 +161,9 @@ const KalaCompanion = ({ stage, levelId, levelState, inventory, activeChallenge,
                 setDismissedBubble(true);
               }}
               aria-label="Dismiss KALA tip"
-              className="text-[#C5C9CC]/60 hover:text-[#F5F1E8] p-0.5"
+              className="text-[#C5C9CC]/60 hover:text-[#F5F1E8] p-1 -mr-1"
             >
-              <X size={13} />
+              <X size={14} />
             </button>
           </div>
           <p className="text-xs text-[#F5F1E8]/90 leading-relaxed line-clamp-3">
@@ -176,8 +176,8 @@ const KalaCompanion = ({ stage, levelId, levelState, inventory, activeChallenge,
       <div
         className={`bg-[#101519] border border-[#34302A] rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 pointer-events-auto ${
           isOpen
-            ? 'w-[330px] sm:w-[370px] h-[450px] opacity-100 scale-100 mb-3'
-            : 'w-0 h-0 opacity-0 scale-95'
+            ? 'w-[calc(100vw-2rem)] sm:w-[370px] max-w-[400px] h-[480px] max-h-[75vh] opacity-100 scale-100 mb-2 sm:mb-3'
+            : 'w-0 h-0 opacity-0 scale-95 pointer-events-none'
         }`}
       >
         <div className="bg-[#151B20] px-4 py-3 border-b border-[#34302A] flex justify-between items-center">

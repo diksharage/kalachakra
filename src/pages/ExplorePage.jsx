@@ -73,6 +73,7 @@ const ExplorePage = () => {
   const [viewMode, setViewMode] = useState('map'); // 'map' or 'list'
   const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'lifestyle', 'then_now', 'actions'
   const [enlargedImage, setEnlargedImage] = useState(null);
+  const [mobileLayersOpen, setMobileLayersOpen] = useState(false);
 
   // Active layers
   const [layers, setLayers] = useState({
@@ -363,8 +364,21 @@ const ExplorePage = () => {
 
       {/* MAIN ATLAS WORKSPACE (3-PANEL LAYOUT) */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+        {/* MOBILE LAYERS TOGGLE BAR (< lg) */}
+        <div className="lg:hidden px-4 py-2 bg-[#090C0F] border-b border-[#34302A] flex items-center justify-between shrink-0">
+          <button
+            type="button"
+            onClick={() => setMobileLayersOpen(o => !o)}
+            className="px-3 py-1.5 rounded-xl bg-gold/15 border border-gold/40 text-gold text-xs font-bold flex items-center gap-1.5 min-h-[36px]"
+          >
+            <Layers size={14} />
+            <span>Historical Layers & Context ({Object.values(layers).filter(Boolean).length}/6) {mobileLayersOpen ? '▲' : '▼'}</span>
+          </button>
+          <span className="text-[11px] text-[#C5C9CC] font-mono">{filteredLocations.length} Sites</span>
+        </div>
+
         {/* LEFT PANEL: HISTORICAL LAYERS & FILTERS */}
-        <aside className="w-full lg:w-72 bg-[#090C0F] border-b lg:border-b-0 lg:border-r border-[#34302A] p-4 flex flex-col gap-4 shrink-0 overflow-y-auto max-h-[240px] lg:max-h-full text-left">
+        <aside className={`${mobileLayersOpen ? 'flex' : 'hidden'} lg:flex w-full lg:w-72 bg-[#090C0F] border-b lg:border-b-0 lg:border-r border-[#34302A] p-4 flex-col gap-4 shrink-0 overflow-y-auto max-h-[260px] lg:max-h-full text-left z-20`}>
           {/* Layer toggles */}
           <div>
             <div className="text-xs uppercase tracking-widest text-gold font-bold flex items-center gap-1.5 mb-2">
@@ -800,10 +814,12 @@ const ExplorePage = () => {
 
         {/* RIGHT PANEL: SELECTED PLACE INFORMATION & RECONSTRUCTION DECK */}
         {selectedLoc && (
-          <aside className="w-full lg:w-96 bg-[#090C0F] border-t lg:border-t-0 lg:border-l border-[#34302A] flex flex-col shrink-0 shadow-2xl z-30 animate-fade-in max-h-[420px] lg:max-h-full overflow-hidden text-left">
+          <aside className="fixed inset-x-0 bottom-0 z-50 max-h-[82vh] lg:max-h-full lg:static lg:w-96 bg-[#090C0F] border-t-2 border-gold/40 lg:border-t-0 lg:border-l border-[#34302A] rounded-t-3xl lg:rounded-none flex flex-col shrink-0 shadow-2xl animate-fade-in overflow-hidden text-left">
+            {/* Mobile Handle Indicator */}
+            <div className="lg:hidden w-12 h-1 bg-content/25 rounded-full mx-auto my-2 shrink-0" />
             {/* Place Header */}
-            <div className="p-4 bg-[#101519] border-b border-[#34302A] relative flex items-start gap-3">
-              <span className="text-4xl p-2 rounded-xl bg-black/40 border border-[#34302A] shrink-0">
+            <div className="p-3.5 sm:p-4 bg-[#101519] border-b border-[#34302A] relative flex items-start gap-3">
+              <span className="text-3xl sm:text-4xl p-2 rounded-xl bg-black/40 border border-[#34302A] shrink-0">
                 {selectedLoc.icon}
               </span>
               <div className="flex-1 min-w-0 text-left">
@@ -814,12 +830,13 @@ const ExplorePage = () => {
                   <button
                     type="button"
                     onClick={() => setSelectedLoc(null)}
-                    className="text-[#C5C9CC] hover:text-gold transition-colors p-1"
+                    className="text-[#C5C9CC] hover:text-gold transition-colors p-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg hover:bg-surface/50"
+                    aria-label="Close place details"
                   >
-                    <X size={16} />
+                    <X size={18} />
                   </button>
                 </div>
-                <h2 className="text-lg font-serif font-bold text-[#F5F1E8] truncate mt-1">
+                <h2 className="text-base sm:text-lg font-serif font-bold text-[#F5F1E8] truncate mt-1">
                   {selectedLoc.name}
                 </h2>
                 <p className="text-[11px] text-[#C5C9CC] truncate">{selectedLoc.modernLocation}</p>

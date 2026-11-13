@@ -341,47 +341,47 @@ const ArtifactDiscoverer = ({ data, theme, ageGroup, onComplete, playSound }) =>
       </div>
 
       {!isFullyUncovered ? (
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-3 sm:gap-4">
           {/* Tool Selector Bar */}
-          <div className="flex items-center gap-3 bg-black/40 p-1.5 rounded-2xl border border-content/10">
+          <div className="flex items-center gap-2 bg-black/40 p-1.5 rounded-2xl border border-content/10 w-full max-w-sm justify-center">
             <button
               type="button"
               onClick={() => setActiveTool('trowel')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all min-h-[44px] ${
                 activeTool === 'trowel'
                   ? 'bg-gold text-[#070A0C] shadow-md'
                   : 'text-content/70 hover:text-content'
               }`}
             >
-              <Shovel size={14} /> ⛏️ Archaeological Trowel
+              <Shovel size={15} /> <span>⛏️ Trowel</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveTool('brush')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold transition-all min-h-[44px] ${
                 activeTool === 'brush'
                   ? 'bg-gold text-[#070A0C] shadow-md'
                   : 'text-content/70 hover:text-content'
               }`}
             >
-              <Brush size={14} /> 🖌️ Fine Excavation Brush
+              <Brush size={15} /> <span>🖌️ Brush</span>
             </button>
           </div>
 
-          {/* 3x3 Dig Trench Canvas (Inspired by User Image 2) */}
-          <div className="relative w-full max-w-sm aspect-square p-4 rounded-3xl border-4 border-[#3A2B1D] bg-gradient-to-b from-[#241A13] to-[#120D09] shadow-2xl flex flex-col items-center justify-center overflow-hidden">
+          {/* 3x3 Dig Trench Canvas */}
+          <div className="relative w-full max-w-[280px] sm:max-w-xs md:max-w-sm aspect-square p-2.5 sm:p-4 rounded-2xl sm:rounded-3xl border-4 border-[#3A2B1D] bg-gradient-to-b from-[#241A13] to-[#120D09] shadow-2xl flex flex-col items-center justify-center overflow-hidden">
             {/* Underlying Revealed Artifact in Center */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center pointer-events-none">
-              <span className="text-7xl md:text-8xl filter drop-shadow-[0_0_20px_rgba(217,164,65,0.4)] transition-all duration-700 animate-float">
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-4 sm:p-6 text-center pointer-events-none">
+              <span className="text-6xl sm:text-7xl md:text-8xl filter drop-shadow-[0_0_20px_rgba(217,164,65,0.4)] transition-all duration-700 animate-float">
                 {data.icon}
               </span>
-              <span className="text-sm font-bold text-gold mt-2 uppercase tracking-wider">
+              <span className="text-xs sm:text-sm font-bold text-gold mt-2 uppercase tracking-wider truncate max-w-full px-2">
                 {data.discoveryTitle || data.label}
               </span>
             </div>
 
             {/* Sediment Quadrant Tiles */}
-            <div className="grid grid-cols-3 grid-rows-3 w-full h-full gap-2 relative z-10">
+            <div className="grid grid-cols-3 grid-rows-3 w-full h-full gap-1.5 sm:gap-2 relative z-10">
               {Array.from({ length: TOTAL_QUADRANTS }, (_, idx) => {
                 const isCleared = excavatedCells.includes(idx);
                 return (
@@ -390,18 +390,19 @@ const ArtifactDiscoverer = ({ data, theme, ageGroup, onComplete, playSound }) =>
                     type="button"
                     onClick={() => handleDigCell(idx)}
                     disabled={isCleared}
-                    className={`rounded-xl border transition-all duration-500 relative flex items-center justify-center ${
+                    aria-label={`Excavate trench quadrant ${quadrantLabels[idx]}`}
+                    className={`rounded-xl border transition-all duration-500 relative flex items-center justify-center min-h-[44px] ${
                       isCleared
                         ? 'opacity-0 scale-90 pointer-events-none'
                         : 'bg-gradient-to-br from-[#4A3728] via-[#38281B] to-[#261A10] border-[#664C36] hover:border-gold hover:scale-102 shadow-md cursor-pointer'
                     }`}
                   >
                     {!isCleared && (
-                      <div className="flex flex-col items-center justify-center">
-                        <span className="text-xs font-bold text-amber-200/60 font-mono">
+                      <div className="flex flex-col items-center justify-center pointer-events-none">
+                        <span className="text-xs font-bold text-amber-200/70 font-mono">
                           {quadrantLabels[idx]}
                         </span>
-                        <span className="text-[10px] text-amber-300/40 uppercase tracking-tighter">
+                        <span className="text-[9px] text-amber-300/50 uppercase tracking-tighter">
                           {activeTool === 'trowel' ? 'Dig' : 'Brush'}
                         </span>
                       </div>
@@ -412,42 +413,42 @@ const ArtifactDiscoverer = ({ data, theme, ageGroup, onComplete, playSound }) =>
             </div>
           </div>
 
-          <div className="flex items-center justify-between w-full max-w-sm text-xs font-bold text-content/70">
-            <span>Tap each quadrant to excavate ({excavatedCells.length}/9)</span>
+          <div className="flex items-center justify-between w-full max-w-sm text-xs font-bold text-content/70 px-1">
+            <span>Tap quadrants to excavate ({excavatedCells.length}/9)</span>
             <button
               onClick={handleUncoverAll}
-              className="text-gold hover:underline uppercase tracking-wider"
+              className="text-gold hover:underline uppercase tracking-wider min-h-[44px] flex items-center"
             >
-              Clear Entire Trench →
+              Clear Trench →
             </button>
           </div>
         </div>
       ) : (
         /* Field Examination Table & Diagnostic Clue Identification */
         <div className="text-left space-y-4 animate-in fade-in duration-300">
-          <div className="bg-surface/80 border border-content/15 rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center">
-            <div className="w-24 h-24 rounded-2xl bg-black/40 border border-gold/30 flex items-center justify-center text-5xl shrink-0 shadow-lg">
+          <div className="bg-surface/80 border border-content/15 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row gap-3 sm:gap-4 items-center sm:items-start">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-black/40 border border-gold/30 flex items-center justify-center text-4xl sm:text-5xl shrink-0 shadow-lg">
               {data.icon}
             </div>
-            <div className="flex-1">
-              <div className="text-[11px] uppercase tracking-widest text-gold font-bold mb-1">
+            <div className="flex-1 text-center sm:text-left">
+              <div className="text-[10px] sm:text-[11px] uppercase tracking-widest text-gold font-bold mb-1">
                 Field Laboratory Analysis • Authenticated Artifact
               </div>
-              <h4 className="text-lg md:text-xl font-serif font-bold text-content mb-1">
+              <h4 className="text-base sm:text-lg md:text-xl font-serif font-bold text-content mb-1">
                 {data.discoveryTitle || data.label}
               </h4>
-              <p className="text-xs md:text-sm text-content/85 leading-relaxed">
+              <p className="text-xs sm:text-sm text-content/85 leading-relaxed">
                 {data.examinationNotes || (data.getDiscoverMessage ? data.getDiscoverMessage(ageGroup) : (data.discoverMessage || 'You uncovered significant prehistoric evidence here.'))}
               </p>
             </div>
           </div>
 
           {hasUseIdentification && (
-            <div className="bg-black/35 border border-gold/25 rounded-2xl p-4 space-y-3">
+            <div className="bg-black/35 border border-gold/25 rounded-2xl p-3 sm:p-4 space-y-3">
               <div className="text-xs font-bold uppercase tracking-wider text-gold flex items-center gap-1.5">
                 <Compass size={14} /> Clue Interpretation: Identify Object Use
               </div>
-              <p className="text-sm font-medium text-content/90">
+              <p className="text-xs sm:text-sm font-medium text-content/90">
                 {data.usePrompt || 'How did early human communities primarily use this discovery?'}
               </p>
               <div className="space-y-2">
@@ -464,7 +465,7 @@ const ArtifactDiscoverer = ({ data, theme, ageGroup, onComplete, playSound }) =>
                       key={idx}
                       type="button"
                       onClick={() => setSelectedUseIdx(idx)}
-                      className={`w-full text-left p-3.5 rounded-xl border text-xs md:text-sm font-semibold transition-all ${btnStyle}`}
+                      className={`w-full text-left p-3 sm:p-3.5 rounded-xl border text-xs sm:text-sm font-semibold transition-all min-h-[44px] flex items-center ${btnStyle}`}
                     >
                       {opt.label}
                     </button>
@@ -472,7 +473,7 @@ const ArtifactDiscoverer = ({ data, theme, ageGroup, onComplete, playSound }) =>
                 })}
               </div>
               {selectedOpt && (
-                <div className={`p-3 rounded-xl text-xs md:text-sm font-medium border ${selectedOpt.isCorrect ? 'bg-green-900/20 border-green-500/40 text-green-300' : 'bg-amber-900/20 border-amber-500/40 text-amber-200'}`}>
+                <div className={`p-3 rounded-xl text-xs sm:text-sm font-medium border ${selectedOpt.isCorrect ? 'bg-green-900/20 border-green-500/40 text-green-300' : 'bg-amber-900/20 border-amber-500/40 text-amber-200'}`}>
                   {selectedOpt.feedback}
                 </div>
               )}
@@ -495,7 +496,7 @@ const ArtifactDiscoverer = ({ data, theme, ageGroup, onComplete, playSound }) =>
           <button
             onClick={onComplete}
             disabled={!canCollect}
-            className={`px-6 py-3.5 font-bold rounded-xl w-full transition-all ${canCollect ? theme.button : 'bg-surface/40 text-content/40 border border-content/10 cursor-not-allowed'}`}
+            className={`min-h-[48px] px-6 py-3.5 font-bold rounded-xl w-full transition-all text-sm sm:text-base ${canCollect ? theme.button : 'bg-surface/40 text-content/40 border border-content/10 cursor-not-allowed'}`}
           >
             {canCollect ? 'Authenticate & Add to Collection →' : 'Select Correct Historical Use Above to Complete'}
           </button>
@@ -634,16 +635,16 @@ const ExplorePanel = ({ data, theme, ageGroup, isYoung, isReplay, playSound, upd
       </div>
 
       {/* Atmospheric Visual Environment Scene (Images 1 & 3) */}
-      <div className="relative w-full aspect-[16/9] md:aspect-[21/9] rounded-3xl overflow-hidden border-2 border-gold/30 shadow-2xl bg-gradient-to-b from-[#182026] via-[#10161C] to-[#0A0E12] flex items-center justify-center">
+      <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] md:aspect-[21/9] min-h-[220px] sm:min-h-[280px] rounded-2xl sm:rounded-3xl overflow-hidden border-2 border-gold/30 shadow-2xl bg-gradient-to-b from-[#182026] via-[#10161C] to-[#0A0E12] flex items-center justify-center">
         {/* Layered landscape background elements */}
         <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_30%_30%,rgba(217,164,65,0.25),transparent_60%)] pointer-events-none" />
         
         {/* Environmental Horizon & Terrain Ambience */}
         <div className="absolute bottom-0 inset-x-0 h-1/2 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
 
-        <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-content/15 text-xs text-content/90 flex items-center gap-2">
-          <Eye size={13} className="text-gold animate-pulse" />
-          <span>Tap environmental beacons across the landscape to investigate and gather resources</span>
+        <div className="absolute top-2.5 sm:top-4 left-2.5 sm:left-4 bg-black/75 backdrop-blur-md px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl border border-content/15 text-[10px] sm:text-xs text-content/90 flex items-center gap-1.5 max-w-[90%] sm:max-w-none">
+          <Eye size={13} className="text-gold animate-pulse shrink-0" />
+          <span className="truncate sm:whitespace-normal">Tap beacons across the landscape to investigate and gather resources</span>
         </div>
 
         {/* Environmental Hotspot Beacons placed across the landscape */}
@@ -668,7 +669,7 @@ const ExplorePanel = ({ data, theme, ageGroup, isYoung, isReplay, playSound, upd
                 {!isFound && (
                   <span className="absolute -inset-2 rounded-full border-2 border-gold/60 animate-ping opacity-75 pointer-events-none" />
                 )}
-                <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-2xl md:text-3xl shadow-2xl border-2 transition-all ${
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl sm:text-2xl md:text-3xl shadow-2xl border-2 transition-all min-h-[40px] min-w-[40px] ${
                   isFound
                     ? 'bg-green-950/80 border-green-500/80 text-green-300'
                     : isSelected
@@ -677,7 +678,7 @@ const ExplorePanel = ({ data, theme, ageGroup, isYoung, isReplay, playSound, upd
                 }`}>
                   {isFound ? '✓' : disc.icon}
                 </div>
-                <span className={`mt-1.5 px-2.5 py-0.5 rounded-lg text-[10px] md:text-xs font-bold uppercase tracking-wider whitespace-nowrap shadow-md ${
+                <span className={`mt-1 px-2 py-0.5 rounded-lg text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider max-w-[85px] sm:max-w-none truncate shadow-md ${
                   isFound
                     ? 'bg-green-900/80 text-green-300 border border-green-500/40'
                     : 'bg-black/80 text-content border border-content/20 group-hover:border-gold'
@@ -700,37 +701,37 @@ const ExplorePanel = ({ data, theme, ageGroup, isYoung, isReplay, playSound, upd
           : 'Environmental Observation';
 
         return (
-          <div className="bg-surface/90 border-2 border-gold/40 rounded-2xl p-4 md:p-5 shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-300 text-left space-y-3">
-            <div className="flex items-start justify-between gap-3">
+          <div className="bg-surface/90 border-2 border-gold/40 rounded-2xl p-3.5 sm:p-5 shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-300 text-left space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <span className="text-4xl p-2 rounded-xl bg-black/40 border border-content/10">
+                <span className="text-3xl sm:text-4xl p-2 rounded-xl bg-black/40 border border-content/10 shrink-0">
                   {disc.icon}
                 </span>
-                <div>
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-gold">
+                <div className="min-w-0">
+                  <div className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gold">
                     {disc.examineTitle || 'Field Inspection'}
                   </div>
-                  <h4 className="text-base md:text-lg font-bold text-[#F5F1E8]">
+                  <h4 className="text-sm sm:text-base md:text-lg font-bold text-[#F5F1E8] truncate">
                     {disc.label}
                   </h4>
                 </div>
               </div>
               {isFound ? (
-                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-green-400 bg-green-900/30 border border-green-500/30 px-3 py-1.5 rounded-xl">
+                <span className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-green-400 bg-green-900/30 border border-green-500/30 px-3 py-2 rounded-xl min-h-[44px]">
                   <CheckCircle size={14} /> Collected ✓
                 </span>
               ) : (
                 <button
                   type="button"
                   onClick={() => handleHarvest(disc)}
-                  className="px-5 py-2.5 rounded-xl bg-[#D9A441] text-[#070A0C] font-extrabold text-xs md:text-sm hover:bg-[#D9A441]/90 transition-all shadow-lg shrink-0"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#D9A441] text-[#070A0C] font-extrabold text-xs sm:text-sm hover:bg-[#D9A441]/90 transition-all shadow-lg shrink-0 min-h-[44px] flex items-center justify-center"
                 >
                   Harvest & Gather ({rewardLabel}) →
                 </button>
               )}
             </div>
 
-            <p className="text-xs md:text-sm text-content/90 leading-relaxed bg-black/30 p-3 rounded-xl border border-content/10">
+            <p className="text-xs sm:text-sm text-content/90 leading-relaxed bg-black/30 p-3 rounded-xl border border-content/10">
               <strong className="text-gold">Survival & Historical Insight: </strong>
               {disc.whyUseful || disc.feedback}
             </p>
@@ -791,84 +792,95 @@ const VisualStoryViewer = ({ story, theme, onComplete, playSound }) => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center justify-start h-full max-w-5xl mx-auto overflow-y-auto hide-scrollbar p-2">
-      <div className="w-full flex justify-between items-center mb-6">
-        <h4 className="text-sm font-bold uppercase tracking-widest text-gold">Visual Learning</h4>
+    <div className="w-full flex flex-col items-center justify-start h-full max-w-5xl mx-auto overflow-y-auto hide-scrollbar p-2 sm:p-4">
+      <div className="w-full flex justify-between items-center mb-4 sm:mb-6">
+        <h4 className="text-xs sm:text-sm font-bold uppercase tracking-widest text-gold">Visual Learning</h4>
         <div className="flex gap-2">
           {story.map((_, idx) => (
-            <div key={idx} className={"w-3 h-3 rounded-full transition-colors " + (idx === currentIndex ? 'bg-gold' : idx < currentIndex ? 'bg-gold/50' : 'bg-surface border border-content/20')} />
+            <div key={idx} className={"w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-colors " + (idx === currentIndex ? 'bg-gold' : idx < currentIndex ? 'bg-gold/50' : 'bg-surface border border-content/20')} />
           ))}
         </div>
       </div>
 
-      <div className={"w-full bg-surface border rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row transition-all duration-500 " + (theme?.border || 'border-content/10')}>
-        <div className="w-full md:w-1/2 relative bg-black/40 min-h-[300px] flex items-center justify-center p-4 border-b md:border-b-0 md:border-r border-content/10">
+      <div className={"w-full bg-surface border rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row transition-all duration-500 " + (theme?.border || 'border-content/10')}>
+        <div className="w-full md:w-1/2 relative bg-black/50 h-52 sm:h-64 md:h-auto min-h-[200px] md:min-h-[320px] flex items-center justify-center p-3 sm:p-4 border-b md:border-b-0 md:border-r border-content/10 shrink-0">
           {slide.image ? (
             <>
-              {!imageLoaded && <div className="absolute inset-0 flex items-center justify-center animate-pulse"><div className="w-12 h-12 border-4 border-gold border-t-transparent rounded-full animate-spin" /></div>}
+              {!imageLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center animate-pulse">
+                  <div className="w-10 h-10 border-4 border-gold border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
               <img 
                 src={slide.image} 
                 alt={slide.title}
                 onLoad={() => setImageLoaded(true)}
-                className={"w-full h-full object-contain max-h-[400px] transition-opacity duration-500 " + (imageLoaded ? 'opacity-100' : 'opacity-0')}
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  setImageLoaded(true);
+                }}
+                className={"w-full h-full object-contain max-h-[360px] transition-opacity duration-500 " + (imageLoaded ? 'opacity-100' : 'opacity-0')}
               />
               {slide.focusPoint && (
-                <div className="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md p-3 rounded-xl border border-gold/30 text-xs text-content/90 flex gap-2 items-start shadow-xl animate-fade-in delay-500">
+                <div className="absolute bottom-3 left-3 right-3 bg-black/85 backdrop-blur-md p-2.5 rounded-xl border border-gold/30 text-[11px] sm:text-xs text-content/90 flex gap-2 items-start shadow-xl animate-fade-in delay-500">
                   <div className="w-4 h-4 text-gold shrink-0 mt-0.5">🔍</div>
-                  <p>{slide.focusPoint}</p>
+                  <p className="line-clamp-2 sm:line-clamp-none">{slide.focusPoint}</p>
                 </div>
               )}
             </>
           ) : (
-            <div className="text-8xl md:text-9xl animate-float opacity-80 filter drop-shadow-2xl">
+            <div className="text-7xl sm:text-8xl md:text-9xl animate-float opacity-80 filter drop-shadow-2xl">
               {slide.icon || '🏛️'}
             </div>
           )}
         </div>
 
-        <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-surface-light rounded-full text-xs font-bold uppercase tracking-wider text-content/70 mb-4 self-start">
-            <span className="w-3 h-3">📖</span> {slide.type || 'History'}
-          </div>
-          
-          <h3 className="text-2xl md:text-3xl font-serif font-bold mb-4 leading-tight text-content">{slide.title}</h3>
-          <p className="text-base md:text-lg text-content/90 leading-relaxed mb-6 flex-1">{slide.text}</p>
-          
-          <div className="space-y-3 mb-8">
-            {slide.evidence && (
-              <div className="flex gap-3 items-start bg-green-900/20 border border-green-500/30 p-3 rounded-xl text-sm">
-                <CheckCircle className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-bold text-green-300 block mb-0.5">Evidence:</span>
-                  <span className="text-green-100/80">{slide.evidence}</span>
-                </div>
-              </div>
-            )}
+        <div className="w-full md:w-1/2 p-4 sm:p-6 md:p-8 flex flex-col justify-between">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-surface-light rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider text-content/70 mb-3 sm:mb-4 self-start">
+              <span className="w-3 h-3">📖</span> {slide.type || 'History'}
+            </div>
             
-            {slide.uncertainty && (
-              <div className="flex gap-3 items-start bg-amber-900/20 border border-amber-500/30 p-3 rounded-xl text-sm">
-                <span className="w-5 h-5 text-amber-400 shrink-0 mt-0.5 font-bold text-lg leading-none">⚠</span>
-                <div>
-                  <span className="font-bold text-amber-300 block mb-0.5">Uncertainty:</span>
-                  <span className="text-amber-100/80">{slide.uncertainty}</span>
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-serif font-bold mb-2 sm:mb-4 leading-tight text-content">{slide.title}</h3>
+            <p className="text-sm sm:text-base text-content/90 leading-relaxed mb-4 sm:mb-6">{slide.text}</p>
+            
+            <div className="space-y-2.5 mb-6">
+              {slide.evidence && (
+                <div className="flex gap-2.5 items-start bg-green-900/20 border border-green-500/30 p-2.5 sm:p-3 rounded-xl text-xs sm:text-sm">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-green-300 block mb-0.5">Evidence:</span>
+                    <span className="text-green-100/80">{slide.evidence}</span>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+              
+              {slide.uncertainty && (
+                <div className="flex gap-2.5 items-start bg-amber-900/20 border border-amber-500/30 p-2.5 sm:p-3 rounded-xl text-xs sm:text-sm">
+                  <span className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 shrink-0 mt-0.5 font-bold text-base sm:text-lg leading-none">⚠</span>
+                  <div>
+                    <span className="font-bold text-amber-300 block mb-0.5">Uncertainty:</span>
+                    <span className="text-amber-100/80">{slide.uncertainty}</span>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
           
-          <div className="flex gap-3 mt-auto">
+          <div className="flex gap-3 pt-2">
             <button 
               onClick={handlePrev}
               disabled={currentIndex === 0}
-              className="p-4 rounded-xl border border-content/10 hover:bg-surface/50 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+              aria-label="Previous Slide"
+              className="min-w-[48px] min-h-[48px] p-3 rounded-xl border border-content/10 hover:bg-surface/50 disabled:opacity-30 disabled:pointer-events-none transition-colors flex items-center justify-center text-lg font-bold"
             >
-              {'<'}
+              ‹
             </button>
             <button 
               onClick={handleNext}
-              className={"flex-1 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all " + (isLast ? 'bg-green-600 text-white hover:bg-green-500' : 'bg-gold text-black hover:bg-gold-light')}
+              className={"flex-1 min-h-[48px] p-3 sm:p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all text-sm sm:text-base shadow-md " + (isLast ? 'bg-green-600 text-white hover:bg-green-500' : 'bg-gold text-black hover:bg-gold-light')}
             >
-              {isLast ? 'Complete Learning' : 'Next Insight'}
+              {isLast ? 'Complete Learning' : 'Next Insight →'}
             </button>
           </div>
         </div>
@@ -1274,7 +1286,7 @@ const Stage5Builder = ({ config, theme, levelState, setLevelState, resources, up
           </div>
 
           {/* 4x4 Settlement Grid Canvas */}
-          <div className="grid grid-cols-4 gap-3 aspect-square max-w-md mx-auto w-full p-3 rounded-2xl bg-[#090C0F] border-2 border-content/20 shadow-inner">
+          <div className="grid grid-cols-4 gap-1.5 sm:gap-3 aspect-square max-w-[320px] sm:max-w-md mx-auto w-full p-2 sm:p-3 rounded-2xl bg-[#090C0F] border-2 border-content/20 shadow-inner">
             {Array.from({ length: 16 }, (_, idx) => {
               const isWater = (builderConfig.waterTiles || [2, 6, 10, 14]).includes(idx);
               const isCellBuilt = idx < currentBuilt.length;
@@ -1287,7 +1299,8 @@ const Stage5Builder = ({ config, theme, levelState, setLevelState, resources, up
                   key={idx}
                   type="button"
                   onClick={() => selectedBuilding && handleConstruct(selectedBuilding)}
-                  className={`relative rounded-xl border flex flex-col items-center justify-center p-2 transition-all duration-300 group ${
+                  aria-label={`Settlement plot ${idx + 1}: ${isCellBuilt ? (buildingAtCell?.name || 'Built') : isWater ? 'River water access' : 'Open plot'}`}
+                  className={`relative rounded-xl border flex flex-col items-center justify-center p-1 sm:p-2 min-h-[48px] transition-all duration-300 group ${
                     isCellBuilt
                       ? 'bg-green-950/40 border-green-500/60 shadow-lg'
                       : isWater
@@ -1295,11 +1308,11 @@ const Stage5Builder = ({ config, theme, levelState, setLevelState, resources, up
                       : 'bg-[#151B20]/80 border-content/15 hover:border-gold hover:bg-[#1A2228]'
                   }`}
                 >
-                  <span className="text-3xl md:text-4xl transition-transform group-hover:scale-110">
+                  <span className="text-2xl sm:text-3xl md:text-4xl transition-transform group-hover:scale-110">
                     {isCellBuilt ? (buildingAtCell?.icon || '⛺') : isWater ? '💧' : '🌿'}
                   </span>
-                  <span className="text-[10px] font-bold text-content/70 mt-1 truncate max-w-full">
-                    {isCellBuilt ? (buildingAtCell?.name || 'Built') : isWater ? 'River' : `Plot ${idx + 1}`}
+                  <span className="text-[9px] sm:text-[10px] font-bold text-content/70 mt-0.5 sm:mt-1 truncate max-w-full">
+                    {isCellBuilt ? (buildingAtCell?.name || 'Built') : isWater ? 'River' : `P${idx + 1}`}
                   </span>
                   {isCellBuilt && (
                     <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-green-400" />
@@ -1626,6 +1639,7 @@ const LevelEngine = ({ config }) => {
 
   const [lockToast, setLockToast] = useState(null);
   const [buildChoice, setBuildChoice] = useState(null);
+  const [mobileTrackerOpen, setMobileTrackerOpen] = useState(false);
 
 
 
@@ -2010,14 +2024,14 @@ const LevelEngine = ({ config }) => {
     if (type === 'explore') return null;
 
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-        <div className={"glass-panel relative rounded-2xl w-full max-h-[90vh] overflow-y-auto border shadow-2xl text-center flex flex-col " + theme.border + (type === 'challenge' && data.format === 'minigame' ? " max-w-4xl p-0" : " max-w-xl p-5 md:p-8")}>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-sm animate-fade-in">
+        <div className={"glass-panel relative rounded-2xl sm:rounded-3xl w-full max-h-[94vh] sm:max-h-[90vh] overflow-y-auto border shadow-2xl text-center flex flex-col " + theme.border + (type === 'challenge' && data.format === 'minigame' ? " max-w-4xl p-0" : " max-w-2xl lg:max-w-3xl p-4 sm:p-6 md:p-8")}>
 
           {type !== 'challenge' || data.format !== 'minigame' ? (
             <button
               type="button"
               onClick={() => setLevelState(prev => ({ ...prev, activePopup: null }))}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-surface/80 border border-content/20 hover:border-gold text-content/70 hover:text-gold flex items-center justify-center text-sm font-bold z-10"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 w-10 h-10 min-w-[40px] min-h-[40px] rounded-full bg-surface/90 border border-content/20 hover:border-gold text-content/70 hover:text-gold flex items-center justify-center text-base font-bold z-20 transition-colors shadow-md"
               aria-label="Close modal"
             >
               ✕
@@ -2482,56 +2496,116 @@ const LevelEngine = ({ config }) => {
       </div>
 
       {/* 2. MAIN LAYOUT (Sidebar + Map) */}
-      <div className="flex flex-col md:flex-row gap-6 flex-1 overflow-y-auto md:overflow-hidden">
+      <div className="flex flex-col lg:flex-row gap-4 md:gap-6 flex-1 min-h-0 overflow-y-auto lg:overflow-hidden">
         
-        {/* SIDEBAR */}
-        <div className="w-full md:w-80 flex flex-col gap-4 shrink-0 max-h-[35vh] md:max-h-none overflow-y-auto hide-scrollbar">
-          
-          {stage < 6 && (
-              <ObjectiveTracker 
-                stage={stage} 
-                levelState={levelState} 
-                locations={locations} 
-                targetExplore={targetExplore} 
-                targetDiscover={targetDiscover} 
-                targetLearn={targetLearn} 
-                targetChallenges={targetChallenges} 
-                targetBuilds={targetBuilds} 
-                allChallenges={allChallenges} 
-                buildActions={buildActions} 
-                handleLocationClick={handleLocationClick} 
-                startChallenge={startChallenge} 
-                setBuilderPopup={(bAction) => {
-                  setBuildChoice(bAction.choices ? bAction.choices[0].id : null);
-                  setLevelState(prev => ({ ...prev, activePopup: { type: 'confirm_build', data: bAction } }));
-                }}
-                theme={theme} 
-              />
-            )}
-            
-            <div className={"glass-panel p-5 rounded-2xl border " + theme.border}>
-              <p className="text-xs uppercase text-content/50 mb-3 font-bold tracking-wider">Resources Available</p>
-              <div className="flex gap-2 flex-wrap">
-                {(() => {
-                  const unbuilt = buildActions.filter(b => !builtItems.includes(b.id));
-                  const totalReqs = {};
-                  unbuilt.forEach(b => {
-                    if (b.requirements) {
-                      Object.entries(b.requirements).forEach(([rk, rv]) => {
-                        totalReqs[rk] = (totalReqs[rk] || 0) + rv;
-                      });
-                    }
-                  });
-                  return Object.entries(resources).map(([k, v]) => (
-                    <ResourceCard key={k} type={k} value={v} required={totalReqs[k]} theme={theme} />
-                  ));
-                })()}
+        {/* MOBILE / TABLET OBJECTIVES ACCORDION (< lg) */}
+        <div className="lg:hidden glass-panel p-3 rounded-2xl border border-content/15 flex flex-col gap-2.5 transition-all shrink-0">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 truncate">
+              <span className="text-xs font-bold uppercase tracking-wider text-gold">🎯 Stage {stage}:</span>
+              <span className="text-xs text-content/90 font-medium truncate">{stagesData.find(s => s.id === stage)?.label || 'Objectives'} ({stagesData.find(s => s.id === stage)?.current || 0}/{stagesData.find(s => s.id === stage)?.max || 0})</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setMobileTrackerOpen(o => !o)}
+              className="px-3 py-1.5 rounded-xl bg-gold/15 border border-gold/40 text-gold text-xs font-bold flex items-center gap-1.5 shrink-0 min-h-[40px] hover:bg-gold/25 transition-colors"
+            >
+              <span>{mobileTrackerOpen ? 'Hide Objectives ▲' : 'View Objectives & Resources ▼'}</span>
+            </button>
+          </div>
+          {mobileTrackerOpen && (
+            <div className="flex flex-col gap-3 pt-2 border-t border-content/10 max-h-[50vh] overflow-y-auto animate-fade-in">
+              {stage < 6 && (
+                <ObjectiveTracker 
+                  stage={stage} 
+                  levelState={levelState} 
+                  locations={locations} 
+                  targetExplore={targetExplore} 
+                  targetDiscover={targetDiscover} 
+                  targetLearn={targetLearn} 
+                  targetChallenges={targetChallenges} 
+                  targetBuilds={targetBuilds} 
+                  allChallenges={allChallenges} 
+                  buildActions={buildActions} 
+                  handleLocationClick={handleLocationClick} 
+                  startChallenge={startChallenge} 
+                  setBuilderPopup={(bAction) => {
+                    setBuildChoice(bAction.choices ? bAction.choices[0].id : null);
+                    setLevelState(prev => ({ ...prev, activePopup: { type: 'confirm_build', data: bAction } }));
+                  }}
+                  theme={theme} 
+                />
+              )}
+              <div className={"glass-panel p-4 rounded-2xl border " + theme.border}>
+                <p className="text-xs uppercase text-content/50 mb-2 font-bold tracking-wider">Resources Available</p>
+                <div className="flex gap-2 flex-wrap">
+                  {(() => {
+                    const unbuilt = buildActions.filter(b => !builtItems.includes(b.id));
+                    const totalReqs = {};
+                    unbuilt.forEach(b => {
+                      if (b.requirements) {
+                        Object.entries(b.requirements).forEach(([rk, rv]) => {
+                          totalReqs[rk] = (totalReqs[rk] || 0) + rv;
+                        });
+                      }
+                    });
+                    return Object.entries(resources).map(([k, v]) => (
+                      <ResourceCard key={k} type={k} value={v} required={totalReqs[k]} theme={theme} />
+                    ));
+                  })()}
+                </div>
               </div>
             </div>
+          )}
+        </div>
+
+        {/* DESKTOP PERMANENT SIDEBAR (>= lg) */}
+        <div className="hidden lg:flex lg:w-80 flex-col gap-4 shrink-0 overflow-y-auto hide-scrollbar">
+          {stage < 6 && (
+            <ObjectiveTracker 
+              stage={stage} 
+              levelState={levelState} 
+              locations={locations} 
+              targetExplore={targetExplore} 
+              targetDiscover={targetDiscover} 
+              targetLearn={targetLearn} 
+              targetChallenges={targetChallenges} 
+              targetBuilds={targetBuilds} 
+              allChallenges={allChallenges} 
+              buildActions={buildActions} 
+              handleLocationClick={handleLocationClick} 
+              startChallenge={startChallenge} 
+              setBuilderPopup={(bAction) => {
+                setBuildChoice(bAction.choices ? bAction.choices[0].id : null);
+                setLevelState(prev => ({ ...prev, activePopup: { type: 'confirm_build', data: bAction } }));
+              }}
+              theme={theme} 
+            />
+          )}
+          
+          <div className={"glass-panel p-5 rounded-2xl border " + theme.border}>
+            <p className="text-xs uppercase text-content/50 mb-3 font-bold tracking-wider">Resources Available</p>
+            <div className="flex gap-2 flex-wrap">
+              {(() => {
+                const unbuilt = buildActions.filter(b => !builtItems.includes(b.id));
+                const totalReqs = {};
+                unbuilt.forEach(b => {
+                  if (b.requirements) {
+                    Object.entries(b.requirements).forEach(([rk, rv]) => {
+                      totalReqs[rk] = (totalReqs[rk] || 0) + rv;
+                    });
+                  }
+                });
+                return Object.entries(resources).map(([k, v]) => (
+                  <ResourceCard key={k} type={k} value={v} required={totalReqs[k]} theme={theme} />
+                ));
+              })()}
+            </div>
+          </div>
         </div>
 
         {/* MAP / INTERACTIVE AREA */}
-        <div className={"flex-1 rounded-2xl border relative flex flex-col overflow-hidden " + theme.border + " " + theme.bg + "/10 backdrop-blur-sm"}>
+        <div className={"flex-1 rounded-2xl border relative flex flex-col overflow-hidden min-h-[360px] " + theme.border + " " + theme.bg + "/10 backdrop-blur-sm"}>
           
           {stage === 6 && activePopup?.type !== 'reward' ? (
              <div className="relative h-full p-6 md:p-8 flex flex-col items-center justify-center z-10 animate-fade-in text-center overflow-y-auto w-full">
@@ -2800,7 +2874,7 @@ const LevelEngine = ({ config }) => {
                       onClick={() => handleLocationClick(loc)}
                       disabled={!isClickable}
                       aria-label={`Map Node: ${loc.label}. ${!isClickable ? 'Completed' : 'Click to interact'}`}
-                      className={"relative flex flex-col items-center justify-center w-32 h-32 md:w-40 md:h-40 rounded-2xl border-2 transition-all group p-3 " +
+                      className={"relative flex flex-col items-center justify-center w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-2xl border-2 transition-all group p-2.5 sm:p-3 min-h-[44px] min-w-[44px] " +
                         (isLearned ? theme.bg + "/85 border-green-500/50" : isDiscovered ? theme.bg + "/80 " + theme.border : isExplored ? theme.bg + "/50 border-gold/40" : "bg-surface/75 border-content/20") + " " +
                         (isClickable ? 'hover:border-gold hover:scale-105 shadow-xl cursor-pointer' : 'opacity-85 cursor-default')
                       }
